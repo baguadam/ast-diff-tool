@@ -16,8 +16,8 @@
         <!--Left side for project settings, visible on each view-->
         <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="5">
             <StackPanel Background="#ebecf0">
-                <Button Content="Load Compilation Database" Margin="10" Height="30"/>
-                <Button Content="Load saved project" Margin="10" Height="30"/>
+                <Button Content="Load Compilation Database" Margin="10" Height="30" ToolTip="Click to load the compilation database"/>
+                <Button Content="Load saved project" Margin="10" Height="30" ToolTip="Click to load a saved project"/>
 
                 <Border BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
                     <StackPanel>
@@ -38,7 +38,8 @@
                         <TextBlock Text="Project settings" FontWeight="Bold" FontSize="14" HorizontalAlignment="Left" Margin="5, 20, 0, 0"/>
                         <CheckBox Content="Store assembly code" FontSize="13" Margin="5, 10, 0, 0"/>
                         <CheckBox Content="Store preprocessed code" FontSize="13" Margin="5, 10, 0, 0"/>
-                        <Button Content="Compile project" Margin="10, 30, 10, 10" Height="30"/>
+                        
+                        <Button Content="Compile project" Margin="10, 30, 10, 10" Height="30" ToolTip="Click to compile your project"/>
                     </StackPanel>
                 </Border>
             </StackPanel>
