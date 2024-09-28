@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASTDiffTool.Models", "ASTDi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASTDiffTool.ViewModels", "ASTDiffTool.ViewModels\ASTDiffTool.ViewModels.csproj", "{5CC9367C-BF5A-45C2-B4A7-4FD32461E52F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASTDiffTool.Views", "ASTDiffTool.Views\ASTDiffTool.Views.csproj", "{0BF44EDB-14C3-4073-B49D-6AA4A1A85F0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{5CC9367C-BF5A-45C2-B4A7-4FD32461E52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CC9367C-BF5A-45C2-B4A7-4FD32461E52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CC9367C-BF5A-45C2-B4A7-4FD32461E52F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BF44EDB-14C3-4073-B49D-6AA4A1A85F0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BF44EDB-14C3-4073-B49D-6AA4A1A85F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BF44EDB-14C3-4073-B49D-6AA4A1A85F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BF44EDB-14C3-4073-B49D-6AA4A1A85F0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
