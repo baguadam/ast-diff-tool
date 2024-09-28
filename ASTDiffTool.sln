@@ -4,6 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASTDiffTool", "ASTDiffTool\ASTDiffTool.csproj", "{1743543A-AC97-4290-AD66-C033DE906C23}"
+	ProjectSection(ProjectDependencies) = postProject
+		{440BAB9E-E30A-4D89-A005-133FA32269F3} = {440BAB9E-E30A-4D89-A005-133FA32269F3}
+		{5CC9367C-BF5A-45C2-B4A7-4FD32461E52F} = {5CC9367C-BF5A-45C2-B4A7-4FD32461E52F}
+		{F62CD271-2E00-4A4B-8EFF-FA60BF751149} = {F62CD271-2E00-4A4B-8EFF-FA60BF751149}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E546901E-6A31-403D-B560-9A77DADC6133}"
 	ProjectSection(SolutionItems) = preProject

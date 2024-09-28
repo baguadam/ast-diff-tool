@@ -8,4 +8,10 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ASTDiffTool.Models\ASTDiffTool.Models.csproj" />
+    <ProjectReference Include="..\ASTDiffTool.ViewModels\ASTDiffTool.ViewModels.csproj" />
+    <ProjectReference Include="..\ASTDiffTool.Views\ASTDiffTool.Views.csproj" />
+  </ItemGroup>
+
 </Project>
