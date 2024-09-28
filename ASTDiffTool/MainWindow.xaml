@@ -54,10 +54,12 @@
 
                 <!--Contains main info/navigation buttons + statistics-->
                 <Border Grid.Row="0" BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
+                    <!--The content will be displayed based on the events and clicked buttons-->
                 </Border>
 
                 <!--Contains the codes for the asts, preprocessed codes or source codes-->
                 <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
+                    <!--The content will be displayed based on the events and clicked buttons-->
                 </Border>
             </Grid>
         </Border>
