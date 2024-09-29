@@ -27,15 +27,13 @@
                     <StackPanel>
                         <TextBlock Text="Select C++ standards for compilation" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="2, 10, 2, 2" />
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-                            <ComboBox Margin="0, 0, 20, 0" SelectedIndex="{Binding FirstSelectedStandard}">
-                                <ComboBoxItem Content="C++98"/>
-                                <ComboBoxItem Content="C++03"/>
-                                <ComboBoxItem Content="C++11"/>
+                            <ComboBox Margin="0, 0, 20, 0" 
+                                      ItemsSource="{Binding AvailableStandardsForFirstCombo}"
+                                      SelectedIndex="{Binding FirstSelectedStandard}">
                             </ComboBox>
-                            <ComboBox Margin="20, 0, 0, 0" SelectedIndex="{Binding SecondSelectedStandard}">
-                                <ComboBoxItem Content="C++98"/>
-                                <ComboBoxItem Content="C++03"/>
-                                <ComboBoxItem Content="C++11"/>
+                            <ComboBox Margin="20, 0, 0, 0"
+                                      ItemsSource="{Binding AvailableStandardsForSecondCombo}"
+                                      SelectedIndex="{Binding SecondSelectedStandard}">
                             </ComboBox>
                         </StackPanel>
 
