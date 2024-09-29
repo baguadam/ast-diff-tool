@@ -39,11 +39,14 @@
                         </StackPanel>
 
                         <TextBlock Text="Project settings" FontWeight="Bold" FontSize="14" HorizontalAlignment="Left" Margin="5, 20, 0, 0"/>
-                        <CheckBox Content="Store assembly code" FontSize="13" Margin="5, 10, 0, 0"/>
-                        <CheckBox Content="Store preprocessed code" FontSize="13" Margin="5, 10, 0, 0"/>
+                        <CheckBox Content="Store assembly code" FontSize="13" Margin="5, 10, 0, 0"
+                                  IsChecked="{Binding IsStoreAssemblyChecked, Mode=TwoWay}"/>
+                        <CheckBox Content="Store preprocessed code" FontSize="13" Margin="5, 10, 0, 0"
+                                  IsChecked="{Binding IsStorePreprocessedCodeChecked, Mode=TwoWay}"/>
                         
                         <Button Content="Compile project" Margin="10, 30, 10, 10" Height="30" 
                                 ToolTip="Click to compile your project"
+                                IsEnabled="{Binding HasSelectedFile}"
                                 Command="{Binding CompileProjectCommand}"/>
                     </StackPanel>
                 </Border>

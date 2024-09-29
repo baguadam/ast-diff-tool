@@ -14,25 +14,59 @@ namespace ASTDiffTool.ViewModels
     public partial class MainViewModel : ObservableRecipient
     {
         private readonly ProjectSettings _projectSettings;
-        private const int INDEX_FOR_FIRST = 0;
-        private const int INDEX_FOR_SECOND = 1;
 
         #region Observable Properties
         [ObservableProperty]
-        private int firstSelectedStandard = INDEX_FOR_FIRST;
+        private int firstSelectedStandard;
 
         [ObservableProperty]
-        private int secondSelectedStandard = INDEX_FOR_SECOND;
+        private int secondSelectedStandard;
 
         [ObservableProperty]
-        private IEnumerable<string> allStandards;
+        private bool isStoreAssemblyChecked;
+
+        [ObservableProperty]
+        private bool isStorePreprocessedCodeChecked;
+
+        [ObservableProperty]
+        private bool hasSelectedFile = false;
+
+        [ObservableProperty]
+        private IList<string> allStandards;
         #endregion
 
+        #region Constructor(s)
         public MainViewModel(ProjectSettings projectSettings)
         {
             _projectSettings = projectSettings;
+
+            // settings the values retrieved from the model
             AllStandards = _projectSettings.AllStandards;
+            FirstSelectedStandard = _projectSettings.FirstSelectedStandard;
+            SecondSelectedStandard = _projectSettings.SecondSelectedStandard;
+            IsStoreAssemblyChecked = _projectSettings.IsStoreAssemblyChecked;
+            IsStorePreprocessedCodeChecked = _projectSettings.IsStorePreprocessedCodeChecked;
         }
+        #endregion
+
+        #region Partial methods
+        partial void OnFirstSelectedStandardChanged(int value)
+        {
+            _projectSettings.FirstSelectedStandard = value;
+        }
+        partial void OnSecondSelectedStandardChanged(int value)
+        {
+            _projectSettings.SecondSelectedStandard = value;
+        }
+        partial void OnIsStoreAssemblyCheckedChanged(bool value)
+        {
+            _projectSettings.IsStoreAssemblyChecked = value;
+        }
+        partial void OnIsStorePreprocessedCodeCheckedChanged(bool value)
+        {
+            _projectSettings.IsStorePreprocessedCodeChecked = value;
+        }
+        #endregion
 
         #region Commands
         /// <summary>
@@ -59,7 +93,9 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void CompileProject()
         {
-            throw new NotImplementedException();
+            Debug.WriteLine($"Compilation settings: {AllStandards[FirstSelectedStandard]}, {AllStandards[SecondSelectedStandard]} \n" +
+                $"Assembly: {IsStoreAssemblyChecked} \n" +
+                $"Preprocessed: {IsStorePreprocessedCodeChecked}");
         }
         #endregion
     }

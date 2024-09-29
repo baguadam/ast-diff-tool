@@ -9,21 +9,13 @@ namespace ASTDiffTool.Models
 {
     public class ProjectSettings
     {
+        private const int INDEX_FOR_FIRST = 0;
+        private const int INDEX_FOR_SECOND = 1;
         public List<string> AllStandards => ["C++98", "C++03", "C++11", "C++14", "C++17"];
 
-        public int FirstSelectedStandard { get; private set; }
-        public int SecondSelectedStandard { get; private set; }
-
-        public ProjectSettings()
-        {
-            FirstSelectedStandard = 0;
-            SecondSelectedStandard = 0;
-        }
-
-        public void UpdateSelectedStandards(int firstSelectedIndex, int secondSelectedIndex)
-        {
-            FirstSelectedStandard = firstSelectedIndex;
-            SecondSelectedStandard = secondSelectedIndex;
-        }
+        public int FirstSelectedStandard { get; set; } = INDEX_FOR_FIRST;
+        public int SecondSelectedStandard { get; set; } = INDEX_FOR_SECOND;
+        public bool IsStoreAssemblyChecked { get; set; } = false;
+        public bool IsStorePreprocessedCodeChecked { get; set; } = false;
     }
 }
