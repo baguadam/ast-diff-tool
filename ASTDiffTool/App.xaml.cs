@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using ASTDiffTool.ViewModels;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
@@ -9,6 +10,14 @@ namespace ASTDiffTool
     /// </summary>
     public partial class App : Application
     {
-    }
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
 
+            MainWindow mainWindow = new();
+            mainWindow.DataContext = new MainViewModel();
+
+            mainWindow.Show();
+        }
+    }
 }
