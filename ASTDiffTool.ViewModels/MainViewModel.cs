@@ -23,10 +23,7 @@ namespace ASTDiffTool.ViewModels
         private int secondSelectedStandard;
 
         [ObservableProperty]
-        private IEnumerable<string> availableStandardsForFirstCombo;
-
-        [ObservableProperty]
-        private IEnumerable<string> availableStandardsForSecondCombo;
+        private IEnumerable<string> allStandards;
         #endregion
 
         public MainViewModel(ProjectSettings projectSettings)
@@ -34,17 +31,8 @@ namespace ASTDiffTool.ViewModels
             _projectSettings = projectSettings;
             FirstSelectedStandard = _projectSettings.FirstSelectedStandard;
             SecondSelectedStandard = _projectSettings.SecondSelectedStandard;
-
-            ChangeAvailableStandards();
+            AllStandards = _projectSettings.AllStandards;
         }
-
-        #region Private methods
-        private void ChangeAvailableStandards()
-        {
-            AvailableStandardsForFirstCombo = _projectSettings.AllStandards.Except([_projectSettings.AllStandards[SecondSelectedStandard]]);
-            AvailableStandardsForSecondCombo = _projectSettings.AllStandards.Except([_projectSettings.AllStandards[FirstSelectedStandard]]);
-        }
-        #endregion
 
         #region Commands
         /// <summary>
