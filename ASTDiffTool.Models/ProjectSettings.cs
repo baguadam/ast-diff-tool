@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,17 +17,15 @@ namespace ASTDiffTool.Models
         public ProjectSettings()
         {
             FirstSelectedStandard = 0;
-            SecondSelectedStandard = 1;
+            SecondSelectedStandard = 0;
         }
 
-        public void ChangeFirstSelectedStandard(int standardIndex)
+        public void UpdateSelectedStandards(int firstSelectedIndex, int secondSelectedIndex)
         {
-            FirstSelectedStandard = standardIndex;
-        }
-
-        public void ChangeSecondSelectedStandard(int standardIndex) 
-        { 
-            SecondSelectedStandard = standardIndex;
+            Debug.WriteLine($"METHOD CALLED, BEFORE: {FirstSelectedStandard}, {SecondSelectedStandard}");
+            FirstSelectedStandard = firstSelectedIndex;
+            SecondSelectedStandard = secondSelectedIndex;
+            Debug.WriteLine($"AFTER: {FirstSelectedStandard}, {SecondSelectedStandard}");
         }
     }
 }

@@ -11,19 +11,45 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
-    public partial class MainViewModel : ObservableRecipient
+    public partial class MainViewModel : ViewModelBase
     {
         private readonly ProjectSettings _projectSettings;
 
+        private int _firstSelectedStandard;
+        private int _secondSelectedStandard;
+        private IEnumerable<string> _allStandards;
+
         #region Observable Properties
-        [ObservableProperty]
-        private int firstSelectedStandard;
-
-        [ObservableProperty]
-        private int secondSelectedStandard;
-
-        [ObservableProperty]
-        private IEnumerable<string> allStandards;
+        public int FirstSelectedStandard
+        {
+            get => _firstSelectedStandard;
+            set
+            {
+                _projectSettings.UpdateSelectedStandards(value, SecondSelectedStandard);
+                OnPropertyChanged(nameof(FirstSelectedStandard));
+            }
+        }
+        public int SecondSelectedStandard
+        {
+            get => _secondSelectedStandard;
+            set
+            {
+                _projectSettings.UpdateSelectedStandards(FirstSelectedStandard, value);
+                OnPropertyChanged(nameof(SecondSelectedStandard));
+            }
+        }
+        public IEnumerable<string> AllStandards
+        {
+            get => _allStandards;
+            private set
+            {
+                if (_allStandards != value)
+                {
+                    _allStandards = value.ToList();
+                    OnPropertyChanged(nameof(AllStandards));
+                }
+            }
+        }
         #endregion
 
         public MainViewModel(ProjectSettings projectSettings)
@@ -49,7 +75,6 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void LoadSavedProject()
         {
-
         }
 
         /// <summary>
@@ -58,17 +83,6 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void CompileProject()
         {
-
-        }
-
-        /// <summary>
-        /// Handling combo box changes for selecting the two standards for compilation
-        /// </summary>
-        /// <param name="selectedStandard"></param>
-        [RelayCommand]
-        public void OnStandardSelectionChanged(int selectedStandardIndex)
-        {
-            Debug.WriteLine($"ITT: {selectedStandardIndex}");
         }
         #endregion
     }
