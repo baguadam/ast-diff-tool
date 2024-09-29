@@ -15,15 +15,20 @@ namespace ASTDiffTool.ViewModels
     {
         private readonly ProjectSettings _projectSettings;
 
+        #region Observable Properties
+        [ObservableProperty]
+        private int firstSelectedStandard;
+
+        [ObservableProperty]
+        private int secondSelectedStandard;
+        #endregion
+
         public MainViewModel(ProjectSettings projectSettings)
         {
             _projectSettings = projectSettings;
+            FirstSelectedStandard = _projectSettings.FirstSelectedStandard;
+            SecondSelectedStandard = _projectSettings.SecondSelectedStandard;
         }
-
-        #region Observable Properties
-        [ObservableProperty]
-        private string buttonText = "Click";
-        #endregion
 
         #region Commands
         /// <summary>
@@ -32,7 +37,6 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void LoadCompilationDatabase()
         {
-            ButtonText = "CLICKED";
         }
 
         /// <summary>
@@ -51,6 +55,16 @@ namespace ASTDiffTool.ViewModels
         public void CompileProject()
         {
 
+        }
+
+        /// <summary>
+        /// Handling combobox changes for selecting the two standards for compilation
+        /// </summary>
+        /// <param name="selectedStandard"></param>
+        [RelayCommand]
+        public void OnStandardSelectionChanged(int selectedStandardIndex)
+        {
+            Debug.WriteLine($"ITT: {selectedStandardIndex}");
         }
         #endregion
     }

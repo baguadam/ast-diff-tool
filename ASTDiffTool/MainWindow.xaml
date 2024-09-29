@@ -16,7 +16,7 @@
         <!--Left side for project settings, visible on each view-->
         <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="5">
             <StackPanel Background="#ebecf0">
-                <Button Content="{Binding ButtonText}" Margin="10" Height="30" 
+                <Button Content="Load compilation database" Margin="10" Height="30" 
                         ToolTip="Click to load the compilation database"
                         Command="{Binding LoadCompilationDatabaseCommand}"/>
                 <Button Content="Load saved project" Margin="10" Height="30" 
@@ -27,12 +27,12 @@
                     <StackPanel>
                         <TextBlock Text="Select C++ standards for compilation" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="2, 10, 2, 2" />
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-                            <ComboBox Margin="0, 0, 20, 0" SelectedIndex="0">
+                            <ComboBox Margin="0, 0, 20, 0" SelectedIndex="{Binding FirstSelectedStandard}">
                                 <ComboBoxItem Content="C++98"/>
                                 <ComboBoxItem Content="C++03"/>
                                 <ComboBoxItem Content="C++11"/>
                             </ComboBox>
-                            <ComboBox Margin="20, 0, 0, 0" SelectedIndex="1">
+                            <ComboBox Margin="20, 0, 0, 0" SelectedIndex="{Binding SecondSelectedStandard}">
                                 <ComboBoxItem Content="C++98"/>
                                 <ComboBoxItem Content="C++03"/>
                                 <ComboBoxItem Content="C++11"/>
