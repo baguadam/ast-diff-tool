@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using ASTDiffTool.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,13 @@ namespace ASTDiffTool.ViewModels
 {
     public partial class MainViewModel : ObservableRecipient
     {
+        private readonly ProjectSettings _projectSettings;
+
+        public MainViewModel(ProjectSettings projectSettings)
+        {
+            _projectSettings = projectSettings;
+        }
+
         #region Observable Properties
         [ObservableProperty]
         private string buttonText = "Click";
