@@ -22,10 +22,8 @@ namespace ASTDiffTool.Models
 
         public void UpdateSelectedStandards(int firstSelectedIndex, int secondSelectedIndex)
         {
-            Debug.WriteLine($"METHOD CALLED, BEFORE: {FirstSelectedStandard}, {SecondSelectedStandard}");
             FirstSelectedStandard = firstSelectedIndex;
             SecondSelectedStandard = secondSelectedIndex;
-            Debug.WriteLine($"AFTER: {FirstSelectedStandard}, {SecondSelectedStandard}");
         }
     }
 }

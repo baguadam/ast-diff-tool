@@ -11,52 +11,26 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
-    public partial class MainViewModel : ViewModelBase
+    public partial class MainViewModel : ObservableRecipient
     {
         private readonly ProjectSettings _projectSettings;
-
-        private int _firstSelectedStandard;
-        private int _secondSelectedStandard;
-        private IEnumerable<string> _allStandards;
+        private const int INDEX_FOR_FIRST = 0;
+        private const int INDEX_FOR_SECOND = 1;
 
         #region Observable Properties
-        public int FirstSelectedStandard
-        {
-            get => _firstSelectedStandard;
-            set
-            {
-                _projectSettings.UpdateSelectedStandards(value, SecondSelectedStandard);
-                OnPropertyChanged(nameof(FirstSelectedStandard));
-            }
-        }
-        public int SecondSelectedStandard
-        {
-            get => _secondSelectedStandard;
-            set
-            {
-                _projectSettings.UpdateSelectedStandards(FirstSelectedStandard, value);
-                OnPropertyChanged(nameof(SecondSelectedStandard));
-            }
-        }
-        public IEnumerable<string> AllStandards
-        {
-            get => _allStandards;
-            private set
-            {
-                if (_allStandards != value)
-                {
-                    _allStandards = value.ToList();
-                    OnPropertyChanged(nameof(AllStandards));
-                }
-            }
-        }
+        [ObservableProperty]
+        private int firstSelectedStandard = INDEX_FOR_FIRST;
+
+        [ObservableProperty]
+        private int secondSelectedStandard = INDEX_FOR_SECOND;
+
+        [ObservableProperty]
+        private IEnumerable<string> allStandards;
         #endregion
 
         public MainViewModel(ProjectSettings projectSettings)
         {
             _projectSettings = projectSettings;
-            FirstSelectedStandard = _projectSettings.FirstSelectedStandard;
-            SecondSelectedStandard = _projectSettings.SecondSelectedStandard;
             AllStandards = _projectSettings.AllStandards;
         }
 
@@ -67,6 +41,7 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void LoadCompilationDatabase()
         {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -75,6 +50,7 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void LoadSavedProject()
         {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -83,6 +59,7 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void CompileProject()
         {
+            throw new NotImplementedException();
         }
         #endregion
     }
