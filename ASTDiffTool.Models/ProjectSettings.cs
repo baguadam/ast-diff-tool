@@ -13,6 +13,7 @@ namespace ASTDiffTool.Models
         private const int INDEX_FOR_SECOND = 1;
         public List<string> AllStandards => ["C++98", "C++03", "C++11", "C++14", "C++17"];
 
+        public string CompilationDatabasePath { get; set; } = string.Empty;
         public int FirstSelectedStandard { get; set; } = INDEX_FOR_FIRST;
         public int SecondSelectedStandard { get; set; } = INDEX_FOR_SECOND;
         public bool IsStoreAssemblyChecked { get; set; } = false;

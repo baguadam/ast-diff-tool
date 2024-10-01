@@ -6,7 +6,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ASTDiffTool"
         mc:Ignorable="d"
-        Title="AST Differential Tool" Height="450" Width="800">
+        Title="AST Differential Tool" Height="600" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
     <Grid>
         <!--Main Grid of the application-->
         <Grid.ColumnDefinitions>
@@ -16,7 +19,30 @@
 
         <!--Left side for project settings, visible on each view-->
         <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="5">
+            
             <StackPanel Background="#ebecf0">
+                <!--Notification message for file loading-->
+                <TextBlock Text="{Binding NotificationMessage}" 
+                           FontSize="13"
+                           FontWeight="Bold"
+                           Visibility="{Binding IsNotificationVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                           Margin="10">
+                    <!--Setting the text color based on the message-->
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="Black" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding NotificationMessage}" Value="File selected successfully!">
+                                    <Setter Property="Foreground" Value="Green" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding NotificationMessage}" Value="Failed to select file!">
+                                    <Setter Property="Foreground" Value="Red" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
                 <Button Content="Load compilation database" Margin="10" Height="30" 
                         ToolTip="Click to load the compilation database"
                         Command="{Binding LoadCompilationDatabaseCommand}"/>
@@ -43,7 +69,18 @@
                                   IsChecked="{Binding IsStoreAssemblyChecked, Mode=TwoWay}"/>
                         <CheckBox Content="Store preprocessed code" FontSize="13" Margin="5, 10, 0, 0"
                                   IsChecked="{Binding IsStorePreprocessedCodeChecked, Mode=TwoWay}"/>
-                        
+
+                        <!--File path is only displayed if a file has already been selected-->
+                        <StackPanel Visibility="{Binding HasSelectedFile, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Text="Compilation Database Path" 
+                                       FontWeight="Bold" FontSize="14" 
+                                       HorizontalAlignment="Left" Margin="5, 20, 0, 0"/>
+                            <TextBlock Text="{Binding CompilationDatabasePath}" 
+                                       TextWrapping="Wrap"
+                                       Margin="5, 10, 0, 0" 
+                                       FontSize="13"/>
+                        </StackPanel>
+
                         <Button Content="Compile project" Margin="10, 30, 10, 10" Height="30" 
                                 ToolTip="Click to compile your project"
                                 IsEnabled="{Binding HasSelectedFile}"

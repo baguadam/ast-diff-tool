@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ASTDiffTool.Models\ASTDiffTool.Models.csproj" />
+    <ProjectReference Include="..\ASTDiffTool.Services\ASTDiffTool.Services.csproj" />
   </ItemGroup>
 
 </Project>
