@@ -1,4 +1,4 @@
-﻿using ASTDiffTool.Services;
+﻿using ASTDiffTool.Services.Interfaces;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;

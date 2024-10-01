@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace ASTDiffTool.Services
+namespace ASTDiffTool.Services.Interfaces
 {
     public interface IFileDialogService
     {
