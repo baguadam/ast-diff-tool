@@ -48,7 +48,8 @@
                         Command="{Binding LoadCompilationDatabaseCommand}"/>
                 <Button Content="Load saved project" Margin="10" Height="30" 
                         ToolTip="Click to load a saved project"
-                        Command="{Binding LoadSavedProjectCommand}"/>
+                        Command="{Binding LoadSavedProjectCommand}"
+                        IsEnabled="False"/>
 
                 <Border BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
                     <StackPanel>
