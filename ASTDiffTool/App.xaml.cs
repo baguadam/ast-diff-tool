@@ -25,6 +25,7 @@ namespace ASTDiffTool
 
             var services = new ServiceCollection();
             ConfigureServices(services);
+            _serviceProvider = services.BuildServiceProvider();
             
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
