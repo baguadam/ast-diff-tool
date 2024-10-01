@@ -9,6 +9,6 @@ namespace ASTDiffTool.Services
 {
     public interface IFileDialogService
     {
-        string OpenFile(string filter);
+        string? OpenFile(string filter);
     }
 }
