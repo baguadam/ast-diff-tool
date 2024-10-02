@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using ASTDiffTool.ViewModels.Factories;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace ASTDiffTool.ViewModels
 {
     public partial class NavigationViewModel : ObservableRecipient
     {
+        private readonly IViewModelFactory _viewModelFactory;
         private ObservableObject _currentView;
 
         public ObservableObject CurrentView
@@ -18,27 +20,28 @@ namespace ASTDiffTool.ViewModels
             set => SetProperty(ref _currentView, value);
         }
 
-        public NavigationViewModel()
+        public NavigationViewModel(IViewModelFactory viewModelFactory)
         {
-            CurrentView = new ASTPageViewModel();
+            _viewModelFactory = viewModelFactory;
+            NavigateASTPage();
         }
 
         [RelayCommand]
         public void NavigateASTPage()
         {
-            CurrentView = new ASTPageViewModel();
+            CurrentView = _viewModelFactory.CreateASTPageViewModel();
         }
 
         [RelayCommand]
         public void NavigatePreprocessedCodePage()
         {
-            CurrentView = new PreprocessedCodePageViewModel();
+            CurrentView = _viewModelFactory.CreatePreprocessedCodePageViewModel();
         }
 
         [RelayCommand]
         public void NavigateProjectPage()
         {
-            CurrentView = new ProjectPageViewModel();
+            CurrentView = _viewModelFactory.CreateProjectPageViewModel();
         }
     }
 }

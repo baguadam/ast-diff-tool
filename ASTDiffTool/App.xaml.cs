@@ -1,6 +1,7 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.ViewModels;
+using ASTDiffTool.ViewModels.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
@@ -35,8 +36,15 @@ namespace ASTDiffTool
         {
             services.AddSingleton<ProjectSettings>();
             services.AddSingleton<IFileDialogService, FileDialogService>();
+
+            services.AddSingleton<NewProjectPageViewModel>();
+            services.AddSingleton<ASTPageViewModel>();
+            services.AddSingleton<ProjectPageViewModel>();
+            services.AddSingleton<PreprocessedCodePageViewModel>();
             services.AddSingleton<NavigationViewModel>();
             services.AddSingleton<MainViewModel>();
+
+            services.AddSingleton<IViewModelFactory, ViewModelFactory>();
 
             services.AddTransient<MainWindow>(provider =>
             {
