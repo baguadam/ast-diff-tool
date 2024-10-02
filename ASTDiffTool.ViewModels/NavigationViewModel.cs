@@ -43,5 +43,11 @@ namespace ASTDiffTool.ViewModels
         {
             CurrentView = _viewModelFactory.CreateProjectPageViewModel();
         }
+
+        [RelayCommand]
+        public void NavigateNewProjectPage()
+        {
+            CurrentView = _viewModelFactory.CreateNewProjectPageViewModel();
+        }
     }
 }

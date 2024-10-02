@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
-    public class NewProjectPageViewModel : ObservableRecipient
+    public partial class NewProjectPageViewModel : ObservableRecipient
     {
-
+        [ObservableProperty]
+        private string title = "New Project Pages";
     }
 }

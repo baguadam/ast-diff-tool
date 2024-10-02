@@ -9,14 +9,14 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
         <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
-                               Command="{Binding NavigateASTPageCommand}"
+                               Command="{Binding NavigateNewProjectPageCommand}"
                                GroupName="NavigationGroup">
             <TextBlock Text="New project" 
                        Style="{StaticResource TextStyle}"/>
         </menu:NavigationButton>
         <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
-                               Command="{Binding NavigatePreprocessedCodePageCommand}"
-                               GroupName="NavigationGroup">
+                               GroupName="NavigationGroup"
+                               IsEnabled="False">
             <TextBlock Text="Load project" 
                        Style="{StaticResource TextStyle}"/>
         </menu:NavigationButton>
@@ -29,20 +29,20 @@
                        Style="{StaticResource TextStyle}"/>
             </menu:NavigationButton>
             <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
-                               Command="{Binding NavigatePreprocessedCodePageCommand}"
+                               Command="{Binding NavigateProjectPageCommand}"
                                GroupName="NavigationGroup">
                 <TextBlock Text="Project Details" 
                        Style="{StaticResource TextStyle}"/>
             </menu:NavigationButton>
             <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
-                               Command="{Binding NavigateASTPageCommand}"
+                               Command="{Binding NavigatePreprocessedCodePageCommand}"
                                GroupName="NavigationGroup">
                 <TextBlock Text="Preprocessed codes" 
                        Style="{StaticResource TextStyle}"/>
             </menu:NavigationButton>
             <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
-                               Command="{Binding NavigatePreprocessedCodePageCommand}"
-                               GroupName="NavigationGroup">
+                               GroupName="NavigationGroup"
+                               IsEnabled="False">
                 <TextBlock Text="Assembly code" 
                        Style="{StaticResource TextStyle}"/>
             </menu:NavigationButton>

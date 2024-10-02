@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="White">
-        <TextBlock Text="Currently displayed: Preprocessed!" 
+        <TextBlock Text="{Binding Title}" 
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
     </Grid>
