@@ -6,13 +6,15 @@
         <Setter Property="Margin"
                 Value="10" />
         <Setter Property="Height"
-                Value="30" />
+                Value="40" />
         <Setter Property="BorderThickness"
                 Value="0" />
         <Setter Property="Background"
                 Value="#272B2F" />
         <Setter Property="Foreground"
                 Value="White" />
+        <Setter Property="FontSize"
+                Value="14" />
 
         <Setter Property="Template">
             <Setter.Value>

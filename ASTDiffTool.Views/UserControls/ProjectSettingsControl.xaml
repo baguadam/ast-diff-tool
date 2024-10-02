@@ -38,10 +38,11 @@
                                        FontSize="13"/>
             </StackPanel>
 
-            <Button Content="Compile project" Margin="10, 30, 10, 10" Height="30" 
-                                ToolTip="Click to compile your project"
-                                IsEnabled="{Binding HasSelectedFile}"
-                                Command="{Binding CompileProjectCommand}"/>
+            <Button Style="{StaticResource ButtonStyle}"
+                    Content="Compile project"                     
+                    ToolTip="Click to compile your project"      
+                    IsEnabled="{Binding HasSelectedFile}"
+                    Command="{Binding CompileProjectCommand}"/>
         </StackPanel>
     </Border>
 </UserControl>

@@ -33,13 +33,13 @@
 
         <StackPanel Orientation="Horizontal">
             <Button Style="{StaticResource ButtonStyle}"
-                    Content="Load compilation database" 
-                    Width="150"
+                    Content="Load compilation database"     
+                    Width="200"
                     ToolTip="Click to load the compilation database"
                     Command="{Binding LoadCompilationDatabaseCommand}"/>
             <Button Style="{StaticResource ButtonStyle}"
                     Content="Load saved project" 
-                    Width="150"
+                    Width="200"
                     ToolTip="Click to load a saved project"
                     Command="{Binding LoadSavedProjectCommand}"
                     IsEnabled="False"/>
