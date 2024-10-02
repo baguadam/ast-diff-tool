@@ -23,7 +23,7 @@ namespace ASTDiffTool.ViewModels
         public NavigationViewModel(IViewModelFactory viewModelFactory)
         {
             _viewModelFactory = viewModelFactory;
-            NavigateASTPage();
+            NavigateNewProjectPage();
         }
 
         [RelayCommand]

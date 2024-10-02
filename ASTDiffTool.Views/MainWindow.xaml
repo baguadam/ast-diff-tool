@@ -25,41 +25,13 @@
                 Background="#282828">
             <StackPanel Margin="0, 100, 0, 100">
                 <controls:NavigationControl DataContext="{Binding Navigation}"/>
-
-                <!--LoadFilesControl is displayed here--><!--
-                <controls:LoadFilesControl />
-                
-                --><!--ProjectSettingsControl is displayed here--><!--
-                <controls:ProjectSettingsControl />-->
             </StackPanel>
         </Border>
 
         <!--Right side, its content is generated dynamically-->
-        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5" Background="#ebecf0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25*" />
-                    <RowDefinition Height="75*" />
-                </Grid.RowDefinitions>
-
-                <!--Contains main info/navigation buttons + statistics-->
-                <Border Grid.Row="0" BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
-                    <StackPanel>
-                        <Button Content="AST View" Margin="10, 30, 10, 10" Height="30" 
-                                    ToolTip="Click to compile your project"
-                                    Command="{Binding NavigateASTPageCommand}"/>
-                        <Button Content="Preprocessed View" Margin="10, 10, 10, 30" Height="30" 
-                                    ToolTip="Click to compile your project"
-                                    Command="{Binding NavigatePreprocessedCodePageCommand}"/>
-                    </StackPanel>
-                </Border>
-
-                <!--Contains the codes for the asts, preprocessed codes or source codes-->
-                <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
-                    <ContentControl x:Name="Pages"
-                                    Content="{Binding Navigation.CurrentView}" />
-                </Border>
-            </Grid>
+        <Border Grid.Column="1">
+            <ContentControl x:Name="Pages"
+                            Content="{Binding Navigation.CurrentView}" />
         </Border>
     </Grid>
 </Window>

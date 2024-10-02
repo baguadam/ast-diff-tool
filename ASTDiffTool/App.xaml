@@ -5,6 +5,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ASTDiffTool.Views;component/Styles/NavButton.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/ASTDiffTool.Views;component/Styles/Button.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/ASTDiffTool.Views;component/Styles/Text.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/ASTDiffTool.Views;component/Utilities/DataTemplate.xaml" />

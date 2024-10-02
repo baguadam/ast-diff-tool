@@ -1,0 +1,66 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="NavBtnStyle"
+           TargetType="RadioButton">
+
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="Margin"
+                Value="0, 5, 0, 0" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="border"
+                            Height="40"
+                            BorderThickness="0"
+                            HorizontalAlignment="Stretch">
+
+                        <Border.Background>
+                            <SolidColorBrush x:Name="BorderBackground"
+                                             Color="#272B2F" />
+                        </Border.Background>
+
+                        <Grid>
+                            <!--Indicator for the left side in case of hover or selected menu item-->
+                            <Border x:Name="Indicator"
+                                    Height="20"
+                                    Width="5"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Background="White"
+                                    Visibility="Collapsed"
+                                    CornerRadius="2"/>
+
+                            <ContentPresenter />
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!--Change background color on hover, display the indicator-->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" TargetName="border" Value="#3E434A" />
+                            <Setter Property="Visibility" TargetName="Indicator" Value="Visible" />
+                        </Trigger>
+
+                        <!--Revert to original background color when not hovered, remove the indicator-->
+                        <Trigger Property="IsMouseOver" Value="False">
+                            <Setter Property="Background" TargetName="border" Value="#272B2F" />
+                            <Setter Property="Visibility" TargetName="Indicator" Value="Collapsed" />
+                        </Trigger>
+
+                        <!--When the menu item is selected, the indicator is displayed, backgroun color is differend-->
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Background" TargetName="border" Value="#212529" />
+                            <Setter Property="Visibility" TargetName="Indicator" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+</ResourceDictionary>

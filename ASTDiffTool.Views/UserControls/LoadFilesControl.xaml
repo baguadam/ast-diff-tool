@@ -15,7 +15,7 @@
                            FontWeight="Bold"
                            Visibility="{Binding IsNotificationVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                            Margin="10">
-                    <!--Setting the text color based on the message-->
+            <!--Setting the text color based on the message-->
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="Foreground" Value="Black" />
@@ -31,12 +31,18 @@
             </TextBlock.Style>
         </TextBlock>
 
-        <Button Content="Load compilation database" Margin="10" Height="30" 
-                        ToolTip="Click to load the compilation database"
-                        Command="{Binding LoadCompilationDatabaseCommand}"/>
-        <Button Content="Load saved project" Margin="10" Height="30" 
-                        ToolTip="Click to load a saved project"
-                        Command="{Binding LoadSavedProjectCommand}"
-                        IsEnabled="False"/>
+        <StackPanel Orientation="Horizontal">
+            <Button Style="{StaticResource ButtonStyle}"
+                    Content="Load compilation database" 
+                    Width="150"
+                    ToolTip="Click to load the compilation database"
+                    Command="{Binding LoadCompilationDatabaseCommand}"/>
+            <Button Style="{StaticResource ButtonStyle}"
+                    Content="Load saved project" 
+                    Width="150"
+                    ToolTip="Click to load a saved project"
+                    Command="{Binding LoadSavedProjectCommand}"
+                    IsEnabled="False"/>
+        </StackPanel>
     </StackPanel>
 </UserControl>
