@@ -22,7 +22,7 @@
 
         <!--Left side for project settings, visible on each view-->
         <Border Grid.Column="0" 
-                Background="#282828">
+                Background="#272524">
             <StackPanel Margin="0, 100, 0, 100">
                 <controls:NavigationControl DataContext="{Binding Navigation}"/>
             </StackPanel>
