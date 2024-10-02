@@ -35,6 +35,7 @@ namespace ASTDiffTool
         {
             services.AddSingleton<ProjectSettings>();
             services.AddSingleton<IFileDialogService, FileDialogService>();
+            services.AddSingleton<NavigationViewModel>();
             services.AddSingleton<MainViewModel>();
 
             services.AddTransient<MainWindow>(provider =>

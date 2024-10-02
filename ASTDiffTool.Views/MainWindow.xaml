@@ -24,7 +24,7 @@
         <Border Grid.Column="0" 
                 Background="#282828">
             <StackPanel Margin="0, 100, 0, 100">
-                <controls:NavigationControl/>
+                <controls:NavigationControl DataContext="{Binding Navigation}"/>
 
                 <!--LoadFilesControl is displayed here--><!--
                 <controls:LoadFilesControl />
@@ -57,7 +57,7 @@
                 <!--Contains the codes for the asts, preprocessed codes or source codes-->
                 <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
                     <ContentControl x:Name="Pages"
-                                    Content="{Binding CurrentView}" />
+                                    Content="{Binding Navigation.CurrentView}" />
                 </Border>
             </Grid>
         </Border>

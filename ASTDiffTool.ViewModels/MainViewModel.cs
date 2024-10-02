@@ -20,9 +20,6 @@ namespace ASTDiffTool.ViewModels
 
         #region Observable Properties
         [ObservableProperty]
-        private object currentView;
-
-        [ObservableProperty]
         private int firstSelectedStandard;
 
         [ObservableProperty]
@@ -50,13 +47,14 @@ namespace ASTDiffTool.ViewModels
         private bool isNotificationVisible;
         #endregion
 
-        #region Constructor(s)
-        public MainViewModel(ProjectSettings projectSettings, IFileDialogService fileDialogService)
-        {
-            CurrentView = new ASTPageViewModel();
+        public NavigationViewModel Navigation { get; }
 
+        #region Constructor(s)
+        public MainViewModel(ProjectSettings projectSettings, IFileDialogService fileDialogService, NavigationViewModel navigationViewModel)
+        {
             _projectSettings = projectSettings;
             _fileDialogService = fileDialogService;
+            Navigation = navigationViewModel;
 
             // settings the values retrieved from the model
             AllStandards = _projectSettings.AllStandards;
@@ -134,24 +132,6 @@ namespace ASTDiffTool.ViewModels
                 $"Assembly: {IsStoreAssemblyChecked} \n" +
                 $"Preprocessed: {IsStorePreprocessedCodeChecked} \n" +
                 $"Compilation Database path: {CompilationDatabasePath}");
-        }
-
-        [RelayCommand]
-        public void NavigateASTPage()
-        {
-            CurrentView = new ASTPageViewModel();
-        }
-
-        [RelayCommand]
-        public void NavigatePreprocessedCodePage()
-        {
-            CurrentView = new PreprocessedCodePageViewModel();
-        }
-
-        [RelayCommand]
-        public void NavigateProjectPage()
-        {
-            CurrentView = new ProjectPageViewModel();
         }
         #endregion
     }
