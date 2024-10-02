@@ -7,35 +7,45 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
-    <Border BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
+    <Border Margin="0, 10, 0, 0"
+            Padding="10"
+            BorderThickness="1"
+            BorderBrush="White">
         <StackPanel>
-            <TextBlock Text="Select C++ standards for compilation" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="2, 10, 2, 2" />
+            <TextBlock Text="Select C++ standards for compilation" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" Margin="2, 10, 2, 2" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                 <ComboBox Margin="0, 0, 20, 0" 
-                                      ItemsSource="{Binding AllStandards}"
-                                      SelectedIndex="{Binding FirstSelectedStandard, Mode=TwoWay}">
+                          ItemsSource="{Binding AllStandards}"
+                          SelectedIndex="{Binding FirstSelectedStandard, Mode=TwoWay}">
                 </ComboBox>
-                <ComboBox Margin="20, 0, 0, 0"
-                                      ItemsSource="{Binding AllStandards}"
-                                      SelectedIndex="{Binding SecondSelectedStandard, Mode=TwoWay}">
+                <ComboBox Margin="20, 0, 0, 0"   
+                          ItemsSource="{Binding AllStandards}"
+                          SelectedIndex="{Binding SecondSelectedStandard, Mode=TwoWay}">
                 </ComboBox>
             </StackPanel>
 
-            <TextBlock Text="Project settings" FontWeight="Bold" FontSize="14" HorizontalAlignment="Left" Margin="5, 20, 0, 0"/>
-            <CheckBox Content="Store assembly code" FontSize="13" Margin="5, 10, 0, 0"
-                                  IsChecked="{Binding IsStoreAssemblyChecked, Mode=TwoWay}"/>
-            <CheckBox Content="Store preprocessed code" FontSize="13" Margin="5, 10, 0, 0"
-                                  IsChecked="{Binding IsStorePreprocessedCodeChecked, Mode=TwoWay}"/>
+            <TextBlock Text="Project settings" Style="{StaticResource TextStyle}" Margin="5, 20, 0, 0"/>
+            <CheckBox Content="Store assembly code" 
+                      FontSize="13" 
+                      Margin="5, 10, 0, 0" 
+                      Foreground="White"
+                      IsChecked="{Binding IsStoreAssemblyChecked, Mode=TwoWay}"/>
+            <CheckBox Content="Store preprocessed code" 
+                      FontSize="13" 
+                      Margin="5, 10, 0, 0"
+                      Foreground="White"
+                      IsChecked="{Binding IsStorePreprocessedCodeChecked, Mode=TwoWay}"/>
 
             <!--File path is only displayed if a file has already been selected-->
             <StackPanel Visibility="{Binding HasSelectedFile, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <TextBlock Text="Compilation Database Path" 
-                                       FontWeight="Bold" FontSize="14" 
-                                       HorizontalAlignment="Left" Margin="5, 20, 0, 0"/>
-                <TextBlock Text="{Binding CompilationDatabasePath}" 
-                                       TextWrapping="Wrap"
-                                       Margin="5, 10, 0, 0" 
-                                       FontSize="13"/>
+                           Style="{StaticResource TextStyle}"       
+                           Margin="5, 20, 0, 0"/>
+                <TextBlock Text="{Binding CompilationDatabasePath}"             
+                           TextWrapping="Wrap"
+                           Foreground="White"
+                           Margin="5, 10, 0, 0" 
+                           FontSize="13"/>
             </StackPanel>
 
             <Button Style="{StaticResource ButtonStyle}"
