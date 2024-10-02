@@ -6,27 +6,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ASTDiffTool"
         xmlns:controls="clr-namespace:ASTDiffTool.Views.UserControls"
-        xmlns:menu="clr-namespace:ASTDiffTool.Views.Utilities"
         mc:Ignorable="d"
-        Title="AST Differential Tool" Height="600" Width="800">
+        Title="AST Differential Tool" Height="600" Width="800"
+        ResizeMode="NoResize"
+        Background="#090F13">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
     <Grid>
         <!--Main Grid of the application-->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="35*"/>
-            <ColumnDefinition Width="65*"/>
+            <ColumnDefinition Width="30*"/>
+            <ColumnDefinition Width="70*"/>
         </Grid.ColumnDefinitions>
 
         <!--Left side for project settings, visible on each view-->
-        <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="5">
-            <StackPanel Background="#ebecf0">
-                <!--LoadFilesControl is displayed here-->
+        <Border Grid.Column="0" 
+                Background="#282828">
+            <StackPanel Margin="0, 100, 0, 100">
+                <controls:NavigationControl/>
+
+                <!--LoadFilesControl is displayed here--><!--
                 <controls:LoadFilesControl />
                 
-                <!--ProjectSettingsControl is displayed here-->
-                <controls:ProjectSettingsControl />
+                --><!--ProjectSettingsControl is displayed here--><!--
+                <controls:ProjectSettingsControl />-->
             </StackPanel>
         </Border>
 

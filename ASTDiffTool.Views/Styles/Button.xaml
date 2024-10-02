@@ -5,7 +5,7 @@
            TargetType="RadioButton">
 
         <Setter Property="HorizontalAlignment"
-                Value="Center" />
+                Value="Stretch" />
         <Setter Property="VerticalAlignment"
                 Value="Center" />
         <Setter Property="Margin"
@@ -15,9 +15,9 @@
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <Border x:Name="border"
-                            Height="50"
-                            Width="200"
-                            BorderThickness="0">
+                            Height="40"
+                            BorderThickness="0"
+                            HorizontalAlignment="Stretch">
 
                         <Border.Background>
                             <SolidColorBrush x:Name="BorderBackground"
@@ -26,13 +26,15 @@
 
                         <Grid>
                             <Border x:Name="Indicator"
-                                    Height="35"
-                                    Width="4"
+                                    Height="20"
+                                    Width="5"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center"
                                     Background="White"
                                     Visibility="Collapsed"
                                     CornerRadius="2"/>
+
+                            <ContentPresenter />
                         </Grid>
                     </Border>
 
