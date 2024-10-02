@@ -5,7 +5,8 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ASTDiffTool"
-        xmlns:controls="clr-namespace:ASTDiffTool.Views.UserControls" 
+        xmlns:controls="clr-namespace:ASTDiffTool.Views.UserControls"
+        xmlns:menu="clr-namespace:ASTDiffTool.Views.Utilities"
         mc:Ignorable="d"
         Title="AST Differential Tool" Height="600" Width="800">
     <Window.Resources>
@@ -39,13 +40,20 @@
 
                 <!--Contains main info/navigation buttons + statistics-->
                 <Border Grid.Row="0" BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
-                    <!--The content will be displayed based on the events and clicked buttons-->
+                    <StackPanel>
+                        <Button Content="AST View" Margin="10, 30, 10, 10" Height="30" 
+                                    ToolTip="Click to compile your project"
+                                    Command="{Binding NavigateASTPageCommand}"/>
+                        <Button Content="Preprocessed View" Margin="10, 10, 10, 30" Height="30" 
+                                    ToolTip="Click to compile your project"
+                                    Command="{Binding NavigatePreprocessedCodePageCommand}"/>
+                    </StackPanel>
                 </Border>
 
                 <!--Contains the codes for the asts, preprocessed codes or source codes-->
                 <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
-                    <!--The content will be displayed based on the events and clicked buttons-->
-                    <Frame Grid.Row="1" Name="ContentFrame" NavigationUIVisibility="Hidden" />
+                    <ContentControl x:Name="Pages"
+                                    Content="{Binding CurrentView}" />
                 </Border>
             </Grid>
         </Border>

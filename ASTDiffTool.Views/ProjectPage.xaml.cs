@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ASTDiffTool.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace ASTDiffTool.Views
         public ProjectPage()
         {
             InitializeComponent();
+            DataContext = new ProjectPageViewModel();
         }
     }
 }
