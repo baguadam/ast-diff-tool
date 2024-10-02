@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace ASTDiffTool.Views
 {
     /// <summary>
-    /// Interaction logic for ProjectView.xaml
+    /// Interaction logic for ProjectPage.xaml
     /// </summary>
-    public partial class ProjectView : Page
+    public partial class ProjectPage : UserControl
     {
-        public ProjectView()
+        public ProjectPage()
         {
             InitializeComponent();
         }

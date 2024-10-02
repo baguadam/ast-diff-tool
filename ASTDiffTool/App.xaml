@@ -3,6 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:ASTDiffTool">
     <Application.Resources>
-        
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ASTDiffTool.Views.Styles/Page.xaml" />
+                <ResourceDictionary Source="ASTDiffTool.Views.Styles/Button.xaml" />
+                <ResourceDictionary Source="ASTDiffTool.Views.Styles/Text.xaml" />
+                <ResourceDictionary Source="ASTDiffTool.Views.Utilities/DataTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

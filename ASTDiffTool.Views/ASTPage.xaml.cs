@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace ASTDiffTool.Views
 {
     /// <summary>
-    /// Interaction logic for ASTView.xaml
+    /// Interaction logic for ASTPage.xaml
     /// </summary>
-    public partial class ASTView : Page
+    public partial class ASTPage : UserControl
     {
-        public ASTView()
+        public ASTPage()
         {
             InitializeComponent();
         }

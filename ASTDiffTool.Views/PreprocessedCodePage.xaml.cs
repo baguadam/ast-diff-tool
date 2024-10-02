@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace ASTDiffTool.Views
 {
     /// <summary>
-    /// Interaction logic for PreprocessedCodeView.xaml
+    /// Interaction logic for PreprocessedCodePage.xaml
     /// </summary>
-    public partial class PreprocessedCodeView : Page
+    public partial class PreprocessedCodePage : UserControl
     {
-        public PreprocessedCodeView()
+        public PreprocessedCodePage()
         {
             InitializeComponent();
         }
