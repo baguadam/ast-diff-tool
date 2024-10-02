@@ -7,8 +7,7 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="ASTView">
-
     <Grid>
-        
+        <TextBlock Text="This is the AST View" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
 </Page>

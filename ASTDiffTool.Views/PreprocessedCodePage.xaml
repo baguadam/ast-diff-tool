@@ -9,6 +9,6 @@
       Title="PreprocessedCodeView">
 
     <Grid>
-        
+        <TextBlock Text="This is the Preprocessed Code View" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
 </Page>

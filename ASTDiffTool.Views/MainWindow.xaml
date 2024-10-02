@@ -45,6 +45,7 @@
                 <!--Contains the codes for the asts, preprocessed codes or source codes-->
                 <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5" Background="White">
                     <!--The content will be displayed based on the events and clicked buttons-->
+                    <Frame Grid.Row="1" Name="ContentFrame" NavigationUIVisibility="Hidden" />
                 </Border>
             </Grid>
         </Border>

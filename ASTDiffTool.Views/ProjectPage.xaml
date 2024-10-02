@@ -9,6 +9,6 @@
       Title="ProjectView">
 
     <Grid>
-        
+        <TextBlock Text="This is the Project View" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
 </Page>
