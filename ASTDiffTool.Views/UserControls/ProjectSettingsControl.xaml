@@ -37,7 +37,8 @@
                       IsChecked="{Binding IsStorePreprocessedCodeChecked, Mode=TwoWay}"/>
 
             <!--File path is only displayed if a file has already been selected-->
-            <StackPanel Visibility="{Binding HasSelectedFile, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel Visibility="{Binding HasSelectedFile, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Margin="0, 0, 0, 20">
                 <TextBlock Text="Compilation Database Path" 
                            Style="{StaticResource TextStyle}"       
                            Margin="5, 20, 0, 0"/>
