@@ -9,16 +9,33 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
-    public partial class NavigationViewModel : ObservableRecipient
+    public partial class NavigationViewModel : ViewModelBase
     {
         private readonly IViewModelFactory _viewModelFactory;
         private object _currentView;
+        private bool _isProjectCompiled = false;
+
+        #region Properties
+        public bool IsProjectCompiled
+        {
+            get => _isProjectCompiled;
+            set
+            {
+                _isProjectCompiled = value;
+                OnPropertyChanged(nameof(IsProjectCompiled));
+            }
+        }
 
         public object CurrentView
         {
             get => _currentView;
-            set => SetProperty(ref _currentView, value);
+            set
+            {
+                _currentView = value;
+                OnPropertyChanged(nameof(CurrentView));
+            }
         }
+        #endregion
 
         public NavigationViewModel(IViewModelFactory viewModelFactory)
         {

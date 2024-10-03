@@ -15,10 +15,22 @@ namespace ASTDiffTool.ViewModels
     public partial class MainViewModel : ObservableRecipient
     {
         public NavigationViewModel Navigation { get; }
+        public NewProjectPageViewModel NewProjectPage { get; }
 
-        public MainViewModel(NavigationViewModel navigationViewModel)
+        public MainViewModel(NavigationViewModel navigationViewModel, NewProjectPageViewModel newProjectPageViewModel)
         {
             Navigation = navigationViewModel;
+            NewProjectPage = newProjectPageViewModel;
+
+            // Subscribing to events
+            NewProjectPage.ProjectCompiled += OnProjectCompiled;
         }
+
+        #region Event handlers
+        private void OnProjectCompiled(object? sender, EventArgs e)
+        {
+            Navigation.IsProjectCompiled = true;
+        }
+        #endregion
     }
 }

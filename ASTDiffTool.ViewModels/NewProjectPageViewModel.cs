@@ -13,6 +13,8 @@ namespace ASTDiffTool.ViewModels
 {
     public partial class NewProjectPageViewModel : ViewModelBase
     {
+        public event EventHandler ProjectCompiled;
+
         private readonly ProjectSettings _projectSettings;
         private readonly IFileDialogService _fileDialogService;
 
@@ -160,6 +162,15 @@ namespace ASTDiffTool.ViewModels
                 $"Assembly: {IsStoreAssemblyChecked} \n" +
                 $"Preprocessed: {IsStorePreprocessedCodeChecked} \n" +
                 $"Compilation Database path: {CompilationDatabasePath}");
+
+            OnProjectCompiled();
+        }
+        #endregion
+
+        #region Private Methods
+        private void OnProjectCompiled()
+        {
+            ProjectCompiled?.Invoke(this, EventArgs.Empty);
         }
         #endregion
     }
