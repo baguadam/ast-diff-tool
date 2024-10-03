@@ -1,6 +1,8 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.ViewModels;
+using ASTDiffTool.ViewModels.Factories;
+using ASTDiffTool.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
@@ -26,16 +28,38 @@ namespace ASTDiffTool
             var services = new ServiceCollection();
             ConfigureServices(services);
             _serviceProvider = services.BuildServiceProvider();
-            
-            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+        
+            _view = _serviceProvider.GetRequiredService<MainWindow>();
+            _view.Show();
         }
 
         private void ConfigureServices (IServiceCollection services)
         {
+            // *********************************************
+            // REGISTERING MODELS, SERVICES AND VIEW MODELS
+            // *********************************************
             services.AddSingleton<ProjectSettings>();
             services.AddSingleton<IFileDialogService, FileDialogService>();
+
+            services.AddSingleton<NewProjectPageViewModel>();
+            services.AddSingleton<ASTPageViewModel>();
+            services.AddSingleton<ProjectPageViewModel>();
+            services.AddSingleton<PreprocessedCodePageViewModel>();
+            services.AddSingleton<NavigationViewModel>();
             services.AddSingleton<MainViewModel>();
+
+            services.AddSingleton<IViewModelFactory, ViewModelFactory>();
+
+            // *********************************************
+            // INJECTING THE VIEW MODELS INTO THE VIEWS
+            // *********************************************
+            services.AddTransient<NewProjectPage>(provider =>
+            {
+                var newProjectPage = new NewProjectPage();
+                var newProjectPageViewModel = provider.GetRequiredService<NewProjectPageViewModel>();
+                newProjectPage.DataContext = newProjectPageViewModel;
+                return newProjectPage;
+            });
 
             services.AddTransient<MainWindow>(provider =>
             {
