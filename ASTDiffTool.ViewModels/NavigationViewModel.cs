@@ -12,9 +12,9 @@ namespace ASTDiffTool.ViewModels
     public partial class NavigationViewModel : ObservableRecipient
     {
         private readonly IViewModelFactory _viewModelFactory;
-        private ObservableObject _currentView;
+        private object _currentView;
 
-        public ObservableObject CurrentView
+        public object CurrentView
         {
             get => _currentView;
             set => SetProperty(ref _currentView, value);

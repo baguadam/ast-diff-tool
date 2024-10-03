@@ -24,7 +24,6 @@ namespace ASTDiffTool.Views
         public NewProjectPage()
         {
             InitializeComponent();
-            DataContext = new NewProjectPageViewModel();
         }
     }
 }
