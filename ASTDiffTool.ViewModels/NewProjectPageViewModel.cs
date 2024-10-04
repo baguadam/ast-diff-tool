@@ -1,5 +1,6 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
+using ASTDiffTool.ViewModels.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -15,6 +16,7 @@ namespace ASTDiffTool.ViewModels
     {
         private readonly ProjectSettings _projectSettings;
         private readonly IFileDialogService _fileDialogService;
+        private readonly INavigationService _navigationService;
 
         private bool _hasSelectedFile = false;
         private string _notificationMessage;
@@ -107,10 +109,11 @@ namespace ASTDiffTool.ViewModels
         }
         #endregion
 
-        public NewProjectPageViewModel(IFileDialogService fileDialogService, ProjectSettings projectSettings)
+        public NewProjectPageViewModel(IFileDialogService fileDialogService, INavigationService navigationService, ProjectSettings projectSettings)
         {
             _projectSettings = projectSettings;
             _fileDialogService = fileDialogService;
+            _navigationService = navigationService;
         }
 
         #region Commands
@@ -160,6 +163,9 @@ namespace ASTDiffTool.ViewModels
                 $"Assembly: {IsStoreAssemblyChecked} \n" +
                 $"Preprocessed: {IsStorePreprocessedCodeChecked} \n" +
                 $"Compilation Database path: {CompilationDatabasePath}");
+
+            // in case of successful compilation, navigate to AST View
+            _navigationService.NavigateTo<ASTPageViewModel>();
         }
         #endregion
     }
