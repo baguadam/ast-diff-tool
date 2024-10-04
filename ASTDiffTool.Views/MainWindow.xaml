@@ -24,14 +24,14 @@
         <Border Grid.Column="0" 
                 Background="#272524">
             <StackPanel Margin="0, 100, 0, 100">
-                <controls:NavigationControl DataContext="{Binding Navigation}"/>
+                <controls:NavigationControl />
             </StackPanel>
         </Border>
 
         <!--Right side, its content is generated dynamically-->
         <Border Grid.Column="1">
             <ContentControl x:Name="Pages"
-                            Content="{Binding Navigation.CurrentView}" />
+                            Content="{Binding CurrentViewModel}" />
         </Border>
     </Grid>
 </Window>

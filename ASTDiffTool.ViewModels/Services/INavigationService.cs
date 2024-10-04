@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels.Services
 {
-    public interface INavigateService
+    public interface INavigationService
     {
+        event EventHandler<NavigationEventArgs> NavigationCompleted;
         ViewModelBase CurrentViewModel { get; }
         void NavigateTo<TViewModel>() where TViewModel : ViewModelBase;
+        void OnNavigationCompleted(NavigationEventArgs args);
     }
 }
