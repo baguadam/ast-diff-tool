@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
-    public partial class PreprocessedCodePageViewModel : ObservableRecipient
+    public partial class PreprocessedCodePageViewModel : ViewModelBase
     {
-        [ObservableProperty]
-        private string title = "Preprocessed Code Page";
+        private string _title = "Preprocessed Page View";
+
+        public string Title { get { return _title; } }
     }
 }
