@@ -1,6 +1,6 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
-using ASTDiffTool.ViewModels.Services;
+using ASTDiffTool.ViewModels.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -12,11 +12,15 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
-    public partial class NewProjectPageViewModel : ViewModelBase
+    public partial class NewProjectPageViewModel(IFileDialogService fileDialogService,
+        INavigationService navigationService,
+        IEventAggregator eventAggregator,
+        ProjectSettings projectSettings) : ViewModelBase
     {
-        private readonly ProjectSettings _projectSettings;
-        private readonly IFileDialogService _fileDialogService;
-        private readonly INavigationService _navigationService;
+        private readonly ProjectSettings _projectSettings = projectSettings;
+        private readonly IFileDialogService _fileDialogService = fileDialogService;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly IEventAggregator _eventAggregator = eventAggregator;
 
         private bool _hasSelectedFile = false;
         private string _notificationMessage;
@@ -107,14 +111,8 @@ namespace ASTDiffTool.ViewModels
                 OnPropertyChanged(nameof(IsNotificationVisible));
             }
         }
-        #endregion
 
-        public NewProjectPageViewModel(IFileDialogService fileDialogService, INavigationService navigationService, ProjectSettings projectSettings)
-        {
-            _projectSettings = projectSettings;
-            _fileDialogService = fileDialogService;
-            _navigationService = navigationService;
-        }
+        #endregion
 
         #region Commands
         /// <summary>

@@ -2,6 +2,7 @@
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.ViewModels;
 using ASTDiffTool.ViewModels.Factories;
+using ASTDiffTool.ViewModels.Interfaces;
 using ASTDiffTool.ViewModels.Services;
 using ASTDiffTool.Views;
 using ASTDiffTool.Views.UserControls;
@@ -43,6 +44,7 @@ namespace ASTDiffTool
             services.AddSingleton<ProjectSettings>();
             services.AddSingleton<IFileDialogService, FileDialogService>();
             services.AddSingleton<INavigationService, NavigationService>();
+            services.AddSingleton<IEventAggregator, EventAggregator>();
 
             services.AddSingleton<NewProjectPageViewModel>();
             services.AddSingleton<ASTPageViewModel>();

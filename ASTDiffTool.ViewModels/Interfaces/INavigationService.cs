@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ASTDiffTool.ViewModels.Utilities;
+using ASTDiffTool.ViewModels.Services;
 
-namespace ASTDiffTool.ViewModels.Services
+namespace ASTDiffTool.ViewModels.Interfaces
 {
     public interface INavigationService
     {

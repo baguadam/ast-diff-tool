@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ASTDiffTool.ViewModels.Factories
+namespace ASTDiffTool.ViewModels.Interfaces
 {
     public interface IViewModelFactory
     {
