@@ -10,7 +10,7 @@
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="Detected Differences"
                        Style="{StaticResource TextStyle}"/>
-            <TextBlock Text="13"
+            <TextBlock Text="{Binding NumberOfDifferences}"
                        Margin="50, 0, 0, 0"
                        Padding="10"
                        FontSize="16"

@@ -42,6 +42,8 @@ namespace ASTDiffTool
             // REGISTERING MODELS, SERVICES AND VIEW MODELS
             // *********************************************
             services.AddSingleton<ProjectSettings>();
+            services.AddSingleton<Project>();
+
             services.AddSingleton<IFileDialogService, FileDialogService>();
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IEventAggregator, EventAggregator>();
@@ -63,6 +65,14 @@ namespace ASTDiffTool
                 var newProjectPageViewModel = provider.GetRequiredService<NewProjectPageViewModel>();
                 newProjectPage.DataContext = newProjectPageViewModel;
                 return newProjectPage;
+            });
+
+            services.AddTransient<ASTPage>(provider =>
+            {
+                var ASTPage = new ASTPage();
+                var ASTPageViewModel = provider.GetRequiredService<ASTPageViewModel>();
+                ASTPage.DataContext = ASTPageViewModel;
+                return ASTPage;
             });
 
             services.AddTransient<MainWindow>(provider =>

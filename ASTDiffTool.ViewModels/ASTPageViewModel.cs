@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using ASTDiffTool.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,18 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
-    public partial class ASTPageViewModel : ViewModelBase
+    public partial class ASTPageViewModel(Project project) : ViewModelBase
     {
-        private string _title = "AST Page View";
+        private readonly Project _project = project;
 
-        public string Title { get { return _title; }}
+        public int NumberOfDifferences
+        {
+            get => _project.NumberOfDifferences;
+            set
+            {
+                _project.NumberOfDifferences = value;
+                OnPropertyChanged(nameof(NumberOfDifferences));
+            }
+        }
     }
 }
