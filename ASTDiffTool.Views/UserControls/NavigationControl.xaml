@@ -4,53 +4,106 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ASTDiffTool.Views.UserControls"
-             xmlns:menu="clr-namespace:ASTDiffTool.Views.Utilities"
+             xmlns:utils="clr-namespace:ASTDiffTool.Views.Utilities"
+             xmlns:vm="clr-namespace:ASTDiffTool.ViewModels;assembly=ASTDiffTool.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <!--Type converter to set IsChecked properly according to the current view model-->
+        <utils:IsTypeConverter x:Key="IsType" />
     </UserControl.Resources>
     <StackPanel>
-        <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
-                               Command="{Binding NavigateNewProjectPageCommand}"
-                               IsChecked="{Binding CurrentView}"
-                               GroupName="NavigationGroup">
+        <!--NEW PROJECT PAGE-->
+        <utils:NavigationButton Command="{Binding NavigateNewProjectPageCommand}"
+                                GroupName="NavigationGroup">
+            <utils:NavigationButton.Style>
+                <Style TargetType="utils:NavigationButton" BasedOn="{StaticResource NavBtnStyle}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentViewModel, Converter={StaticResource IsType}, ConverterParameter={x:Type vm:NewProjectPageViewModel}}" Value="True">
+                            <Setter Property="IsChecked"
+                                    Value="True" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </utils:NavigationButton.Style>
+                     
             <TextBlock Text="New project" 
                        Style="{StaticResource TextStyle}"/>
-        </menu:NavigationButton>
-        <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
+        </utils:NavigationButton>
+        
+        <!--FEATURE: might be implemented later-->
+        <utils:NavigationButton Style="{StaticResource NavBtnStyle}"
                                GroupName="NavigationGroup"
                                IsEnabled="False">
             <TextBlock Text="Load project" 
                        Style="{StaticResource TextStyle}"/>
-        </menu:NavigationButton>
+        </utils:NavigationButton>
 
+        <!--This part is only visible if a selected project has been compiled successfully-->
         <StackPanel Margin="0, 20, 0, 0"
                     Visibility="{Binding IsCompilationCompleted, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
-                               Command="{Binding NavigateASTPageCommand}"
-                               GroupName="NavigationGroup">
+            <!--AST PAGE-->
+            <utils:NavigationButton Command="{Binding NavigateASTPageCommand}"
+                                    GroupName="NavigationGroup">
+                <utils:NavigationButton.Style>
+                    <Style TargetType="utils:NavigationButton" BasedOn="{StaticResource NavBtnStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentViewModel, Converter={StaticResource IsType}, ConverterParameter={x:Type vm:ASTPageViewModel}}" Value="True">
+                                <Setter Property="IsChecked"
+                                        Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </utils:NavigationButton.Style>
+                
                 <TextBlock Text="AST Comparison" 
                        Style="{StaticResource TextStyle}"/>
-            </menu:NavigationButton>
-            <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
-                               Command="{Binding NavigateProjectPageCommand}"
-                               GroupName="NavigationGroup">
+            </utils:NavigationButton>
+            
+            <!--PROJECT PAGE-->
+            <utils:NavigationButton Command="{Binding NavigateProjectPageCommand}"
+                                    GroupName="NavigationGroup">
+                <utils:NavigationButton.Style>
+                    <Style TargetType="utils:NavigationButton" BasedOn="{StaticResource NavBtnStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentViewModel, Converter={StaticResource IsType}, ConverterParameter={x:Type vm:ProjectPageViewModel}}" Value="True">
+                                <Setter Property="IsChecked"
+                                    Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </utils:NavigationButton.Style>
+                
                 <TextBlock Text="Project Details" 
                        Style="{StaticResource TextStyle}"/>
-            </menu:NavigationButton>
-            <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
-                               Command="{Binding NavigatePreprocessedCodePageCommand}"
-                               GroupName="NavigationGroup">
+            </utils:NavigationButton>
+            
+            <!--PREPROCESSED CODE PAGE-->
+            <utils:NavigationButton Command="{Binding NavigatePreprocessedCodePageCommand}"
+                                    GroupName="NavigationGroup">
+                <utils:NavigationButton.Style>
+                    <Style TargetType="utils:NavigationButton" BasedOn="{StaticResource NavBtnStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentViewModel, Converter={StaticResource IsType}, ConverterParameter={x:Type vm:PreprocessedCodePageViewModel}}" Value="True">
+                                <Setter Property="IsChecked"
+                                        Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </utils:NavigationButton.Style>
+                
                 <TextBlock Text="Preprocessed codes" 
                        Style="{StaticResource TextStyle}"/>
-            </menu:NavigationButton>
-            <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
+            </utils:NavigationButton>
+            
+            <!--FEATURE: might be implemented later-->
+            <utils:NavigationButton Style="{StaticResource NavBtnStyle}"
                                GroupName="NavigationGroup"
                                IsEnabled="False">
                 <TextBlock Text="Assembly code" 
                        Style="{StaticResource TextStyle}"/>
-            </menu:NavigationButton>
+            </utils:NavigationButton>
         </StackPanel>
     </StackPanel>
 </UserControl>
