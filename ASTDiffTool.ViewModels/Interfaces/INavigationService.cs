@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ASTDiffTool.ViewModels.Services;
+using ASTDiffTool.ViewModels.Events;
 
 namespace ASTDiffTool.ViewModels.Interfaces
 {

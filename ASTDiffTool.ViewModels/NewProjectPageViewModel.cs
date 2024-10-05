@@ -1,5 +1,6 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
+using ASTDiffTool.ViewModels.Events;
 using ASTDiffTool.ViewModels.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -162,8 +163,15 @@ namespace ASTDiffTool.ViewModels
                 $"Preprocessed: {IsStorePreprocessedCodeChecked} \n" +
                 $"Compilation Database path: {CompilationDatabasePath}");
 
-            // in case of successful compilation, navigate to AST View
-            _navigationService.NavigateTo<ASTPageViewModel>();
+            bool isSuccessful = true; // right now mocking the compilation with a true value here
+            // publishing an event that contains the result of the compilation
+            var projectCompilationEvent = new ProjectCompilationEvent(isSuccessful);
+            _eventAggregator.Publish(projectCompilationEvent);
+
+            if (isSuccessful)
+            {
+                _navigationService.NavigateTo<ASTPageViewModel>(); // in case of successful compilation, navigate to AST View            
+            }
         }
         #endregion
     }

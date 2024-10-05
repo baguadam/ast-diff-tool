@@ -1,4 +1,5 @@
 ﻿using ASTDiffTool.Services.Interfaces;
+using ASTDiffTool.ViewModels.Events;
 using ASTDiffTool.ViewModels.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;

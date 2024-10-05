@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ASTDiffTool.ViewModels.Services
+namespace ASTDiffTool.ViewModels.Events
 {
     public class NavigationEventArgs : EventArgs
     {

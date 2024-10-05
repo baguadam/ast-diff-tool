@@ -1,7 +1,7 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
+using ASTDiffTool.ViewModels.Events;
 using ASTDiffTool.ViewModels.Interfaces;
-using ASTDiffTool.ViewModels.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -17,9 +17,12 @@ namespace ASTDiffTool.ViewModels
     public partial class MainViewModel : ViewModelBase
     {
         private readonly INavigationService _navigationService;
+        private readonly IEventAggregator _eventAggregator;
 
         private ViewModelBase _currentViewModel;
+        private bool _isCompilationCompleted = false;
 
+        #region Properties
         public ViewModelBase CurrentViewModel
         {
             get => _currentViewModel;
@@ -30,14 +33,30 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
-        public MainViewModel(INavigationService navigationService)
+        public bool IsCompilationCompleted
+        {
+            get => _isCompilationCompleted;
+            set
+            {
+                _isCompilationCompleted = value;
+                OnPropertyChanged(nameof(IsCompilationCompleted));
+            }
+        }
+        #endregion
+
+        public MainViewModel(INavigationService navigationService, IEventAggregator eventAggregator)
         {
             _navigationService = navigationService;
+            _eventAggregator = eventAggregator;
+
+            // subscribing 
             _navigationService.NavigationCompleted += OnNavigationService_NavigationCompleted;
+            _eventAggregator.Subscribe<ProjectCompilationEvent>(HandleProjectCompiled);
 
             navigationService.NavigateTo<NewProjectPageViewModel>();
         }
 
+        #region Commands
         [RelayCommand]
         public void NavigateASTPage()
         {
@@ -61,10 +80,18 @@ namespace ASTDiffTool.ViewModels
         {
             _navigationService.NavigateTo<NewProjectPageViewModel>();
         }
+        #endregion
 
+        #region Event handlers
         private void OnNavigationService_NavigationCompleted(object? sender, NavigationEventArgs args)
         {
             CurrentViewModel = args.ViewModel;
         }
+
+        private void HandleProjectCompiled(ProjectCompilationEvent compilationEvent)
+        {
+            IsCompilationCompleted = compilationEvent.IsSuccessful;
+        }
+        #endregion
     }
 }

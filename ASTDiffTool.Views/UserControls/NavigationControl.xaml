@@ -7,6 +7,9 @@
              xmlns:menu="clr-namespace:ASTDiffTool.Views.Utilities"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
     <StackPanel>
         <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
                                Command="{Binding NavigateNewProjectPageCommand}"
@@ -22,7 +25,8 @@
                        Style="{StaticResource TextStyle}"/>
         </menu:NavigationButton>
 
-        <StackPanel Margin="0, 20, 0, 0">
+        <StackPanel Margin="0, 20, 0, 0"
+                    Visibility="{Binding IsCompilationCompleted, Converter={StaticResource BooleanToVisibilityConverter}}">
             <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
                                Command="{Binding NavigateASTPageCommand}"
                                GroupName="NavigationGroup">
