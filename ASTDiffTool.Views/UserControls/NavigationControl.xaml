@@ -13,7 +13,7 @@
     <StackPanel>
         <menu:NavigationButton Style="{StaticResource NavBtnStyle}"
                                Command="{Binding NavigateNewProjectPageCommand}"
-                               IsChecked="True"
+                               IsChecked="{Binding CurrentView}"
                                GroupName="NavigationGroup">
             <TextBlock Text="New project" 
                        Style="{StaticResource TextStyle}"/>
