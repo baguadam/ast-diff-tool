@@ -1,4 +1,5 @@
 ﻿using ASTDiffTool.Services.Interfaces;
+using ASTDiffTool.ViewModels.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -8,22 +9,17 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels.Services
 {
-    public class NavigationService : INavigationService
+    public class NavigationService(IServiceProvider serviceProvider) : INavigationService
     {
-        public event EventHandler<NavigationEventArgs> NavigationCompleted;
-        private readonly IServiceProvider _serviceProvider;
+        public event EventHandler<NavigationEventArgs> NavigationCompleted = null!;
+        private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-        public ViewModelBase CurrentViewModel { get; private set; }
-
-        public NavigationService(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
+        private ViewModelBase _currentViewModel = null!;
 
         public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase
         {
-            CurrentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
-            OnNavigationCompleted(new NavigationEventArgs(CurrentViewModel));
+            _currentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
+            OnNavigationCompleted(new NavigationEventArgs(_currentViewModel));
         }
 
         public void OnNavigationCompleted(NavigationEventArgs args)
