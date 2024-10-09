@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ASTDiffTool.ViewModels;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +22,15 @@ namespace ASTDiffTool.Views.UserControls
     /// </summary>
     public partial class TextDisplayerControl : UserControl
     {
+        public static readonly DependencyProperty LinesProperty =
+            DependencyProperty.Register("Lines", typeof(ObservableCollection<LineViewModel>), typeof(TextDisplayerControl));
+
+        public ObservableCollection<LineViewModel> Lines
+        {
+            get { return (ObservableCollection<LineViewModel>)GetValue(LinesProperty); }
+            set { SetValue(LinesProperty, value); }
+        }
+
         public TextDisplayerControl()
         {
             InitializeComponent();

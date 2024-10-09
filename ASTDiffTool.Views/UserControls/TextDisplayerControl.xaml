@@ -7,16 +7,28 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <Grid Background="AntiqueWhite">
-        <ItemsControl ItemsSource="{Binding}">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+                  VerticalScrollBarVisibility="Auto">
+        <!-- "Text editor" view for the AST code of the standards -->
+        <ItemsControl ItemsSource="{Binding Lines, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                          Grid.Column="0"
+                          Background="#272524">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button>
+                    <Button Command="{Binding Path=DataContext.JumpToSourceCodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                        <!-- Button Template is added and the textblock is displayed inside -->
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Button.Template>
+
+                        <!-- TextBlock with multibinding to display the line number and the line -->
                         <TextBlock>
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0}: {1}">
                                     <Binding Path="(ItemsControl.AlternationIndex)" 
-                                RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" />
+                                                 RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" />
                                     <Binding Path="Line" />
                                 </MultiBinding>
                             </TextBlock.Text>
@@ -24,23 +36,30 @@
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding State}" Value="Highlighted">
-                                            <Setter Property="Background" Value="Yellow" />
+                                            <Setter Property="Background" Value="Orange" />
+                                            <Setter Property="Foreground" Value="Black" />
                                         </DataTrigger>
                                     </Style.Triggers>
+                                    <Setter Property="FontSize"
+                                                Value="15" />
+                                    <Setter Property="Foreground"
+                                                Value="#DBDBDB" />
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
+            <!--Defining the panel to layout the control: now its a virtual stack panel-->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
+            <!-- Unique indices for line numbers -->
             <ItemsControl.AlternationCount>
                 <x:Static Member="sys:Int32.MaxValue" xmlns:sys="clr-namespace:System;assembly=mscorlib" />
             </ItemsControl.AlternationCount>
         </ItemsControl>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

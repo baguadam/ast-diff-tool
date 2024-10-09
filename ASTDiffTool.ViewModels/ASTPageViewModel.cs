@@ -1,8 +1,10 @@
 ﻿using ASTDiffTool.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +33,12 @@ namespace ASTDiffTool.ViewModels
                 _project.NumberOfDifferences = value;
                 OnPropertyChanged(nameof(NumberOfDifferences));
             }
+        }
+
+        [RelayCommand]
+        public void JumpToSourceCode()
+        {
+            Debug.WriteLine($"Line is clicked!");
         }
 
         private void FillLinesWithDummyData()
