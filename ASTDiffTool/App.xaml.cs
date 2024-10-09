@@ -1,4 +1,5 @@
 ﻿using ASTDiffTool.Models;
+using ASTDiffTool.Services;
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.ViewModels;
 using ASTDiffTool.ViewModels.Factories;
@@ -45,6 +46,7 @@ namespace ASTDiffTool
             services.AddSingleton<Project>();
 
             services.AddSingleton<IFileDialogService, FileDialogService>();
+            services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IEventAggregator, EventAggregator>();
 

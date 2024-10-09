@@ -14,7 +14,7 @@ namespace ASTDiffTool.Models
 
     public class LineModel
     {
-        public string Text { get; set; }
+        public string Line { get; set; }
         public LineState State { get; set; }
     }
 }

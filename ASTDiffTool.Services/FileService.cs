@@ -19,7 +19,7 @@ namespace ASTDiffTool.Services
                 string line;
                 while ((line = await reader.ReadLineAsync()) != null)
                 {
-                    lines.Add(new LineModel { Text = line, State = LineState.NORMAL });
+                    lines.Add(new LineModel { Line = line, State = LineState.NORMAL });
                 }
             }
 

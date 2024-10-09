@@ -1,4 +1,5 @@
 ﻿using ASTDiffTool.Models;
+using ASTDiffTool.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -14,15 +15,39 @@ namespace ASTDiffTool.ViewModels
     public partial class ASTPageViewModel : ViewModelBase
     {
         private readonly Project _project;
+        private readonly IFileService _fileService;
 
-        public ObservableCollection<LineViewModel> FirstStandardLines { get; set; } = new ObservableCollection<LineViewModel>();
-        public ObservableCollection<LineViewModel> SecondStandardLines { get; set; } = new ObservableCollection<LineViewModel>();
+        private ObservableCollection<LineModel> _firstStandardLines;
+        private ObservableCollection<LineModel> _secondStandardLines;
 
-        public ASTPageViewModel(Project project)
+        #region Properties
+        public ObservableCollection<LineModel> FirstStandardLines
+        {
+            get => _firstStandardLines;
+            set
+            {
+                _firstStandardLines = value;
+                OnPropertyChanged(nameof(FirstStandardLines));
+            }
+        }
+
+        public ObservableCollection<LineModel> SecondStandardLines
+        {
+            get => _secondStandardLines;
+            set
+            {
+                _secondStandardLines = value;
+                OnPropertyChanged(nameof(_secondStandardLines));
+            }
+        }
+        #endregion
+
+        public ASTPageViewModel(IFileService fileService, Project project)
         {
             _project = project;
+            _fileService = fileService;
 
-            FillLinesWithDummyData();
+            ReadASTsFromFile();
         }
 
         public int NumberOfDifferences
@@ -41,23 +66,13 @@ namespace ASTDiffTool.ViewModels
             Debug.WriteLine($"Line is clicked!");
         }
 
-        private void FillLinesWithDummyData()
+        private async void ReadASTsFromFile()
         {
-            for (int i = 0; i < 5000; i++)
-            {
-                var firstStandardLineViewModel = new LineViewModel { Line = $"Line {i + 1} in File 1" };
-                var secondStandardLineViewModel = new LineViewModel { Line = $"Line {i + 1} in File 2" };
+            var firstStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Documents\\Projects\\AST\\ast-diff-tool\\asts\\vector1.txt");
+            var secondStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Documents\\Projects\\AST\\ast-diff-tool\\asts\\vector2.txt");
 
-                // Highlight every 10th line
-                if (i % 10 == 0)
-                {
-                    firstStandardLineViewModel.State = LineState.Highlighted;
-                    secondStandardLineViewModel.State = LineState.Highlighted;
-                }
-
-                FirstStandardLines.Add(firstStandardLineViewModel);
-                SecondStandardLines.Add(secondStandardLineViewModel);
-            }
+            FirstStandardLines = new ObservableCollection<LineModel>(firstStandardData);
+            SecondStandardLines = new ObservableCollection<LineModel>(secondStandardData);
         }
     }
 }
