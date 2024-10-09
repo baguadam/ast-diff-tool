@@ -8,7 +8,6 @@
         xmlns:controls="clr-namespace:ASTDiffTool.Views.UserControls"
         mc:Ignorable="d"
         Title="AST Differential Tool" Height="600" Width="1000"
-        ResizeMode="NoResize"
         Background="#090F13">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

@@ -13,18 +13,20 @@
             <Setter Property="Foreground" Value="#888"/>
         </Style>
     </UserControl.Resources>
-    
+
     <ScrollViewer HorizontalScrollBarVisibility="Auto" 
                   VerticalScrollBarVisibility="Auto">
-        
+
         <!--Styling the scrollbar so it aligns with the dark mode design-->
         <ScrollViewer.Resources>
             <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarStyle}" />
         </ScrollViewer.Resources>
-        
+
         <ItemsControl ItemsSource="{Binding Lines, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                       Grid.Column="0"
-                      Background="#272524">
+                      Background="#272524"
+                      VirtualizingStackPanel.IsVirtualizing="True"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <!--Button is used so that it can be clicked-->
@@ -53,7 +55,7 @@
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-            
+
             <!--Defining ItemsPanel for VirtualizingStackPanel for performance gain because of the large number of lines-->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
