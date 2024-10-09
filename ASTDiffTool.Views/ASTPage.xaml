@@ -14,5 +14,11 @@
         </Grid.RowDefinitions>
 
         <controls:StatisticsControl Grid.Row="0" VerticalAlignment="Center"/>
+        
+        <StackPanel Grid.Row="1" 
+                    Orientation="Horizontal">
+            <controls:TextDisplayerControl DataContext="{Binding FirstStandardLines}"/>
+            <controls:TextDisplayerControl DataContext="{Binding SecondStandardLines}"/>
+        </StackPanel>
     </Grid>
 </UserControl>

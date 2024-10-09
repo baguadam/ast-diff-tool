@@ -6,16 +6,39 @@
              xmlns:local="clr-namespace:ASTDiffTool.Views.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <ListBox Grid.Column="0" 
-             ItemsSource="{Binding File1Lines}"
-             SelectedItem="{Binding SelectedLine1}"
-             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBox.ItemTemplate>
+
+    <Grid Background="AntiqueWhite">
+        <ItemsControl ItemsSource="{Binding}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Line}" Background="{Binding Background}" />
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0}: {1}">
+                                <Binding Path="(ItemsControl.AlternationIndex)" 
+                                     RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" />
+                                <Binding Path="Line" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding State}" Value="Highlighted">
+                                        <Setter Property="Background" Value="Yellow" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.AlternationCount>
+                <x:Static Member="sys:Int32.MaxValue" xmlns:sys="clr-namespace:System;assembly=mscorlib" />
+            </ItemsControl.AlternationCount>
+        </ItemsControl>
     </Grid>
 </UserControl>
