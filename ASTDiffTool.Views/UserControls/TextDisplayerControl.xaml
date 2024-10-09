@@ -6,32 +6,36 @@
              xmlns:local="clr-namespace:ASTDiffTool.Views.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-
+    <UserControl.Resources>
+        <Style x:Key="ScrollBarStyle" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Background" Value="#272524"/>
+            <Setter Property="Foreground" Value="#888"/>
+        </Style>
+    </UserControl.Resources>
+    
     <ScrollViewer HorizontalScrollBarVisibility="Auto" 
                   VerticalScrollBarVisibility="Auto">
-        <!-- "Text editor" view for the AST code of the standards -->
+        
+        <!--Styling the scrollbar so it aligns with the dark mode design-->
+        <ScrollViewer.Resources>
+            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarStyle}" />
+        </ScrollViewer.Resources>
+        
         <ItemsControl ItemsSource="{Binding Lines, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                          Grid.Column="0"
-                          Background="#272524">
+                      Grid.Column="0"
+                      Background="#272524">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
+                    <!--Button is used so that it can be clicked-->
                     <Button Command="{Binding Path=DataContext.JumpToSourceCodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}">
-                        <!-- Button Template is added and the textblock is displayed inside -->
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <ContentPresenter />
                             </ControlTemplate>
                         </Button.Template>
-
-                        <!-- TextBlock with multibinding to display the line number and the line -->
-                        <TextBlock>
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="{}{0}: {1}">
-                                    <Binding Path="(ItemsControl.AlternationIndex)" 
-                                                 RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" />
-                                    <Binding Path="Line" />
-                                </MultiBinding>
-                            </TextBlock.Text>
+                        <!--Textbox is defined inside the button, so it doesn't look like a button-->
+                        <TextBlock Text="{Binding Line}">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
@@ -40,26 +44,21 @@
                                             <Setter Property="Foreground" Value="Black" />
                                         </DataTrigger>
                                     </Style.Triggers>
-                                    <Setter Property="FontSize"
-                                                Value="15" />
-                                    <Setter Property="Foreground"
-                                                Value="#DBDBDB" />
+                                    <Setter Property="FontSize" Value="15" />
+                                    <Setter Property="Foreground" Value="#DBDBDB" />
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-            <!--Defining the panel to layout the control: now its a virtual stack panel-->
+            
+            <!--Defining ItemsPanel for VirtualizingStackPanel for performance gain because of the large number of lines-->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-            <!-- Unique indices for line numbers -->
-            <ItemsControl.AlternationCount>
-                <x:Static Member="sys:Int32.MaxValue" xmlns:sys="clr-namespace:System;assembly=mscorlib" />
-            </ItemsControl.AlternationCount>
         </ItemsControl>
     </ScrollViewer>
 </UserControl>
