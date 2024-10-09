@@ -11,24 +11,26 @@
         <ItemsControl ItemsSource="{Binding}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock>
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0}: {1}">
-                                <Binding Path="(ItemsControl.AlternationIndex)" 
-                                     RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" />
-                                <Binding Path="Line" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding State}" Value="Highlighted">
-                                        <Setter Property="Background" Value="Yellow" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                    <Button>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0}: {1}">
+                                    <Binding Path="(ItemsControl.AlternationIndex)" 
+                                RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" />
+                                    <Binding Path="Line" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding State}" Value="Highlighted">
+                                            <Setter Property="Background" Value="Yellow" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
