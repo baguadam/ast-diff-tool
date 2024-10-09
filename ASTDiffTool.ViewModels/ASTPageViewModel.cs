@@ -43,7 +43,7 @@ namespace ASTDiffTool.ViewModels
 
         private void FillLinesWithDummyData()
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 5000; i++)
             {
                 var firstStandardLineViewModel = new LineViewModel { Line = $"Line {i + 1} in File 1" };
                 var secondStandardLineViewModel = new LineViewModel { Line = $"Line {i + 1} in File 2" };

@@ -46,6 +46,7 @@
                                     </Style.Triggers>
                                     <Setter Property="FontSize" Value="15" />
                                     <Setter Property="Foreground" Value="#DBDBDB" />
+                                    <Setter Property="Padding" Value="5" />
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
