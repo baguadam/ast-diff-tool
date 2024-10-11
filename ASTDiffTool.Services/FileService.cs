@@ -16,7 +16,7 @@ namespace ASTDiffTool.Services
 
             using (var reader = new StreamReader(fileName))
             {
-                string line;
+                string line;         
                 while ((line = await reader.ReadLineAsync()) != null)
                 {
                     lines.Add(new LineModel { Line = line, State = LineState.NORMAL });

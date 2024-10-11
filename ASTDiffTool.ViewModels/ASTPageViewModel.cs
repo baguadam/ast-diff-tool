@@ -68,8 +68,8 @@ namespace ASTDiffTool.ViewModels
 
         private async void ReadASTsFromFile()
         {
-            var firstStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Documents\\Projects\\AST\\ast-diff-tool\\asts\\vector1.txt");
-            var secondStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Documents\\Projects\\AST\\ast-diff-tool\\asts\\vector2.txt");
+            var firstStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Ádám\\Egyetem - 07\\SZAKDOLGOZAT\\ASTDiffTool\\asts\\vector1.txt");
+            var secondStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Ádám\\Egyetem - 07\\SZAKDOLGOZAT\\ASTDiffTool\\asts\\vector2.txt");
 
             FirstStandardLines = new ObservableCollection<LineModel>(firstStandardData);
             SecondStandardLines = new ObservableCollection<LineModel>(secondStandardData);

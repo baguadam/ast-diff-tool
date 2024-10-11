@@ -15,8 +15,8 @@
     <Grid>
         <!--Main Grid of the application-->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="30*"/>
-            <ColumnDefinition Width="70*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="80*"/>
         </Grid.ColumnDefinitions>
 
         <!--Left side for project settings, visible on each view-->
