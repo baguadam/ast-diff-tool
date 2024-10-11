@@ -18,20 +18,21 @@
             <!--Setting the text color based on the message-->
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="Foreground" Value="{StaticResource DarkFontColor}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding NotificationMessage}" Value="File selected successfully!">
-                            <Setter Property="Foreground" Value="Green" />
+                            <Setter Property="Foreground" Value="{StaticResource NotificationSuccessColor}" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding NotificationMessage}" Value="Failed to select file!">
-                            <Setter Property="Foreground" Value="Red" />
+                            <Setter Property="Foreground" Value="{StaticResource NotificationFailedColor}" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>
         </TextBlock>
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center">
             <Button Style="{StaticResource ButtonStyle}"
                     Content="Load compilation database"     
                     Width="200"

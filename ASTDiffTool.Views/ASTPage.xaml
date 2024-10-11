@@ -13,7 +13,9 @@
             <RowDefinition Height="85*" />
         </Grid.RowDefinitions>
 
-        <controls:StatisticsControl Grid.Row="0" VerticalAlignment="Center"/>
+        <controls:StatisticsControl Grid.Row="0" 
+                                    VerticalAlignment="Center"
+                                    Padding="10"/>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -24,12 +26,12 @@
             <!--AST code view of the compiled by first standard-->
             <controls:TextDisplayerControl Lines="{Binding FirstStandardLines}"
                                            Grid.Column="0"
-                                           Padding="5"/>
+                                           Padding="20, 0, 10, 20"/>
             
             <!--AST code view of the compiled by second standard-->
             <controls:TextDisplayerControl Lines="{Binding SecondStandardLines}"
                                            Grid.Column="1"
-                                           Padding="5"/>
+                                           Padding="10, 0, 20, 20"/>
         </Grid>
     </Grid>
 </UserControl>
