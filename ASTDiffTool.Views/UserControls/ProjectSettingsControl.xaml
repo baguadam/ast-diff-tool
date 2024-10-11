@@ -10,7 +10,7 @@
     <Border Margin="0, 10, 0, 0"
             Padding="10"
             BorderThickness="1"
-            BorderBrush="White">
+            BorderBrush="{StaticResource DarkBorderColor}">
         <StackPanel>
             <TextBlock Text="Select C++ standards for compilation" Style="{StaticResource TextStyle}" HorizontalAlignment="Center" Margin="2, 10, 2, 2" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
@@ -28,12 +28,12 @@
             <CheckBox Content="Store assembly code" 
                       FontSize="13" 
                       Margin="5, 10, 0, 0" 
-                      Foreground="White"
+                      Foreground="{StaticResource DarkFontColor}"
                       IsChecked="{Binding IsStoreAssemblyChecked, Mode=TwoWay}"/>
             <CheckBox Content="Store preprocessed code" 
                       FontSize="13" 
                       Margin="5, 10, 0, 0"
-                      Foreground="White"
+                      Foreground="{StaticResource DarkFontColor}"
                       IsChecked="{Binding IsStorePreprocessedCodeChecked, Mode=TwoWay}"/>
 
             <!--File path is only displayed if a file has already been selected-->
@@ -44,7 +44,7 @@
                            Margin="5, 20, 0, 0"/>
                 <TextBlock Text="{Binding CompilationDatabasePath}"             
                            TextWrapping="Wrap"
-                           Foreground="White"
+                           Foreground="{StaticResource DarkFontColor}"
                            Margin="5, 10, 0, 0" 
                            FontSize="13"/>
             </StackPanel>

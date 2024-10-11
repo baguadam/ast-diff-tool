@@ -10,9 +10,11 @@
         <Setter Property="BorderThickness"
                 Value="0" />
         <Setter Property="Background"
-                Value="#272B2F" />
+                Value="{StaticResource ButtonBackgroundColor}" />
         <Setter Property="Foreground"
-                Value="White" />
+                Value="{StaticResource LightFontColor}" />
+        <Setter Property="FontWeight" 
+                Value="Bold"/>
         <Setter Property="FontSize"
                 Value="14" />
 
@@ -28,13 +30,13 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#3E434A" />
-                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="Background" Value="{StaticResource ButtonHoverBackgroundColor}" />
+                            <Setter Property="Foreground" Value="{StaticResource LightFontColor}" />
                         </Trigger>
 
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#212529" />
-                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="Background" Value="{StaticResource ButtonBackgroundColor}" />
+                            <Setter Property="Foreground" Value="{StaticResource LightFontColor}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

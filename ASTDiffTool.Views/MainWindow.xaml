@@ -8,7 +8,7 @@
         xmlns:controls="clr-namespace:ASTDiffTool.Views.UserControls"
         mc:Ignorable="d"
         Title="AST Differential Tool" Height="600" Width="1000"
-        Background="#090F13">
+        Background="{StaticResource PrimarBackgroundColor}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
@@ -21,7 +21,7 @@
 
         <!--Left side for project settings, visible on each view-->
         <Border Grid.Column="0" 
-                Background="#272524">
+                Background="{StaticResource SecondaryBackgroundColor}">
             <StackPanel Margin="0, 100, 0, 100">
                 <controls:NavigationControl />
             </StackPanel>

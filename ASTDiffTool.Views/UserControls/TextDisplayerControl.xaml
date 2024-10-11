@@ -6,27 +6,12 @@
              xmlns:local="clr-namespace:ASTDiffTool.Views.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <Style x:Key="ScrollBarStyle" TargetType="{x:Type ScrollBar}">
-            <Setter Property="Width" Value="10" />
-            <Setter Property="Background" Value="#272524"/>
-            <Setter Property="Foreground" Value="#888"/>
-        </Style>
-    </UserControl.Resources>
-
     <ScrollViewer HorizontalScrollBarVisibility="Auto" 
                   VerticalScrollBarVisibility="Auto">
 
-        <!--Styling the scrollbar so it aligns with the dark mode design-->
-        <ScrollViewer.Resources>
-            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarStyle}" />
-        </ScrollViewer.Resources>
-
         <ItemsControl ItemsSource="{Binding Lines, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                       Grid.Column="0"
-                      Background="#272524"
-                      VirtualizingStackPanel.IsVirtualizing="True"
-                      VirtualizingStackPanel.VirtualizationMode="Recycling">
+                      Background="{StaticResource EditorBackgroundColor}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <!--Button is used so that it can be clicked-->
@@ -42,12 +27,11 @@
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding State}" Value="Highlighted">
-                                            <Setter Property="Background" Value="Orange" />
-                                            <Setter Property="Foreground" Value="Black" />
+                                            <Setter Property="Background" Value="{StaticResource WarningBackgroundColor}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                     <Setter Property="FontSize" Value="15" />
-                                    <Setter Property="Foreground" Value="#DBDBDB" />
+                                    <Setter Property="Foreground" Value="{StaticResource DarkFontColor}" />
                                     <Setter Property="Padding" Value="5" />
                                 </Style>
                             </TextBlock.Style>

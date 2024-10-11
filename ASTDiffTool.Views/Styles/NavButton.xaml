@@ -19,11 +19,6 @@
                             BorderThickness="0"
                             HorizontalAlignment="Stretch">
 
-                        <Border.Background>
-                            <SolidColorBrush x:Name="BorderBackground"
-                                             Color="#272B2F" />
-                        </Border.Background>
-
                         <Grid>
                             <!--Indicator for the left side in case of hover or selected menu item-->
                             <Border x:Name="Indicator"
@@ -31,7 +26,7 @@
                                     Width="5"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center"
-                                    Background="White"
+                                    Background="{StaticResource ButtonBackgroundColor}"
                                     Visibility="Collapsed"
                                     CornerRadius="2"/>
 
@@ -42,19 +37,19 @@
                     <ControlTemplate.Triggers>
                         <!--Change background color on hover, display the indicator-->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" TargetName="border" Value="#3E434A" />
+                            <Setter Property="Background" TargetName="border" Value="{StaticResource ButtonHoverBackgroundColor}" />
                             <Setter Property="Visibility" TargetName="Indicator" Value="Visible" />
                         </Trigger>
 
                         <!--Revert to original background color when not hovered, remove the indicator-->
                         <Trigger Property="IsMouseOver" Value="False">
-                            <Setter Property="Background" TargetName="border" Value="#272B2F" />
+                            <Setter Property="Background" TargetName="border" Value="{StaticResource ButtonBackgroundColor}" />
                             <Setter Property="Visibility" TargetName="Indicator" Value="Collapsed" />
                         </Trigger>
 
                         <!--When the menu item is selected, the indicator is displayed, backgroun color is differend-->
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" TargetName="border" Value="#212529" />
+                            <Setter Property="Background" TargetName="border" Value="{StaticResource ButtonPressedBackgroundColor}" />
                             <Setter Property="Visibility" TargetName="Indicator" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
