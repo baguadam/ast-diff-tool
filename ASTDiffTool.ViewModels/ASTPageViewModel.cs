@@ -18,38 +18,17 @@ namespace ASTDiffTool.ViewModels
         private readonly IFileService _fileService;
         private readonly IDatabaseConnectionService _connectionService;
 
-        private ObservableCollection<LineModel> _firstStandardLines;
-        private ObservableCollection<LineModel> _secondStandardLines;
+        private ObservableCollection<Node> _highestLevelNode;
 
         #region Properties
-        public ObservableCollection<LineModel> FirstStandardLines
+        public ObservableCollection<Node> HighestLevelNodes
         {
-            get => _firstStandardLines;
+            get => _highestLevelNode;
             set
             {
-                _firstStandardLines = value;
-                OnPropertyChanged(nameof(FirstStandardLines));
+                _highestLevelNode = value;
+                OnPropertyChanged(nameof(_highestLevelNode));
             }
-        }
-
-        public ObservableCollection<LineModel> SecondStandardLines
-        {
-            get => _secondStandardLines;
-            set
-            {
-                _secondStandardLines = value;
-                OnPropertyChanged(nameof(_secondStandardLines));
-            }
-        }
-        #endregion
-
-        public ASTPageViewModel(IFileService fileService, IDatabaseConnectionService connectionService, Project project)
-        {
-            _project = project;
-            _fileService = fileService;
-            _connectionService = connectionService;
-
-            GetAllNodes();
         }
 
         public int NumberOfDifferences
@@ -61,6 +40,14 @@ namespace ASTDiffTool.ViewModels
                 OnPropertyChanged(nameof(NumberOfDifferences));
             }
         }
+        #endregion
+
+        public ASTPageViewModel(IFileService fileService, IDatabaseConnectionService connectionService, Project project)
+        {
+            _project = project;
+            _fileService = fileService;
+            _connectionService = connectionService;
+        }
 
         [RelayCommand]
         public void JumpToSourceCode()
@@ -68,21 +55,19 @@ namespace ASTDiffTool.ViewModels
             Debug.WriteLine($"Line is clicked!");
         }
 
-        private async void ReadASTsFromFile()
-        {
-            var firstStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Ádám\\Egyetem - 07\\SZAKDOLGOZAT\\ASTDiffTool\\asts\\vector1.txt");
-            var secondStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Ádám\\Egyetem - 07\\SZAKDOLGOZAT\\ASTDiffTool\\asts\\vector2.txt");
-
-            FirstStandardLines = new ObservableCollection<LineModel>(firstStandardData);
-            SecondStandardLines = new ObservableCollection<LineModel>(secondStandardData);
-        }
-
-        private async void GetAllNodes()
+        private IList<Node> GetHighestLevelNodesWithSubtrees()
         {
             using (var dbContext = _connectionService.Create())
             {
-                // ....
+                var highestLevelNodes = dbContext.Nodes.Where(n => n.IsHighestLevelNode).ToList();
+
+                foreach (var node in highestLevelNodes)
+                {
+
+                }
             }
+
+            return null;
         }
     }
 }
