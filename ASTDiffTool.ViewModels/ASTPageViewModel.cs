@@ -16,6 +16,7 @@ namespace ASTDiffTool.ViewModels
     {
         private readonly Project _project;
         private readonly IFileService _fileService;
+        private readonly IDatabaseConnectionService _connectionService;
 
         private ObservableCollection<LineModel> _firstStandardLines;
         private ObservableCollection<LineModel> _secondStandardLines;
@@ -42,12 +43,13 @@ namespace ASTDiffTool.ViewModels
         }
         #endregion
 
-        public ASTPageViewModel(IFileService fileService, Project project)
+        public ASTPageViewModel(IFileService fileService, IDatabaseConnectionService connectionService, Project project)
         {
             _project = project;
             _fileService = fileService;
+            _connectionService = connectionService;
 
-            ReadASTsFromFile();
+            GetAllNodes();
         }
 
         public int NumberOfDifferences
@@ -73,6 +75,14 @@ namespace ASTDiffTool.ViewModels
 
             FirstStandardLines = new ObservableCollection<LineModel>(firstStandardData);
             SecondStandardLines = new ObservableCollection<LineModel>(secondStandardData);
+        }
+
+        private async void GetAllNodes()
+        {
+            using (var dbContext = _connectionService.Create())
+            {
+                // ....
+            }
         }
     }
 }
