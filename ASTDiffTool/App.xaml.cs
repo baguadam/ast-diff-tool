@@ -42,26 +42,35 @@ namespace ASTDiffTool
             // *********************************************
             // REGISTERING MODELS, SERVICES AND VIEW MODELS
             // *********************************************
-            services.AddSingleton<ProjectSettings>();
-            services.AddSingleton<Project>();
+            _ = services.AddSingleton<ProjectSettings>();
+            _ = services.AddSingleton<Project>();
 
-            services.AddSingleton<IFileDialogService, FileDialogService>();
-            services.AddSingleton<IFileService, FileService>();
-            services.AddSingleton<INavigationService, NavigationService>();
-            services.AddSingleton<IEventAggregator, EventAggregator>();
+            _ = services.AddSingleton<IFileDialogService, FileDialogService>();
+            _ = services.AddSingleton<IFileService, FileService>();
+            _ = services.AddSingleton<INavigationService, NavigationService>();
+            _ = services.AddSingleton<IEventAggregator, EventAggregator>();
+            _ = services.AddSingleton<IDatabaseConnectionService, DatabaseConnectionService>();
 
-            services.AddSingleton<NewProjectPageViewModel>();
-            services.AddSingleton<ASTPageViewModel>();
-            services.AddSingleton<ProjectPageViewModel>();
-            services.AddSingleton<PreprocessedCodePageViewModel>();
-            services.AddSingleton<MainViewModel>();
+            _ = services.AddSingleton<NewProjectPageViewModel>();
+            _ = services.AddSingleton<ASTPageViewModel>();
+            _ = services.AddSingleton<ProjectPageViewModel>();
+            _ = services.AddSingleton<PreprocessedCodePageViewModel>();
+            _ = services.AddSingleton<MainViewModel>();
 
-            services.AddSingleton<IViewModelFactory, ViewModelFactory>();
+            _ = services.AddSingleton<IViewModelFactory, ViewModelFactory>();
+
+            // factory for creating DatabaseContext with the current connection string
+            _ = services.AddScoped<DatabaseContext>(provider =>
+            {
+                var connectionService = provider.GetRequiredService<IDatabaseConnectionService>();
+                var connectionString = connectionService.GetConnectionString();
+                return new DatabaseContext(connectionString);
+            });
 
             // *********************************************
             // INJECTING THE VIEW MODELS INTO THE VIEWS
             // *********************************************
-            services.AddTransient<NewProjectPage>(provider =>
+            _ = services.AddTransient<NewProjectPage>(provider =>
             {
                 var newProjectPage = new NewProjectPage();
                 var newProjectPageViewModel = provider.GetRequiredService<NewProjectPageViewModel>();
@@ -69,7 +78,7 @@ namespace ASTDiffTool
                 return newProjectPage;
             });
 
-            services.AddTransient<ASTPage>(provider =>
+            _ = services.AddTransient<ASTPage>(provider =>
             {
                 var ASTPage = new ASTPage();
                 var ASTPageViewModel = provider.GetRequiredService<ASTPageViewModel>();
@@ -77,7 +86,7 @@ namespace ASTDiffTool
                 return ASTPage;
             });
 
-            services.AddTransient<MainWindow>(provider =>
+            _ = services.AddTransient<MainWindow>(provider =>
             {
                 var mainWindow = new MainWindow();
                 var mainViewModel = provider.GetRequiredService<MainViewModel>();
