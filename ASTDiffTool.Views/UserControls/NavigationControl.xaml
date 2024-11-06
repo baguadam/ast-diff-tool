@@ -28,8 +28,9 @@
                 </Style>
             </utils:NavigationButton.Style>
                      
-            <TextBlock Text="New project" 
-                       Style="{StaticResource TextStyle}"/>
+            <TextBlock Text="New project"              
+                       Style="{StaticResource TextStyle}"
+                       Foreground="{StaticResource LightFontColor}"/>
         </utils:NavigationButton>
         
         <!--FEATURE: might be implemented later-->
@@ -37,7 +38,8 @@
                                GroupName="NavigationGroup"
                                IsEnabled="False">
             <TextBlock Text="Load project" 
-                       Style="{StaticResource TextStyle}"/>
+                       Style="{StaticResource TextStyle}"
+                       Foreground="{StaticResource LightFontColor}"/>
         </utils:NavigationButton>
 
         <!--This part is only visible if a selected project has been compiled successfully-->
@@ -58,7 +60,8 @@
                 </utils:NavigationButton.Style>
                 
                 <TextBlock Text="AST Comparison" 
-                       Style="{StaticResource TextStyle}"/>
+                           Style="{StaticResource TextStyle}"
+                           Foreground="{StaticResource LightFontColor}"/>
             </utils:NavigationButton>
             
             <!--PROJECT PAGE-->
@@ -76,7 +79,8 @@
                 </utils:NavigationButton.Style>
                 
                 <TextBlock Text="Project Details" 
-                       Style="{StaticResource TextStyle}"/>
+                           Style="{StaticResource TextStyle}"
+                           Foreground="{StaticResource LightFontColor}"/>
             </utils:NavigationButton>
             
             <!--PREPROCESSED CODE PAGE-->
@@ -94,7 +98,8 @@
                 </utils:NavigationButton.Style>
                 
                 <TextBlock Text="Preprocessed codes" 
-                       Style="{StaticResource TextStyle}"/>
+                           Style="{StaticResource TextStyle}"
+                           Foreground="{StaticResource LightFontColor}"/>
             </utils:NavigationButton>
             
             <!--FEATURE: might be implemented later-->
@@ -102,7 +107,8 @@
                                GroupName="NavigationGroup"
                                IsEnabled="False">
                 <TextBlock Text="Assembly code" 
-                       Style="{StaticResource TextStyle}"/>
+                           Style="{StaticResource TextStyle}"
+                           Foreground="{StaticResource LightFontColor}"/>
             </utils:NavigationButton>
         </StackPanel>
     </StackPanel>

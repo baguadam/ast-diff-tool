@@ -4,10 +4,34 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ASTDiffTool.Views"
+             xmlns:controls="clr-namespace:ASTDiffTool.Views.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid HorizontalAlignment="Center"
-          VerticalAlignment="Center">
-        <TextBlock Text="ITT VAGYOK" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="15*" />
+            <RowDefinition Height="85*" />
+        </Grid.RowDefinitions>
+
+        <controls:StatisticsControl Grid.Row="0" 
+                                    VerticalAlignment="Center"
+                                    Padding="10"/>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+
+            <!--AST code view of the compiled by first standard-->
+            <controls:TextDisplayerControl Lines="{Binding FirstStandardLines}"
+                                           Grid.Column="0"
+                                           Padding="20, 0, 10, 20"/>
+            
+            <!--AST code view of the compiled by second standard-->
+            <controls:TextDisplayerControl Lines="{Binding SecondStandardLines}"
+                                           Grid.Column="1"
+                                           Padding="10, 0, 20, 20"/>
+        </Grid>
     </Grid>
 </UserControl>

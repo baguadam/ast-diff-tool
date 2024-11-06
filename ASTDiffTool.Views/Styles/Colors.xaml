@@ -1,0 +1,22 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="LightFontColor" Color="White" />
+    <SolidColorBrush x:Key="DarkFontColor" Color="Black" />
+    
+    <SolidColorBrush x:Key="LightBorderColor" Color="White" />
+    <SolidColorBrush x:Key="DarkBorderColor" Color="Black" />
+
+    <SolidColorBrush x:Key="NotificationSuccessColor" Color="Green" />
+    <SolidColorBrush x:Key="NotificationFailedColor" Color="Red" />
+
+    <SolidColorBrush x:Key="PrimarBackgroundColor" Color="#E1DACA" />
+    <SolidColorBrush x:Key="SecondaryBackgroundColor" Color="#F5F5EB" />
+
+    <SolidColorBrush x:Key="ButtonBackgroundColor" Color="#B3907A" />
+    <SolidColorBrush x:Key="ButtonHoverBackgroundColor" Color="#A25133" />
+    <SolidColorBrush x:Key="ButtonPressedBackgroundColor" Color="#A25133" />
+        
+    <SolidColorBrush x:Key="EditorBackgroundColor" Color="White" />
+        
+    <SolidColorBrush x:Key="WarningBackgroundColor" Color="Orange" />
+</ResourceDictionary>

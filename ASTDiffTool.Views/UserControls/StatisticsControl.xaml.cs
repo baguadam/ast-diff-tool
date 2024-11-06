@@ -1,5 +1,4 @@
-﻿using ASTDiffTool.ViewModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ASTDiffTool.Views
+namespace ASTDiffTool.Views.UserControls
 {
     /// <summary>
-    /// Interaction logic for ASTPage.xaml
+    /// Interaction logic for StatisticsControl.xaml
     /// </summary>
-    public partial class ASTPage : UserControl
+    public partial class StatisticsControl : UserControl
     {
-        public ASTPage()
+        public StatisticsControl()
         {
             InitializeComponent();
         }
