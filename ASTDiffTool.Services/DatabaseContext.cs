@@ -17,6 +17,14 @@ namespace ASTDiffTool.Services
 
         public DatabaseContext(string connectionString) => _connectionString = connectionString;
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                _ = optionsBuilder.UseSqlite(_connectionString);
+            }
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure the primary key for the Node entity
