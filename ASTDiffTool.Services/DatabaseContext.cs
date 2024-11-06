@@ -13,6 +13,10 @@ namespace ASTDiffTool.Services
         public DbSet<Node> Nodes {  get; set; }
         public DbSet<Edge> Edges { get; set; }
 
+        private readonly string _connectionString;
+
+        public DatabaseContext(string connectionString) => _connectionString = connectionString;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure the primary key for the Node entity
