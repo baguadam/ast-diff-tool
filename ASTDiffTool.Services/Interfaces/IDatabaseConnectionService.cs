@@ -10,5 +10,6 @@ namespace ASTDiffTool.Services.Interfaces
     {
         string GetConnectionString();
         void UpdateConnectionString(string filePath);
+        DatabaseContext Create();
     }
 }

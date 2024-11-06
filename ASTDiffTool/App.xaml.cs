@@ -59,14 +59,6 @@ namespace ASTDiffTool
 
             _ = services.AddSingleton<IViewModelFactory, ViewModelFactory>();
 
-            // factory for creating DatabaseContext with the current connection string
-            _ = services.AddScoped<DatabaseContext>(provider =>
-            {
-                var connectionService = provider.GetRequiredService<IDatabaseConnectionService>();
-                var connectionString = connectionService.GetConnectionString();
-                return new DatabaseContext(connectionString);
-            });
-
             // *********************************************
             // INJECTING THE VIEW MODELS INTO THE VIEWS
             // *********************************************

@@ -17,5 +17,14 @@ namespace ASTDiffTool.Services
         {
             _connectionString = $"Data Source={filePath}";
         }
+
+        public DatabaseContext Create()
+        {
+            if (string.IsNullOrEmpty(_connectionString))
+            {
+                throw new InvalidOperationException("The connection string has not been initialized.");
+            }
+            return new DatabaseContext(_connectionString);
+        }
     }
 }

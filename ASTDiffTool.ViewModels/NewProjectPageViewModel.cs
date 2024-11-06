@@ -1,9 +1,11 @@
 ﻿using ASTDiffTool.Models;
+using ASTDiffTool.Services;
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.ViewModels.Events;
 using ASTDiffTool.ViewModels.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,12 +18,16 @@ namespace ASTDiffTool.ViewModels
     public partial class NewProjectPageViewModel(IFileDialogService fileDialogService,
         INavigationService navigationService,
         IEventAggregator eventAggregator,
+        IDatabaseConnectionService connectionService,
         ProjectSettings projectSettings) : ViewModelBase
     {
+        private readonly string DB_PATH = "diff.db3";
+
         private readonly ProjectSettings _projectSettings = projectSettings;
         private readonly IFileDialogService _fileDialogService = fileDialogService;
         private readonly INavigationService _navigationService = navigationService;
         private readonly IEventAggregator _eventAggregator = eventAggregator;
+        private readonly IDatabaseConnectionService _connectionService = connectionService;
 
         private bool _hasSelectedFile = false;
         private string _notificationMessage;
@@ -122,13 +128,18 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void LoadCompilationDatabase()
         {
-            var filePath = _fileDialogService.OpenFile("Compilation Database File (*.json)|*.json");
+            string? filePath = _fileDialogService.OpenFile("Compilation Database File (*.json)|*.json");
 
             if (!string.IsNullOrEmpty(filePath))
             {
                 HasSelectedFile = true;
                 CompilationDatabasePath = filePath;
                 _projectSettings.CompilationDatabasePath = filePath;
+
+                // set the database path
+                string? directory = Path.GetDirectoryName(filePath);
+                string databasePath = Path.Combine(filePath, DB_PATH);
+                _connectionService.UpdateConnectionString(databasePath);
 
                 NotificationMessage = "File selected successfully!";
             }
@@ -140,7 +151,7 @@ namespace ASTDiffTool.ViewModels
             IsNotificationVisible = true;
 
             // The text is supposed to visible for 3 seconds
-            Task.Delay(5000).ContinueWith(_ => IsNotificationVisible = false);
+            _ = Task.Delay(5000).ContinueWith(_ => IsNotificationVisible = false);
         }
 
         /// <summary>
