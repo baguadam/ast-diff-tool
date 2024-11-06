@@ -10,28 +10,31 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="15*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="85*" />
         </Grid.RowDefinitions>
 
+        <!--Statistics about detected differences-->
         <controls:StatisticsControl Grid.Row="0" 
                                     VerticalAlignment="Center"
                                     Padding="10"/>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*" />
-                <ColumnDefinition Width="50*" />
-            </Grid.ColumnDefinitions>
+        <!--Toggle buttons to select which differences to display-->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Margin="15, 0, 0, 0">
+            <ToggleButton Content="Only in first AST" 
+                          Style="{StaticResource ButtonLikeToggleButtonStyle}"
+                          IsChecked="{Binding ShowFirstAST, Mode=TwoWay}"/>
+            <ToggleButton Content="Only in second AST" 
+                          Style="{StaticResource ButtonLikeToggleButtonStyle}"
+                          IsChecked="{Binding ShowSecondAST, Mode=TwoWay}"/>
+            <ToggleButton Content="Both ASTs, structural differences" 
+                          Style="{StaticResource ButtonLikeToggleButtonStyle}"
+                          IsChecked="{Binding ShowBothASTs, Mode=TwoWay}"/>
+        </StackPanel>
 
-            <!--AST code view of the compiled by first standard-->
-            <controls:TextDisplayerControl Lines="{Binding FirstStandardLines}"
-                                           Grid.Column="0"
-                                           Padding="20, 0, 10, 20"/>
-            
-            <!--AST code view of the compiled by second standard-->
-            <controls:TextDisplayerControl Lines="{Binding SecondStandardLines}"
-                                           Grid.Column="1"
-                                           Padding="10, 0, 20, 20"/>
-        </Grid>
+        <!--AST code view of the compiled by first standard-->
+        <controls:TextDisplayerControl Lines="{Binding FirstStandardLines}"
+                                       Grid.Row="2"
+                                       Padding="20, 0, 10, 20"/>
     </Grid>
 </UserControl>
