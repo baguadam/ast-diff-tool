@@ -41,6 +41,7 @@ namespace ASTDiffTool.ViewModels
                 if (_projectModel.CompilationDatabasePath != value)
                 {
                     _projectModel.CompilationDatabasePath = value;
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(CanCompile));
                 }
             }
@@ -54,6 +55,7 @@ namespace ASTDiffTool.ViewModels
                 if (_projectModel.MainFilePath != value)
                 {
                     _projectModel.MainFilePath = value;
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(CanCompile));
                 }
             }
@@ -67,6 +69,7 @@ namespace ASTDiffTool.ViewModels
                 if (_projectModel.ProjectName != value)
                 {
                     _projectModel.ProjectName = value;
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(CanCompile));
                 }
             }
@@ -80,6 +83,7 @@ namespace ASTDiffTool.ViewModels
                 if (_projectModel.FirstSelectedStandard != value)
                 {
                     _projectModel.FirstSelectedStandard = value;
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(CanCompile));
                 }
             }
@@ -93,6 +97,7 @@ namespace ASTDiffTool.ViewModels
                 if (_projectModel.SecondSelectedStandard != value)
                 {
                     _projectModel.SecondSelectedStandard = value;
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(CanCompile));
                 }
             }
@@ -175,7 +180,7 @@ namespace ASTDiffTool.ViewModels
             {
                 NotificationMessage = "Please ensure all inputs are provided before compiling.";
                 IsNotificationVisible = true;
-                await Task.Delay(5000);
+                await Task.Delay(3000);
                 IsNotificationVisible = false;
                 return;
             }
@@ -206,7 +211,7 @@ namespace ASTDiffTool.ViewModels
             }
 
             IsNotificationVisible = true;
-            await Task.Delay(5000);
+            await Task.Delay(3000);
             IsNotificationVisible = false;
         }
 

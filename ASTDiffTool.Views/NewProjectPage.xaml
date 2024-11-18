@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ASTDiffTool.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="500" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
@@ -31,7 +31,9 @@
                         <TextBox Width="350" 
                                  Margin="0,0,10,0"
                                  Text="{Binding CompilationDatabasePath}" 
-                                 IsReadOnly="True" />
+                                 IsReadOnly="True" 
+                                 FontSize="14"
+                                 VerticalContentAlignment="Center"/>
                         <Button Content="Browse"
                                 Command="{Binding SelectCompilationDatabaseCommand}"
                                 Width="100"
@@ -47,7 +49,9 @@
                         <TextBox Width="350" 
                                  Margin="0,0,10,0"
                                  Text="{Binding MainFilePath}" 
-                                 IsReadOnly="True" />
+                                 IsReadOnly="True" 
+                                 FontSize="14"
+                                 VerticalContentAlignment="Center"/>
                         <Button Content="Browse"
                                 Command="{Binding SelectMainFileCommand}"
                                 Width="100"
@@ -62,7 +66,9 @@
                     <TextBox Width="350" 
                              Height="30"
                              Margin="0,10,0,0"
-                             Text="{Binding ProjectName}" />
+                             Text="{Binding ProjectName}" 
+                             FontSize="14"
+                             VerticalContentAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Step 4: Select C++ Standards -->
@@ -103,7 +109,7 @@
             </StackPanel>
         </Border>
 
-        <!--lading overlay-->
+        <!-- Loading Overlay -->
         <Border Background="#AA000000"
                 Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
                 IsHitTestVisible="False">
@@ -120,5 +126,23 @@
                              Foreground="LightGreen"/>
             </StackPanel>
         </Border>
+
+        <!--notification popup-->
+        <Popup IsOpen="{Binding IsNotificationVisible}" 
+               Placement="Center"
+               AllowsTransparency="True"
+               PopupAnimation="Fade">
+            <Border Background="#FF333333" 
+                    CornerRadius="10"
+                    Padding="20"
+                    BorderBrush="Black" 
+                    BorderThickness="1">
+                <TextBlock Text="{Binding NotificationMessage}" 
+                           Foreground="White"
+                           FontSize="16" 
+                           FontWeight="Bold"
+                           TextAlignment="Center" />
+            </Border>
+        </Popup>
     </Grid>
 </UserControl>
