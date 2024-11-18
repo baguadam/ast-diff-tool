@@ -22,7 +22,7 @@ namespace ASTDiffTool
         private IServiceProvider _serviceProvider = null!;
 
         private MainViewModel _mainViewModel = null!;
-        private ProjectSettings _projectSettings = null!;
+        private NewProjectModel _projectSettings = null!;
         private MainWindow _view = null!;
 
         protected override void OnStartup(StartupEventArgs e)
@@ -42,7 +42,7 @@ namespace ASTDiffTool
             // *********************************************
             // REGISTERING MODELS, SERVICES AND VIEW MODELS
             // *********************************************
-            services.AddSingleton<ProjectSettings>();
+            services.AddSingleton<NewProjectModel>();
             services.AddSingleton<Project>();
 
             services.AddSingleton<IFileDialogService, FileDialogService>();
