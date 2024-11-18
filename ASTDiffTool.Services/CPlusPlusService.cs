@@ -1,28 +1,37 @@
 ﻿using ASTDiffTool.Services.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ASTDiffTool.Services
 {
     public class CPlusPlusService : ICPlusPlusService
     {
-        private readonly string toolPath = Path.Combine(
-                    @"C:\Users\bagua\OneDrive - Eotvos Lorand Tudomanyegyetem\Adam\Egyetem - 07\SZAKDOLGOZAT\ast-tree-comparer\dump-tool\build",
-                    "clang_ast_tool.exe");
-        public bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string outputFile)
+        private readonly string _toolPath;
+        private readonly string _baseASTDirectoryPath;
+
+        public CPlusPlusService()
+        {
+            
+        }
+
+        public bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string projectName, string version)
         {
             try
             {
+                string projectDirectory = EnsureProjectDirectoryExists(projectName);
+                string outputFile = Path.Combine(projectDirectory, version);
+
+                Debug.WriteLine($"=== {compilationDatabasePath}");
+                Debug.WriteLine($"=== {mainPath}");
+                Debug.WriteLine($"=== {projectDirectory}");
+                Debug.WriteLine($"=== {outputFile}");
+
                 string arguments = $"-p \"{compilationDatabasePath}\" \"{mainPath}\" -o \"{outputFile}\"";
 
                 // setup process info
                 var processInfo = new ProcessStartInfo
                 {
-                    FileName = toolPath,
+                    FileName = _toolPath,
                     Arguments = arguments,
                     UseShellExecute = false,
                     CreateNoWindow = true,
@@ -53,6 +62,18 @@ namespace ASTDiffTool.Services
                 Debug.WriteLine($"Exception occurred while running AST Dump Tool: {ex.Message}");
                 return false;
             }
+        }
+
+        private string EnsureProjectDirectoryExists(string projectName)
+        {
+            string projectDirectory = Path.Combine(_baseASTDirectoryPath, projectName);
+
+            if (!Directory.Exists(projectDirectory))
+            {
+                Directory.CreateDirectory(projectDirectory);
+            }
+
+            return projectDirectory;
         }
     }
 }

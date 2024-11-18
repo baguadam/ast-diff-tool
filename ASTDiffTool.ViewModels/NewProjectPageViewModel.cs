@@ -152,7 +152,7 @@ namespace ASTDiffTool.ViewModels
                 string databasePath = Path.Combine(filePath, DB_PATH);
                 _connectionService.UpdateConnectionString(databasePath);
 
-                NotificationMessage = "File selected successfully!";
+                NotificationMessage = "Successfully selected file!";
             }
             else
             {
@@ -192,12 +192,13 @@ namespace ASTDiffTool.ViewModels
 
             try
             {
-                // run tool via service on different thread to avoid blocking UI
+                // run tool via service on different thread to avoid to block UI
                 var isSuccessfulRun = await Task.Run(() =>
                 {
-                    string outputFilePath = "C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Adam\\Egyetem - 07\\SZAKDOLGOZAT\\try\\result.txt";
+                    string projectName = "test";
+                    string version = "98";
                     string mainPath = "C:\\Users\\bagua\\szakdoga\\vector.cpp";
-                    return _cPlusPlusService.RunASTDumpTool(CompilationDatabasePath, mainPath, outputFilePath);
+                    return _cPlusPlusService.RunASTDumpTool(CompilationDatabasePath, mainPath, projectName, version);
                 });
 
                 if (isSuccessfulRun)

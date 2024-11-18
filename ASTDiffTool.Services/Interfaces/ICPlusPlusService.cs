@@ -8,6 +8,6 @@ namespace ASTDiffTool.Services.Interfaces
 {
     public interface ICPlusPlusService
     {
-        bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string outputFile);
+        bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string projectName, string version);
     }
 }

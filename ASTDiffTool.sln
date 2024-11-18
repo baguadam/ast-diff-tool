@@ -21,7 +21,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASTDiffTool.ViewModels", "A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASTDiffTool.Views", "ASTDiffTool.Views\ASTDiffTool.Views.csproj", "{F62CD271-2E00-4A4B-8EFF-FA60BF751149}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASTDiffTool.Services", "ASTDiffTool.Services\ASTDiffTool.Services.csproj", "{2DE92A52-F616-4C20-920E-A8DD735792A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASTDiffTool.Services", "ASTDiffTool.Services\ASTDiffTool.Services.csproj", "{2DE92A52-F616-4C20-920E-A8DD735792A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5B7D0A42-7B3C-4739-B3B3-DBD58FF4551B} = {5B7D0A42-7B3C-4739-B3B3-DBD58FF4551B}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASTDiffTool.Common", "ASTDiffTool.Common\ASTDiffTool.Common.csproj", "{5B7D0A42-7B3C-4739-B3B3-DBD58FF4551B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +54,10 @@ Global
 		{2DE92A52-F616-4C20-920E-A8DD735792A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DE92A52-F616-4C20-920E-A8DD735792A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DE92A52-F616-4C20-920E-A8DD735792A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B7D0A42-7B3C-4739-B3B3-DBD58FF4551B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B7D0A42-7B3C-4739-B3B3-DBD58FF4551B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B7D0A42-7B3C-4739-B3B3-DBD58FF4551B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B7D0A42-7B3C-4739-B3B3-DBD58FF4551B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
