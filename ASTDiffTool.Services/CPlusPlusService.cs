@@ -10,7 +10,9 @@ namespace ASTDiffTool.Services
 {
     public class CPlusPlusService : ICPlusPlusService
     {
-        private readonly string toolPath = "C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Adam\\Egyetem - 07\\SZAKDOLGOZAT\\ast-tree-comparer\\dump-tool\\build";
+        private readonly string toolPath = Path.Combine(
+                    @"C:\Users\bagua\OneDrive - Eotvos Lorand Tudomanyegyetem\Adam\Egyetem - 07\SZAKDOLGOZAT\ast-tree-comparer\dump-tool\build",
+                    "clang_ast_tool.exe");
         public bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string outputFile)
         {
             try
