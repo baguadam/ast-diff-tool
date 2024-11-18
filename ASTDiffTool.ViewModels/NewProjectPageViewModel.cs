@@ -171,20 +171,32 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void CompileProject()
         {
-            Debug.WriteLine($"Compilation settings: {AllStandards[FirstSelectedStandard]}, {AllStandards[SecondSelectedStandard]} \n" +
-                $"Assembly: {IsStoreAssemblyChecked} \n" +
-                $"Preprocessed: {IsStorePreprocessedCodeChecked} \n" +
-                $"Compilation Database path: {CompilationDatabasePath}");
-
-            bool isSuccessful = true; // right now mocking the compilation with a true value here
-            // publishing an event that contains the result of the compilation
-            var projectCompilationEvent = new ProjectCompilationEvent(isSuccessful);
-            _eventAggregator.Publish(projectCompilationEvent);
-
-            if (isSuccessful)
+            // check for database path
+            if (string.IsNullOrEmpty(CompilationDatabasePath))
             {
-                _navigationService.NavigateTo<ASTPageViewModel>(); // in case of successful compilation, navigate to AST View            
+                NotificationMessage = "Please select a compilation database first";
+                IsNotificationVisible = true;
+                return;
             }
+
+            string outputFilePath = "C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Adam\\Egyetem - 07\\SZAKDOLGOZAT\\try\\result.txt";
+            string mainPath = "C:\\Users\\bagua\\szakdoga\\vector.cpp";
+
+            // run tool via service
+            bool isSuccessfulRun = _cPlusPlusService.RunASTDumpTool(CompilationDatabasePath, mainPath, outputFilePath);
+
+            if (isSuccessfulRun) 
+            {
+                NotificationMessage = "AST Dump was successful!";
+            }
+            else
+            {
+                NotificationMessage = "AST Dump failed :(";
+            }
+
+            IsNotificationVisible = true;
+
+            Task.Delay(5000).ContinueWith(_ => IsNotificationVisible = false);
         }
         #endregion
     }
