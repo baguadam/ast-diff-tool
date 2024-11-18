@@ -19,6 +19,7 @@ namespace ASTDiffTool.ViewModels
         INavigationService navigationService,
         IEventAggregator eventAggregator,
         IDatabaseConnectionService connectionService,
+        ICPlusPlusService cPlusPlusService,
         ProjectSettings projectSettings) : ViewModelBase
     {
         private readonly string DB_PATH = "diff.db3";
@@ -27,6 +28,7 @@ namespace ASTDiffTool.ViewModels
         private readonly IFileDialogService _fileDialogService = fileDialogService;
         private readonly INavigationService _navigationService = navigationService;
         private readonly IEventAggregator _eventAggregator = eventAggregator;
+        private readonly ICPlusPlusService _cPlusPlusService = cPlusPlusService;
         private readonly IDatabaseConnectionService _connectionService = connectionService;
 
         private bool _hasSelectedFile = false;

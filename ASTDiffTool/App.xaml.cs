@@ -50,6 +50,7 @@ namespace ASTDiffTool
             _ = services.AddSingleton<INavigationService, NavigationService>();
             _ = services.AddSingleton<IEventAggregator, EventAggregator>();
             _ = services.AddSingleton<IDatabaseConnectionService, DatabaseConnectionService>();
+            _ = services.AddSingleton<ICPlusPlusService, CPlusPlusService>();
 
             _ = services.AddSingleton<NewProjectPageViewModel>();
             _ = services.AddSingleton<ASTPageViewModel>();
