@@ -1,9 +1,11 @@
 ﻿using ASTDiffTool.Models;
+using ASTDiffTool.Services;
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.ViewModels.Events;
 using ASTDiffTool.ViewModels.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,14 +18,19 @@ namespace ASTDiffTool.ViewModels
     public partial class NewProjectPageViewModel(IFileDialogService fileDialogService,
         INavigationService navigationService,
         IEventAggregator eventAggregator,
+        ICPlusPlusService cPlusPlusService,
         ProjectSettings projectSettings) : ViewModelBase
     {
+        private readonly string DB_PATH = "diff.db3";
+
         private readonly ProjectSettings _projectSettings = projectSettings;
         private readonly IFileDialogService _fileDialogService = fileDialogService;
         private readonly INavigationService _navigationService = navigationService;
         private readonly IEventAggregator _eventAggregator = eventAggregator;
+        private readonly ICPlusPlusService _cPlusPlusService = cPlusPlusService;
 
         private bool _hasSelectedFile = false;
+        private bool _isLoading = false;
         private string _notificationMessage;
         private bool _isNotificationVisible;
 
@@ -87,7 +94,15 @@ namespace ASTDiffTool.ViewModels
                 OnPropertyChanged(nameof(HasSelectedFile));
             }
         }
-
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
         public IList<string> AllStandards
         {
             get => _projectSettings.AllStandards;
@@ -122,7 +137,7 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         public void LoadCompilationDatabase()
         {
-            var filePath = _fileDialogService.OpenFile("Compilation Database File (*.json)|*.json");
+            string? filePath = _fileDialogService.OpenFile("Compilation Database File (*.json)|*.json");
 
             if (!string.IsNullOrEmpty(filePath))
             {
@@ -130,7 +145,11 @@ namespace ASTDiffTool.ViewModels
                 CompilationDatabasePath = filePath;
                 _projectSettings.CompilationDatabasePath = filePath;
 
-                NotificationMessage = "File selected successfully!";
+                // set the database path
+                string? directory = Path.GetDirectoryName(filePath);
+                string databasePath = Path.Combine(filePath, DB_PATH);
+
+                NotificationMessage = "Successfully selected file!";
             }
             else
             {
@@ -140,7 +159,7 @@ namespace ASTDiffTool.ViewModels
             IsNotificationVisible = true;
 
             // The text is supposed to visible for 3 seconds
-            Task.Delay(5000).ContinueWith(_ => IsNotificationVisible = false);
+            _ = Task.Delay(5000).ContinueWith(_ => IsNotificationVisible = false);
         }
 
         /// <summary>
@@ -156,22 +175,52 @@ namespace ASTDiffTool.ViewModels
         /// Command to handle compiling the loaded C++ project
         /// </summary>
         [RelayCommand]
-        public void CompileProject()
+        public async Task CompileProject()
         {
-            Debug.WriteLine($"Compilation settings: {AllStandards[FirstSelectedStandard]}, {AllStandards[SecondSelectedStandard]} \n" +
-                $"Assembly: {IsStoreAssemblyChecked} \n" +
-                $"Preprocessed: {IsStorePreprocessedCodeChecked} \n" +
-                $"Compilation Database path: {CompilationDatabasePath}");
-
-            bool isSuccessful = true; // right now mocking the compilation with a true value here
-            // publishing an event that contains the result of the compilation
-            var projectCompilationEvent = new ProjectCompilationEvent(isSuccessful);
-            _eventAggregator.Publish(projectCompilationEvent);
-
-            if (isSuccessful)
+            // check for database path
+            if (string.IsNullOrEmpty(CompilationDatabasePath))
             {
-                _navigationService.NavigateTo<ASTPageViewModel>(); // in case of successful compilation, navigate to AST View            
+                NotificationMessage = "Please select a compilation database first";
+                IsNotificationVisible = true;
+                return;
             }
+
+            IsLoading = true;
+
+            try
+            {
+                // run tool via service on different thread to avoid to block UI
+                var isSuccessfulRun = await Task.Run(() =>
+                {
+                    string projectName = "test";
+                    string version = "98";
+                    string mainPath = "C:\\Users\\bagua\\szakdoga\\vector.cpp";
+                    return _cPlusPlusService.RunASTDumpTool(CompilationDatabasePath, mainPath, projectName, version);
+                });
+
+                if (isSuccessfulRun)
+                {
+                    NotificationMessage = "AST Dump was successful!";
+                }
+                else
+                {
+                    NotificationMessage = "AST Dump failed :(";
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Exception during compilation: {ex.Message}");
+                NotificationMessage = "An error occurred during compilation.";
+            }
+            finally
+            {
+                IsLoading = false; // hide anyway
+            }
+
+            // show and hide notification
+            IsNotificationVisible = true;
+            await Task.Delay(5000);
+            IsNotificationVisible = false;
         }
         #endregion
     }
