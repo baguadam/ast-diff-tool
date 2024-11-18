@@ -13,6 +13,7 @@ namespace ASTDiffTool.Models
         public string ProjectName { get; set; }
         public string FirstSelectedStandard { get; set; }
         public string SecondSelectedStandard { get; set; }
+        public string ProjectResultPath {  get; set; }
 
         public bool IsComplete =>
             !string.IsNullOrWhiteSpace(CompilationDatabasePath) &&

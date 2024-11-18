@@ -103,6 +103,19 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        public string ProjectResultPath
+        {
+            get => _projectModel.ProjectResultPath; // Assuming ProjectModel holds the path
+            set
+            {
+                if (_projectModel.ProjectResultPath != value)
+                {
+                    _projectModel.ProjectResultPath = value;
+                    OnPropertyChanged(nameof(ProjectResultPath));
+                }
+            }
+        }
+
         public List<string> AllStandards { get; }
 
         public bool CanCompile => _projectModel.IsComplete;
@@ -145,6 +158,20 @@ namespace ASTDiffTool.ViewModels
                 {
                     _isNotificationVisible = value;
                     OnPropertyChanged(nameof(IsNotificationVisible));
+                }
+            }
+        }
+
+        private bool _isProjectCompiled;
+        public bool IsProjectCompiled
+        {
+            get => _isProjectCompiled;
+            set
+            {
+                if (!_isProjectCompiled) 
+                {
+                    _isProjectCompiled = value;
+                    OnPropertyChanged(nameof(IsProjectCompiled));
                 }
             }
         }
@@ -196,14 +223,23 @@ namespace ASTDiffTool.ViewModels
                         _projectModel.ProjectName,
                         _projectModel.FirstSelectedStandard));
 
-                NotificationMessage = isSuccessful
-                    ? "Project compiled successfully!"
-                    : "Compilation failed!";
+                if (isSuccessful)
+                {
+                    ProjectResultPath = _cPlusPlusService.ProjectResultPath; // update project path
+                    NotificationMessage = "Project compiled successfully!";
+                    IsProjectCompiled = true;
+                }
+                else
+                {
+                    NotificationMessage = "Compilation failed!";
+                    IsProjectCompiled = false;
+                }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Debug.WriteLine($"Error during compilation: {ex.Message}");
                 NotificationMessage = "An error occurred during compilation.";
+                IsProjectCompiled = false;
             }
             finally
             {

@@ -2,13 +2,14 @@
 using ASTDiffTool.Shared;
 using System.Diagnostics;
 
-
 namespace ASTDiffTool.Services
 {
     public class CPlusPlusService : ICPlusPlusService
     {
         private readonly string _toolPath;
         private readonly string _baseASTDirectoryPath;
+
+        public string ProjectResultPath { get; set; } = string.Empty;
 
         public CPlusPlusService()
         {
@@ -20,17 +21,18 @@ namespace ASTDiffTool.Services
         {
             try
             {
-                string projectDirectory = EnsureProjectDirectoryExists(projectName);
-                string outputFile = Path.Combine(projectDirectory, version);
+                // directory creation/path
+                ProjectResultPath = EnsureProjectDirectoryExists(projectName);
+                string outputFile = Path.Combine(ProjectResultPath, version);
 
                 Debug.WriteLine($"=== {compilationDatabasePath}");
                 Debug.WriteLine($"=== {mainPath}");
-                Debug.WriteLine($"=== {projectDirectory}");
+                Debug.WriteLine($"=== {ProjectResultPath}");
                 Debug.WriteLine($"=== {outputFile}");
 
                 string arguments = $"-p \"{compilationDatabasePath}\" \"{mainPath}\" -o \"{outputFile}\"";
 
-                // setup process info
+                // setting up the process
                 var processInfo = new ProcessStartInfo
                 {
                     FileName = _toolPath,
@@ -41,7 +43,7 @@ namespace ASTDiffTool.Services
                     RedirectStandardError = true,
                 };
 
-                // start the process
+                // starting the process
                 using var process = new Process { StartInfo = processInfo };
                 process.Start();
 
@@ -53,6 +55,7 @@ namespace ASTDiffTool.Services
                 if (process.ExitCode != 0)
                 {
                     Debug.WriteLine($"Error: {error}");
+                    ProjectResultPath = string.Empty; // in case of failure, clear the path
                     return false; // failed
                 }
 
@@ -62,6 +65,7 @@ namespace ASTDiffTool.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"Exception occurred while running AST Dump Tool: {ex.Message}");
+                ProjectResultPath = string.Empty; // in case of exception, clear the result path
                 return false;
             }
         }
