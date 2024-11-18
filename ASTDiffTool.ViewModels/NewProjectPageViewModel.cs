@@ -32,6 +32,7 @@ namespace ASTDiffTool.ViewModels
         private readonly IDatabaseConnectionService _connectionService = connectionService;
 
         private bool _hasSelectedFile = false;
+        private bool _isLoading = false;
         private string _notificationMessage;
         private bool _isNotificationVisible;
 
@@ -95,7 +96,15 @@ namespace ASTDiffTool.ViewModels
                 OnPropertyChanged(nameof(HasSelectedFile));
             }
         }
-
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
         public IList<string> AllStandards
         {
             get => _projectSettings.AllStandards;
@@ -169,7 +178,7 @@ namespace ASTDiffTool.ViewModels
         /// Command to handle compiling the loaded C++ project
         /// </summary>
         [RelayCommand]
-        public void CompileProject()
+        public async Task CompileProject()
         {
             // check for database path
             if (string.IsNullOrEmpty(CompilationDatabasePath))
@@ -179,24 +188,41 @@ namespace ASTDiffTool.ViewModels
                 return;
             }
 
-            string outputFilePath = "C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Adam\\Egyetem - 07\\SZAKDOLGOZAT\\try\\result.txt";
-            string mainPath = "C:\\Users\\bagua\\szakdoga\\vector.cpp";
+            IsLoading = true;
 
-            // run tool via service
-            bool isSuccessfulRun = _cPlusPlusService.RunASTDumpTool(CompilationDatabasePath, mainPath, outputFilePath);
-
-            if (isSuccessfulRun) 
+            try
             {
-                NotificationMessage = "AST Dump was successful!";
+                // run tool via service on different thread to avoid blocking UI
+                var isSuccessfulRun = await Task.Run(() =>
+                {
+                    string outputFilePath = "C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Adam\\Egyetem - 07\\SZAKDOLGOZAT\\try\\result.txt";
+                    string mainPath = "C:\\Users\\bagua\\szakdoga\\vector.cpp";
+                    return _cPlusPlusService.RunASTDumpTool(CompilationDatabasePath, mainPath, outputFilePath);
+                });
+
+                if (isSuccessfulRun)
+                {
+                    NotificationMessage = "AST Dump was successful!";
+                }
+                else
+                {
+                    NotificationMessage = "AST Dump failed :(";
+                }
             }
-            else
+            catch (Exception ex) 
             {
-                NotificationMessage = "AST Dump failed :(";
+                Debug.WriteLine($"Exception during compilation: {ex.Message}");
+                NotificationMessage = "An error occurred during compilation.";
+            }
+            finally
+            {
+                IsLoading = false; // hide anyway
             }
 
+            // show and hide notification
             IsNotificationVisible = true;
-
-            Task.Delay(5000).ContinueWith(_ => IsNotificationVisible = false);
+            await Task.Delay(5000);
+            IsNotificationVisible = false;
         }
         #endregion
     }
