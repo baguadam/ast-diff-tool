@@ -1,6 +1,7 @@
 ﻿using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.Shared;
 using System.Diagnostics;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
@@ -23,51 +24,43 @@ namespace ASTDiffTool.Services
         {
             try
             {
-                // directory creation/path
-                ProjectResultPath = EnsureProjectDirectoryExists(projectName);
-                string outputFile = Path.Combine(ProjectResultPath, version);
+                // read and parse the original compile_commands.json
+                string originalJson = File.ReadAllText(compilationDatabasePath);
+                var commands = JsonSerializer.Deserialize<List<JsonObject>>(originalJson);
 
-                Debug.WriteLine($"=== {compilationDatabasePath}");
-                Debug.WriteLine($"=== {mainPath}");
-                Debug.WriteLine($"=== {ProjectResultPath}");
-                Debug.WriteLine($"=== {outputFile}");
-
-                string arguments = $"-p \"{compilationDatabasePath}\" \"{mainPath}\" -o \"{outputFile}\"";
-
-                // setting up the process
-                var processInfo = new ProcessStartInfo
+                if (commands is null || commands.Count == 0)
                 {
-                    FileName = _toolPath,
-                    Arguments = arguments,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                };
-
-                // starting the process
-                using var process = new Process { StartInfo = processInfo };
-                process.Start();
-
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
-
-                if (process.ExitCode != 0)
-                {
-                    Debug.WriteLine($"Error: {error}");
-                    ProjectResultPath = string.Empty; // in case of failure, clear the path
-                    return false; // failed
+                    Debug.WriteLine("No commands found in compile_commands.json");
+                    return false;
                 }
 
-                Debug.WriteLine($"Output: {output}");
-                return true; // succeeded
+                // create the two version for the standards
+                var commandsForFirstStandard = ModifyCompileCommands(commands, firstStandard);
+                var commandsForSecondStandard = ModifyCompileCommands(commands, secondStandard);
+
+                // create temp files
+                string tempFileStd1 = Path.GetTempFileName();
+                string tempFileStd2 = Path.GetTempFileName();
+                File.WriteAllText(tempFileStd1, JsonSerializer.Serialize(commandsForFirstStandard));
+                File.WriteAllText(tempFileStd2, JsonSerializer.Serialize(commandsForSecondStandard));
+
+                // run the tool twice
+                ProjectResultPath = EnsureProjectDirectoryExists(projectName);
+                string firstStandardOutput = Path.Combine(ProjectResultPath, firstStandard, ".txt");
+                string secondStandardOutput = Path.Combine(ProjectResultPath, secondStandard, ".txt");
+
+                bool resultFirst = ExecuteASTDumpTool(tempFileStd1, mainPath, firstStandardOutput);
+                bool resultSecond = ExecuteASTDumpTool(tempFileStd2, mainPath, secondStandardOutput);
+
+                // clean up
+                File.Delete(tempFileStd1);
+                File.Delete(tempFileStd2);
+
+                return resultFirst && resultSecond;
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 Debug.WriteLine($"Exception occurred while running AST Dump Tool: {ex.Message}");
-                ProjectResultPath = string.Empty; // in case of exception, clear the result path
                 return false;
             }
         }
@@ -111,6 +104,46 @@ namespace ASTDiffTool.Services
             }
 
             return projectDirectory;
+        }
+
+        private bool ExecuteASTDumpTool(string compilationDatabasePath, string mainPath, string outputFile)
+        {
+            try
+            {
+                string arguments = $"-p \"{compilationDatabasePath}\" \"{mainPath}\" -o \"{outputFile}\"";
+
+                var processInfo = new ProcessStartInfo
+                {
+                    FileName = _toolPath,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                };
+
+                using var process = new Process { StartInfo = processInfo };
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    Debug.WriteLine($"Error: {error}");
+                    return false;
+                }
+
+                Debug.WriteLine($"Output: {output}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Exception occurred during AST Dump Tool execution: {ex.Message}");
+                return false;
+            }
         }
     }
 }

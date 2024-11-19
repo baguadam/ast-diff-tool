@@ -28,7 +28,7 @@ namespace ASTDiffTool.ViewModels
             _projectModel = projectModel;
 
             // initialize available C++ standards
-            AllStandards = new List<string> { "C++98", "C++03", "C++11", "C++14", "C++17", "C++20" };
+            AllStandards = new List<string> { "c++98", "c++03", "c++11", "c++14", "c++17", "c++20" };
         }
 
         #region Properties
@@ -221,7 +221,8 @@ namespace ASTDiffTool.ViewModels
                         _projectModel.CompilationDatabasePath,
                         _projectModel.MainFilePath,
                         _projectModel.ProjectName,
-                        _projectModel.FirstSelectedStandard));
+                        _projectModel.FirstSelectedStandard,
+                        _projectModel.SecondSelectedStandard));
 
                 if (isSuccessful)
                 {
