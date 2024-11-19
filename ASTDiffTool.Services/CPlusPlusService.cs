@@ -10,15 +10,20 @@ namespace ASTDiffTool.Services
     public class CPlusPlusService : ICPlusPlusService
     {
         private readonly IFileService _fileService;
+        private readonly ILoggerService _loggerService;
         private readonly string _dumpToolPath;
         private readonly string _comparerToolPath;
         private readonly string _baseASTDirectoryPath;
 
+        private readonly string DUMP_LOG_FILE = "dump_tool_log.txt";
+        private readonly string COMPARER_LOG_FILE = "comparer_tool_log.txt";
+
         public string ProjectResultPath { get; set; } = string.Empty;
 
-        public CPlusPlusService(IFileService fileService)
+        public CPlusPlusService(IFileService fileService, ILoggerService loggerService)
         {
             _fileService = fileService;
+            _loggerService = loggerService;
 
             _dumpToolPath = CPlusPlusToolPaths.DUMP_TOOL_PATH;
             _comparerToolPath = CPlusPlusToolPaths.COMPARER_TOOL_PATH;
@@ -37,13 +42,13 @@ namespace ASTDiffTool.Services
                 // first run
                 string tempFileStd1 = CreateModifiedCompileCommands(compilationDatabasePath, firstStandard);
                 string argumentsFirst = $"-p \"{CPlusPlusToolPaths.TEMP_AST_PATH}\" \"{mainPath}\" -o \"{firstStandardOutput}\"";
-                bool resultFirst = ExecuteTool(CPlusPlusToolPaths.DUMP_TOOL_PATH, argumentsFirst);
+                bool resultFirst = ExecuteTool(CPlusPlusToolPaths.DUMP_TOOL_PATH, argumentsFirst, DUMP_LOG_FILE);
                 _fileService.DeleteFile(tempFileStd1);
 
                 // second run
                 string tempFileStd2 = CreateModifiedCompileCommands(compilationDatabasePath, secondStandard);
                 string argumentsSecond = $"-p \"{CPlusPlusToolPaths.TEMP_AST_PATH}\" \"{mainPath}\" -o \"{secondStandardOutput}\"";
-                bool resultSecond = ExecuteTool(CPlusPlusToolPaths.DUMP_TOOL_PATH, argumentsSecond);
+                bool resultSecond = ExecuteTool(CPlusPlusToolPaths.DUMP_TOOL_PATH, argumentsSecond, DUMP_LOG_FILE);
                 _fileService.DeleteFile(tempFileStd2);
 
                 return resultFirst && resultSecond;
@@ -63,13 +68,7 @@ namespace ASTDiffTool.Services
                 string secondStandardOutput = Path.Combine(ProjectResultPath, $"{secondStandard}.txt");
 
                 string arguments = $"\"{firstStandardOutput}\" \"{secondStandardOutput}\"";
-                bool result = ExecuteTool(CPlusPlusToolPaths.COMPARER_TOOL_PATH, arguments);
-
-                if (!ExecuteTool(CPlusPlusToolPaths.COMPARER_TOOL_PATH, arguments))
-                {
-                    Debug.WriteLine("Comparer tool execution failed.");
-                    return false;
-                }
+                bool result = ExecuteTool(CPlusPlusToolPaths.COMPARER_TOOL_PATH, arguments, COMPARER_LOG_FILE);
 
                 return result;
             }
@@ -146,7 +145,7 @@ namespace ASTDiffTool.Services
             return projectDirectory;
         }
 
-        private bool ExecuteTool(string toolPath, string arguments)
+        private bool ExecuteTool(string toolPath, string arguments, string logFileName)
         {
             try
             {
@@ -167,6 +166,10 @@ namespace ASTDiffTool.Services
                 string error = process.StandardError.ReadToEnd();
 
                 process.WaitForExit();
+
+                // logging the output to the log file
+                string logFilePath = Path.Combine(ProjectResultPath, logFileName);
+                _loggerService.Log(logFilePath, output, error);
 
                 if (process.ExitCode != 0)
                 {

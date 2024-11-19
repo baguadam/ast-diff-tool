@@ -13,6 +13,5 @@ namespace ASTDiffTool.Services.Interfaces
         string CreateTemporaryFile(string directory, string fileName);
         void EnsureDirectoryExists(string directoryPath);
         void DeleteFile(string filePath);
-        void WriteLog(string logFilePath, string output, string error);
     }
 }

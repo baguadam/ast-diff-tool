@@ -48,35 +48,5 @@ namespace ASTDiffTool.Services
                 File.Delete(filePath);
             }
         }
-
-        public void WriteLog(string logFilePath, string output, string error)
-        {
-            try
-            {
-                using var logWriter = new StreamWriter(logFilePath, append: true);
-
-                logWriter.WriteLine("========================================");
-                logWriter.WriteLine($"Log Timestamp: {DateTime.Now}");
-                logWriter.WriteLine("========================================");
-
-                if (!string.IsNullOrEmpty(output))
-                {
-                    logWriter.WriteLine("Standard Output:");
-                    logWriter.WriteLine(output);
-                }
-
-                if (!string.IsNullOrEmpty(error))
-                {
-                    logWriter.WriteLine("Standard Error:");
-                    logWriter.WriteLine(error);
-                }
-
-                logWriter.WriteLine(); // blank line for readability
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Failed to write log: {ex.Message}");
-            }
-        }
     }
 }
