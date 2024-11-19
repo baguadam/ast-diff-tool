@@ -105,7 +105,7 @@ namespace ASTDiffTool.ViewModels
 
         public string ProjectResultPath
         {
-            get => _projectModel.ProjectResultPath; // Assuming ProjectModel holds the path
+            get => _projectModel.ProjectResultPath;
             set
             {
                 if (_projectModel.ProjectResultPath != value)
@@ -168,11 +168,25 @@ namespace ASTDiffTool.ViewModels
             get => _isProjectCompiled;
             set
             {
-                if (!_isProjectCompiled) 
+                if (_isProjectCompiled != value) 
                 {
                     _isProjectCompiled = value;
                     OnPropertyChanged(nameof(IsProjectCompiled));
                 }
+            }
+        }
+
+        private string _cPlusPlustToolState;
+        public string CPlusPlusToolState
+        {
+            get => _cPlusPlustToolState;
+            set
+            {
+                if (_cPlusPlustToolState != value)
+                {
+                    _cPlusPlustToolState = value;
+                    OnPropertyChanged(nameof(_cPlusPlustToolState));
+                } 
             }
         }
 
@@ -216,7 +230,9 @@ namespace ASTDiffTool.ViewModels
 
             try
             {
-                bool isSuccessful = await Task.Run(() =>
+                // Step 1: running AST Dump Tool
+                CPlusPlusToolState = "Dumping ASTs of the trees...";
+                bool isDumpSuccessful = await Task.Run(() =>
                     _cPlusPlusService.RunASTDumpTool(
                         _projectModel.CompilationDatabasePath,
                         _projectModel.MainFilePath,
@@ -224,17 +240,36 @@ namespace ASTDiffTool.ViewModels
                         _projectModel.FirstSelectedStandard,
                         _projectModel.SecondSelectedStandard));
 
-                if (isSuccessful)
+                if (!isDumpSuccessful)
                 {
-                    ProjectResultPath = _cPlusPlusService.ProjectResultPath; // update project path
-                    NotificationMessage = "Project compiled successfully!";
-                    IsProjectCompiled = true;
-                }
-                else
-                {
-                    NotificationMessage = "Compilation failed!";
+                    NotificationMessage = "Dump Tool failed!";
                     IsProjectCompiled = false;
+                    IsNotificationVisible = true;
+                    await Task.Delay(3000);
+                    IsNotificationVisible = false;
+                    return; // early exit in case of fail
                 }
+
+                // Step 2: running AST Tree Comparer Tool
+                CPlusPlusToolState = "Comparing ASTs and writing results...";
+                bool isComparerSuccessful = await Task.Run(() =>
+                    _cPlusPlusService.RunComparerTool(
+                        _projectModel.FirstSelectedStandard,
+                        _projectModel.SecondSelectedStandard));
+
+                if (!isComparerSuccessful)
+                {
+                    NotificationMessage = "Comparer Tool failed!";
+                    IsProjectCompiled = false;
+                    IsNotificationVisible = true;
+                    await Task.Delay(3000);
+                    IsNotificationVisible = false;
+                    return; // early exit 
+                }
+
+                // if both succeeded
+                NotificationMessage = "Tools completed successfully!";
+                IsProjectCompiled = true;
             }
             catch (Exception ex)
             {
@@ -245,11 +280,10 @@ namespace ASTDiffTool.ViewModels
             finally
             {
                 IsLoading = false;
+                IsNotificationVisible = true;
+                await Task.Delay(3000);
+                IsNotificationVisible = false;
             }
-
-            IsNotificationVisible = true;
-            await Task.Delay(3000);
-            IsNotificationVisible = false;
         }
 
         #endregion
