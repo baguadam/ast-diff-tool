@@ -9,13 +9,16 @@ namespace ASTDiffTool.Services
 {
     public class CPlusPlusService : ICPlusPlusService
     {
+        private readonly IFileService _fileService;
         private readonly string _toolPath;
         private readonly string _baseASTDirectoryPath;
 
         public string ProjectResultPath { get; set; } = string.Empty;
 
-        public CPlusPlusService()
+        public CPlusPlusService(IFileService fileService)
         {
+            _fileService = fileService;
+
             _toolPath = CPlusPlusToolPaths.DUMP_TOOL_PATH;
             _baseASTDirectoryPath = CPlusPlusToolPaths.BASE_AST_DIRECTORY_PATH;
         }
@@ -32,12 +35,12 @@ namespace ASTDiffTool.Services
                 // first run
                 string tempFileStd1 = CreateModifiedCompileCommands(compilationDatabasePath, firstStandard);
                 bool resultFirst = ExecuteASTDumpTool(CPlusPlusToolPaths.TEMP_AST_PATH, mainPath, firstStandardOutput);
-                File.Delete(tempFileStd1);
+                _fileService.DeleteFile(tempFileStd1);
 
                 // second run
                 string tempFileStd2 = CreateModifiedCompileCommands(compilationDatabasePath, secondStandard);
                 bool resultSecond = ExecuteASTDumpTool(CPlusPlusToolPaths.TEMP_AST_PATH, mainPath, secondStandardOutput);
-                File.Delete(tempFileStd2);
+                _fileService.DeleteFile(tempFileStd2);
 
                 return resultFirst;
             }
@@ -84,7 +87,7 @@ namespace ASTDiffTool.Services
         {
             try
             {
-                string originalJson = File.ReadAllText(originalFilePath);
+                string originalJson = _fileService.ReadFile(originalFilePath);
                 var commands = JsonSerializer.Deserialize<List<JsonObject>>(originalJson);
 
                 if (commands is null || commands.Count == 0)
@@ -94,16 +97,9 @@ namespace ASTDiffTool.Services
 
                 var modifiedCommands = ModifyCompileCommands(commands, standard);
 
-                string tempASTFolder = CPlusPlusToolPaths.TEMP_AST_PATH;
-                {
-                    if (!Directory.Exists(tempASTFolder))
-                    {
-                        Directory.CreateDirectory(tempASTFolder);
-                    }
-                }
-
-                string tempFilePath = Path.Combine(tempASTFolder, $"compile_commands.json");
-                File.WriteAllText(tempFilePath, JsonSerializer.Serialize(modifiedCommands));
+                _fileService.EnsureDirectoryExists(CPlusPlusToolPaths.TEMP_AST_PATH);
+                string tempFilePath = _fileService.CreateTemporaryFile(CPlusPlusToolPaths.TEMP_AST_PATH, "compile_commands.json");
+                _fileService.WriteFile(tempFilePath, JsonSerializer.Serialize(modifiedCommands));
 
                 return tempFilePath;
             }
@@ -117,12 +113,7 @@ namespace ASTDiffTool.Services
         private string EnsureProjectDirectoryExists(string projectName)
         {
             string projectDirectory = Path.Combine(_baseASTDirectoryPath, projectName);
-
-            if (!Directory.Exists(projectDirectory))
-            {
-                Directory.CreateDirectory(projectDirectory);
-            }
-
+            _fileService.EnsureDirectoryExists(projectDirectory);
             return projectDirectory;
         }
 
