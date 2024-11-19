@@ -176,16 +176,16 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
-        private string _cPlusPlustToolState;
+        private string _cPlusPlusToolState;
         public string CPlusPlusToolState
         {
-            get => _cPlusPlustToolState;
+            get => _cPlusPlusToolState;
             set
             {
-                if (_cPlusPlustToolState != value)
+                if (_cPlusPlusToolState != value)
                 {
-                    _cPlusPlustToolState = value;
-                    OnPropertyChanged(nameof(_cPlusPlustToolState));
+                    _cPlusPlusToolState = value;
+                    OnPropertyChanged(nameof(CPlusPlusToolState));
                 } 
             }
         }
