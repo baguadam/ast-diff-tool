@@ -31,15 +31,15 @@ namespace ASTDiffTool.Services
 
                 // first run
                 string tempFileStd1 = CreateModifiedCompileCommands(compilationDatabasePath, firstStandard);
-                bool resultFirst = ExecuteASTDumpTool(tempFileStd1, mainPath, firstStandardOutput);
+                bool resultFirst = ExecuteASTDumpTool(CPlusPlusToolPaths.TEMP_AST_PATH, mainPath, firstStandardOutput);
                 File.Delete(tempFileStd1);
 
                 // second run
                 string tempFileStd2 = CreateModifiedCompileCommands(compilationDatabasePath, secondStandard);
-                bool resultSecond = ExecuteASTDumpTool(tempFileStd2, mainPath, secondStandardOutput);
+                bool resultSecond = ExecuteASTDumpTool(CPlusPlusToolPaths.TEMP_AST_PATH, mainPath, secondStandardOutput);
                 File.Delete(tempFileStd2);
-                
-                return resultFirst && resultSecond;
+
+                return resultFirst;
             }
             catch (Exception ex) 
             {
@@ -94,8 +94,17 @@ namespace ASTDiffTool.Services
 
                 var modifiedCommands = ModifyCompileCommands(commands, standard);
 
-                string tempFilePath = Path.GetTempFileName();
+                string tempASTFolder = CPlusPlusToolPaths.TEMP_AST_PATH;
+                {
+                    if (!Directory.Exists(tempASTFolder))
+                    {
+                        Directory.CreateDirectory(tempASTFolder);
+                    }
+                }
+
+                string tempFilePath = Path.Combine(tempASTFolder, $"compile_commands.json");
                 File.WriteAllText(tempFilePath, JsonSerializer.Serialize(modifiedCommands));
+
                 return tempFilePath;
             }
             catch (Exception ex) 
