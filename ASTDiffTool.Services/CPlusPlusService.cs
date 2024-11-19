@@ -24,38 +24,21 @@ namespace ASTDiffTool.Services
         {
             try
             {
-                // read and parse the original compile_commands.json
-                string originalJson = File.ReadAllText(compilationDatabasePath);
-                var commands = JsonSerializer.Deserialize<List<JsonObject>>(originalJson);
-
-                if (commands is null || commands.Count == 0)
-                {
-                    Debug.WriteLine("No commands found in compile_commands.json");
-                    return false;
-                }
-
-                // create the two version for the standards
-                var commandsForFirstStandard = ModifyCompileCommands(commands, firstStandard);
-                var commandsForSecondStandard = ModifyCompileCommands(commands, secondStandard);
-
-                // create temp files
-                string tempFileStd1 = Path.GetTempFileName();
-                string tempFileStd2 = Path.GetTempFileName();
-                File.WriteAllText(tempFileStd1, JsonSerializer.Serialize(commandsForFirstStandard));
-                File.WriteAllText(tempFileStd2, JsonSerializer.Serialize(commandsForSecondStandard));
-
-                // run the tool twice
+                // arguments
                 ProjectResultPath = EnsureProjectDirectoryExists(projectName);
-                string firstStandardOutput = Path.Combine(ProjectResultPath, firstStandard, ".txt");
-                string secondStandardOutput = Path.Combine(ProjectResultPath, secondStandard, ".txt");
+                string firstStandardOutput = Path.Combine(ProjectResultPath, $"{firstStandard}.txt");
+                string secondStandardOutput = Path.Combine(ProjectResultPath, $"{secondStandard}.txt");
 
+                // first run
+                string tempFileStd1 = CreateModifiedCompileCommands(compilationDatabasePath, firstStandard);
                 bool resultFirst = ExecuteASTDumpTool(tempFileStd1, mainPath, firstStandardOutput);
-                bool resultSecond = ExecuteASTDumpTool(tempFileStd2, mainPath, secondStandardOutput);
-
-                // clean up
                 File.Delete(tempFileStd1);
-                File.Delete(tempFileStd2);
 
+                // second run
+                string tempFileStd2 = CreateModifiedCompileCommands(compilationDatabasePath, secondStandard);
+                bool resultSecond = ExecuteASTDumpTool(tempFileStd2, mainPath, secondStandardOutput);
+                File.Delete(tempFileStd2);
+                
                 return resultFirst && resultSecond;
             }
             catch (Exception ex) 
@@ -65,17 +48,20 @@ namespace ASTDiffTool.Services
             }
         }
 
-        private IList<JsonObject> ModifyCompileCommands(IList<JsonObject> commands, string standard)
+        private List<JsonObject> ModifyCompileCommands(List<JsonObject> commands, string standard)
         {
             var modifiedCommands = new List<JsonObject>();
 
-            foreach (var commandsEntry in commands)
+            foreach (var commandEntry in commands)
             {
-                var modifiedEntry = new JsonObject(commandsEntry); // cloning the object
-                if (modifiedEntry["command"] is not null)
+                // seep copy of the current command entry
+                var modifiedEntry = JsonNode.Parse(commandEntry.ToJsonString()).AsObject();
+
+                if (modifiedEntry["command"] != null)
                 {
                     string command = modifiedEntry["command"].ToString();
 
+                    // replace or add the -std flag
                     if (command.Contains("-std=c++"))
                     {
                         command = Regex.Replace(command, @"-std=c\+\+\d{2}", $"-std={standard}");
@@ -92,7 +78,32 @@ namespace ASTDiffTool.Services
             }
 
             return modifiedCommands;
-        } 
+        }
+
+        private string CreateModifiedCompileCommands(string originalFilePath, string standard)
+        {
+            try
+            {
+                string originalJson = File.ReadAllText(originalFilePath);
+                var commands = JsonSerializer.Deserialize<List<JsonObject>>(originalJson);
+
+                if (commands is null || commands.Count == 0)
+                {
+                    throw new InvalidOperationException("No commands found in compile_commands.json");
+                }
+
+                var modifiedCommands = ModifyCompileCommands(commands, standard);
+
+                string tempFilePath = Path.GetTempFileName();
+                File.WriteAllText(tempFilePath, JsonSerializer.Serialize(modifiedCommands));
+                return tempFilePath;
+            }
+            catch (Exception ex) 
+            {
+                Debug.WriteLine($"Error parsing JSON: {ex.Message}");
+                throw new InvalidOperationException("Failed to parse compile_commands.json", ex);
+            }
+        }
 
         private string EnsureProjectDirectoryExists(string projectName)
         {
@@ -133,6 +144,12 @@ namespace ASTDiffTool.Services
                 if (process.ExitCode != 0)
                 {
                     Debug.WriteLine($"Error: {error}");
+                    return false;
+                }
+
+                if (!File.Exists(outputFile))
+                {
+                    Debug.WriteLine($"Output file not created: {outputFile}");
                     return false;
                 }
 
