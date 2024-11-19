@@ -257,11 +257,9 @@ namespace ASTDiffTool.ViewModels
                 }
 
                 // if both succeeded
-                NotificationMessage = "Tools completed successfully!";
-                IsProjectCompiled = true;
-
-                // update ProjectResultPath
                 ProjectResultPath = _cPlusPlusService.ProjectResultPath;
+                await ShowNotification($"Compilation completed successfully! Results saved to: {ProjectResultPath}", true);
+                IsProjectCompiled = true;
             }
             catch (Exception ex)
             {
@@ -271,10 +269,6 @@ namespace ASTDiffTool.ViewModels
             finally
             {
                 IsLoading = false;
-                if (IsProjectCompiled)
-                {
-                    await ShowNotification($"Compilation completed successfully! Results saved to: {ProjectResultPath}", true);
-                }
             }
         }
         #endregion
