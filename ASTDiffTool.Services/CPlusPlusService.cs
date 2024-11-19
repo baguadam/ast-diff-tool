@@ -153,7 +153,6 @@ namespace ASTDiffTool.Services
                     return false;
                 }
 
-                Debug.WriteLine($"Output: {output}");
                 return true;
             }
             catch (Exception ex)
