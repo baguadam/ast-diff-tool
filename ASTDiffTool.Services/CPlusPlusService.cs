@@ -61,20 +61,13 @@ namespace ASTDiffTool.Services
             {
                 string firstStandardOutput = Path.Combine(ProjectResultPath, $"{firstStandard}.txt");
                 string secondStandardOutput = Path.Combine(ProjectResultPath, $"{secondStandard}.txt");
-                string logsOutput = Path.Combine(ProjectResultPath, "comparer_logs.txt");
 
-                string arguments = $"\"{firstStandardOutput}\" \"{secondStandardOutput}\" \"{logsOutput}\"";
+                string arguments = $"\"{firstStandardOutput}\" \"{secondStandardOutput}\"";
                 bool result = ExecuteTool(CPlusPlusToolPaths.COMPARER_TOOL_PATH, arguments);
 
                 if (!ExecuteTool(CPlusPlusToolPaths.COMPARER_TOOL_PATH, arguments))
                 {
                     Debug.WriteLine("Comparer tool execution failed.");
-                    return false;
-                }
-
-                if (!_fileService.ReadFile(logsOutput).Any())
-                {
-                    Debug.WriteLine($"Comparer logs not created: {logsOutput}");
                     return false;
                 }
 
