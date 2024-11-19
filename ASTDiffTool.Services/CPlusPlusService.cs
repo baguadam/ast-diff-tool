@@ -10,7 +10,8 @@ namespace ASTDiffTool.Services
     public class CPlusPlusService : ICPlusPlusService
     {
         private readonly IFileService _fileService;
-        private readonly string _toolPath;
+        private readonly string _dumpToolPath;
+        private readonly string _comparerToolPath;
         private readonly string _baseASTDirectoryPath;
 
         public string ProjectResultPath { get; set; } = string.Empty;
@@ -19,7 +20,8 @@ namespace ASTDiffTool.Services
         {
             _fileService = fileService;
 
-            _toolPath = CPlusPlusToolPaths.DUMP_TOOL_PATH;
+            _dumpToolPath = CPlusPlusToolPaths.DUMP_TOOL_PATH;
+            _comparerToolPath = CPlusPlusToolPaths.COMPARER_TOOL_PATH;
             _baseASTDirectoryPath = CPlusPlusToolPaths.BASE_AST_DIRECTORY_PATH;
         }
 
@@ -34,19 +36,41 @@ namespace ASTDiffTool.Services
 
                 // first run
                 string tempFileStd1 = CreateModifiedCompileCommands(compilationDatabasePath, firstStandard);
-                bool resultFirst = ExecuteASTDumpTool(CPlusPlusToolPaths.TEMP_AST_PATH, mainPath, firstStandardOutput);
+                string argumentsFirst = $"-p \"{CPlusPlusToolPaths.TEMP_AST_PATH}\" \"{mainPath}\" -o \"{firstStandardOutput}\"";
+                bool resultFirst = ExecuteTool(CPlusPlusToolPaths.DUMP_TOOL_PATH, argumentsFirst);
                 _fileService.DeleteFile(tempFileStd1);
 
                 // second run
                 string tempFileStd2 = CreateModifiedCompileCommands(compilationDatabasePath, secondStandard);
-                bool resultSecond = ExecuteASTDumpTool(CPlusPlusToolPaths.TEMP_AST_PATH, mainPath, secondStandardOutput);
+                string argumentsSecond = $"-p \"{CPlusPlusToolPaths.TEMP_AST_PATH}\" \"{mainPath}\" -o \"{secondStandardOutput}\"";
+                bool resultSecond = ExecuteTool(CPlusPlusToolPaths.DUMP_TOOL_PATH, argumentsSecond);
                 _fileService.DeleteFile(tempFileStd2);
 
-                return resultFirst;
+                return resultFirst && resultSecond;
             }
             catch (Exception ex) 
             {
                 Debug.WriteLine($"Exception occurred while running AST Dump Tool: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool RunComparerTool(string firstStandard, string secondStandard)
+        {
+            try
+            {
+                string firstStandardOutput = Path.Combine(ProjectResultPath, $"{firstStandard}.txt");
+                string secondStandardOutput = Path.Combine(ProjectResultPath, $"{secondStandard}.txt");
+                string logsOutput = Path.Combine(ProjectResultPath, "comparer_logs.txt");
+
+                string arguments = $"\"{firstStandardOutput}\" \"{secondStandardOutput}\" \"{logsOutput}\"";
+                bool result = ExecuteTool(CPlusPlusToolPaths.COMPARER_TOOL_PATH, arguments);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Exception occurred while running AST Tree Comparer: {ex.Message}");
                 return false;
             }
         }
@@ -117,15 +141,13 @@ namespace ASTDiffTool.Services
             return projectDirectory;
         }
 
-        private bool ExecuteASTDumpTool(string compilationDatabasePath, string mainPath, string outputFile)
+        private bool ExecuteTool(string toolPath, string arguments)
         {
             try
             {
-                string arguments = $"-p \"{compilationDatabasePath}\" \"{mainPath}\" -o \"{outputFile}\"";
-
                 var processInfo = new ProcessStartInfo
                 {
-                    FileName = _toolPath,
+                    FileName = toolPath,
                     Arguments = arguments,
                     UseShellExecute = false,
                     CreateNoWindow = true,
@@ -144,12 +166,6 @@ namespace ASTDiffTool.Services
                 if (process.ExitCode != 0)
                 {
                     Debug.WriteLine($"Error: {error}");
-                    return false;
-                }
-
-                if (!File.Exists(outputFile))
-                {
-                    Debug.WriteLine($"Output file not created: {outputFile}");
                     return false;
                 }
 

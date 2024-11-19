@@ -10,5 +10,6 @@ namespace ASTDiffTool.Services.Interfaces
     {
         public string ProjectResultPath { get; set; }
         bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string projectName, string firstStandard, string secondStandard);
+        bool RunComparerTool(string firstStandrd, string secondStandrd);
     }
 }
