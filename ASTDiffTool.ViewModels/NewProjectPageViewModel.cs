@@ -219,10 +219,7 @@ namespace ASTDiffTool.ViewModels
         {
             if (!CanCompile)
             {
-                NotificationMessage = "Please ensure all inputs are provided before compiling.";
-                IsNotificationVisible = true;
-                await Task.Delay(3000);
-                IsNotificationVisible = false;
+                await ShowNotification("Please ensure all inputs are provided before compiling.", false);
                 return;
             }
 
@@ -230,9 +227,9 @@ namespace ASTDiffTool.ViewModels
 
             try
             {
-                // Step 1: running AST Dump Tool
+                // Step 1: Running AST Dump Tool
                 CPlusPlusToolState = "Dumping ASTs of the trees...";
-                bool isDumpSuccessful = await Task.Run(() =>
+                bool isDumpSuccessful = await RunCPlusPlusToolAsync(() =>
                     _cPlusPlusService.RunASTDumpTool(
                         _projectModel.CompilationDatabasePath,
                         _projectModel.MainFilePath,
@@ -242,50 +239,68 @@ namespace ASTDiffTool.ViewModels
 
                 if (!isDumpSuccessful)
                 {
-                    NotificationMessage = "Dump Tool failed!";
-                    IsProjectCompiled = false;
-                    IsNotificationVisible = true;
-                    await Task.Delay(3000);
-                    IsNotificationVisible = false;
-                    return; // early exit in case of fail
+                    await ShowNotification("Dump Tool failed!", false);
+                    return;
                 }
 
-                // Step 2: running AST Tree Comparer Tool
+                // Step 2: Running AST Tree Comparer Tool
                 CPlusPlusToolState = "Comparing ASTs and writing results...";
-                bool isComparerSuccessful = await Task.Run(() =>
+                bool isComparerSuccessful = await RunCPlusPlusToolAsync(() =>
                     _cPlusPlusService.RunComparerTool(
                         _projectModel.FirstSelectedStandard,
                         _projectModel.SecondSelectedStandard));
 
                 if (!isComparerSuccessful)
                 {
-                    NotificationMessage = "Comparer Tool failed!";
-                    IsProjectCompiled = false;
-                    IsNotificationVisible = true;
-                    await Task.Delay(3000);
-                    IsNotificationVisible = false;
-                    return; // early exit 
+                    await ShowNotification("Comparer Tool failed!", false);
+                    return;
                 }
 
                 // if both succeeded
                 NotificationMessage = "Tools completed successfully!";
                 IsProjectCompiled = true;
+
+                // update ProjectResultPath
+                ProjectResultPath = _cPlusPlusService.ProjectResultPath;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error during compilation: {ex.Message}");
-                NotificationMessage = "An error occurred during compilation.";
-                IsProjectCompiled = false;
+                await ShowNotification("An error occurred during compilation.", false);
             }
             finally
             {
                 IsLoading = false;
-                IsNotificationVisible = true;
-                await Task.Delay(3000);
-                IsNotificationVisible = false;
+                if (IsProjectCompiled)
+                {
+                    await ShowNotification($"Compilation completed successfully! Results saved to: {ProjectResultPath}", true);
+                }
+            }
+        }
+        #endregion
+
+        #region Helper methods
+        private async Task<bool> RunCPlusPlusToolAsync(Func<bool> toolAction)
+        {
+            try
+            {
+                return await Task.Run(toolAction);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Tool execution error: {ex.Message}");
+                return false;
             }
         }
 
+        private async Task ShowNotification(string message, bool success)
+        {
+            NotificationMessage = message;
+            IsProjectCompiled = success;
+            IsNotificationVisible = true;
+            await Task.Delay(3000);
+            IsNotificationVisible = false;
+        }
         #endregion
     }
 }
