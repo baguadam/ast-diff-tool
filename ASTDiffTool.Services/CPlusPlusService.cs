@@ -1,6 +1,8 @@
 ﻿using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.Shared;
 using System.Diagnostics;
+using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 
 namespace ASTDiffTool.Services
 {
@@ -17,7 +19,7 @@ namespace ASTDiffTool.Services
             _baseASTDirectoryPath = CPlusPlusToolPaths.BASE_AST_DIRECTORY_PATH;
         }
 
-        public bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string projectName, string version)
+        public bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string projectName, string firstStandard, string secondStandard)
         {
             try
             {
@@ -69,6 +71,35 @@ namespace ASTDiffTool.Services
                 return false;
             }
         }
+
+        private IList<JsonObject> ModifyCompileCommands(IList<JsonObject> commands, string standard)
+        {
+            var modifiedCommands = new List<JsonObject>();
+
+            foreach (var commandsEntry in commands)
+            {
+                var modifiedEntry = new JsonObject(commandsEntry); // cloning the object
+                if (modifiedEntry["command"] is not null)
+                {
+                    string command = modifiedEntry["command"].ToString();
+
+                    if (command.Contains("-std=c++"))
+                    {
+                        command = Regex.Replace(command, @"-std=c\+\+\d{2}", $"-std={standard}");
+                    }
+                    else
+                    {
+                        command += $" -std={standard}";
+                    }
+
+                    modifiedEntry["command"] = command;
+                }
+
+                modifiedCommands.Add(modifiedEntry);
+            }
+
+            return modifiedCommands;
+        } 
 
         private string EnsureProjectDirectoryExists(string projectName)
         {
