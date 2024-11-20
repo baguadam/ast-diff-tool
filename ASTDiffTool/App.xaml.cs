@@ -81,19 +81,12 @@ namespace ASTDiffTool
 
             services.AddSingleton<NewProjectPageViewModel>();
             services.AddSingleton<ProjectPageViewModel>();
+            services.AddSingleton<TreeDisplayPageViewModel>();
             services.AddSingleton<MainViewModel>();
 
             // *********************************************
             // INJECTING THE VIEW MODELS INTO THE VIEWS
             // *********************************************
-            services.AddTransient<NewProjectPage>(provider =>
-            {
-                var newProjectPage = new NewProjectPage();
-                var newProjectPageViewModel = provider.GetRequiredService<NewProjectPageViewModel>();
-                newProjectPage.DataContext = newProjectPageViewModel;
-                return newProjectPage;
-            });
-
             services.AddTransient<MainWindow>(provider =>
             {
                 var mainWindow = new MainWindow();
