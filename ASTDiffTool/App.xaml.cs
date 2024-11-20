@@ -1,15 +1,19 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services;
 using ASTDiffTool.Services.Interfaces;
+using ASTDiffTool.Shared;
 using ASTDiffTool.ViewModels;
 using ASTDiffTool.ViewModels.Factories;
 using ASTDiffTool.ViewModels.Interfaces;
 using ASTDiffTool.ViewModels.Services;
 using ASTDiffTool.Views;
 using ASTDiffTool.Views.UserControls;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 
 namespace ASTDiffTool
@@ -40,7 +44,27 @@ namespace ASTDiffTool
         private void ConfigureServices (IServiceCollection services)
         {
             // *********************************************
-            // REGISTERING MODELS, SERVICES AND VIEW MODELS
+            // LOAD APPSETTINGS.JSON
+            // *********************************************
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            services.AddSingleton<IConfiguration>(configuration); // registerint the configurations
+
+            // Get configuration values
+            string encryptionKey = configuration["Encryption:Key"]!;
+            string encryptionIV = configuration["Encryption:IV"]!;
+            string neo4jUri = configuration["Neo4j:Uri"]!;
+            string neo4jUsername = configuration["Neo4j:Username"]!;
+            string encryptedPassword = configuration["Neo4j:Password"]!;
+
+            // Decrypt the Neo4j password
+            string decryptedPassword = EncryptionHelper.Decrypt(encryptedPassword, encryptionKey, encryptionIV);
+
+            // *********************************************
+            // REGISTERING SERVICES
             // *********************************************
             services.AddSingleton<NewProjectModel>();
             services.AddSingleton<Project>();
@@ -51,6 +75,10 @@ namespace ASTDiffTool
             services.AddSingleton<ICPlusPlusService, CPlusPlusService>();
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<ILoggerService, LoggerService>();
+
+            // neo4j connection
+            services.AddSingleton<INeo4jService>(provider =>
+                new Neo4jService(neo4jUri, neo4jUsername, decryptedPassword));
 
             services.AddSingleton<NewProjectPageViewModel>();
             services.AddSingleton<ASTPageViewModel>();
