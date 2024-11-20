@@ -3,7 +3,6 @@ using ASTDiffTool.Services;
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.Shared;
 using ASTDiffTool.ViewModels;
-using ASTDiffTool.ViewModels.Factories;
 using ASTDiffTool.ViewModels.Interfaces;
 using ASTDiffTool.ViewModels.Services;
 using ASTDiffTool.Views;
@@ -68,7 +67,6 @@ namespace ASTDiffTool
             // REGISTERING SERVICES
             // *********************************************
             services.AddSingleton<NewProjectModel>();
-            services.AddSingleton<Project>();
 
             services.AddSingleton<IFileDialogService, FileDialogService>();
             services.AddSingleton<INavigationService, NavigationService>();
@@ -82,12 +80,8 @@ namespace ASTDiffTool
                 new Neo4jService(neo4jUri, neo4jUsername, decryptedPassword));
 
             services.AddSingleton<NewProjectPageViewModel>();
-            services.AddSingleton<ASTPageViewModel>();
             services.AddSingleton<ProjectPageViewModel>();
-            services.AddSingleton<PreprocessedCodePageViewModel>();
             services.AddSingleton<MainViewModel>();
-
-            services.AddSingleton<IViewModelFactory, ViewModelFactory>();
 
             // *********************************************
             // INJECTING THE VIEW MODELS INTO THE VIEWS
@@ -98,14 +92,6 @@ namespace ASTDiffTool
                 var newProjectPageViewModel = provider.GetRequiredService<NewProjectPageViewModel>();
                 newProjectPage.DataContext = newProjectPageViewModel;
                 return newProjectPage;
-            });
-
-            services.AddTransient<ASTPage>(provider =>
-            {
-                var ASTPage = new ASTPage();
-                var ASTPageViewModel = provider.GetRequiredService<ASTPageViewModel>();
-                ASTPage.DataContext = ASTPageViewModel;
-                return ASTPage;
             });
 
             services.AddTransient<MainWindow>(provider =>
