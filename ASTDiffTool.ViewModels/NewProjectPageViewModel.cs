@@ -237,9 +237,11 @@ namespace ASTDiffTool.ViewModels
                         _projectModel.FirstSelectedStandard,
                         _projectModel.SecondSelectedStandard));
 
+                ProjectResultPath = _cPlusPlusService.ProjectResultPath; // path is constructed at the beginning
+
                 if (!isDumpSuccessful)
                 {
-                    await ShowNotification("Dump Tool failed!", false);
+                    await ShowNotification($"Dump Tool failed! See logs: {ProjectResultPath}", false);
                     return;
                 }
 
@@ -252,19 +254,18 @@ namespace ASTDiffTool.ViewModels
 
                 if (!isComparerSuccessful)
                 {
-                    await ShowNotification("Comparer Tool failed!", false);
+                    await ShowNotification($"Comparer Tool failed! See logs: {ProjectResultPath}", false);
                     return;
                 }
 
                 // if both succeeded
-                ProjectResultPath = _cPlusPlusService.ProjectResultPath;
-                await ShowNotification($"Compilation completed successfully! Results saved to: {ProjectResultPath}", true);
+                await ShowNotification("Compilation completed successfully!", true);
                 IsProjectCompiled = true;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error during compilation: {ex.Message}");
-                await ShowNotification("An error occurred during compilation.", false);
+                await ShowNotification($"An error occurred during compilation! See logs: {ProjectResultPath}", false);
             }
             finally
             {
@@ -289,6 +290,8 @@ namespace ASTDiffTool.ViewModels
 
         private async Task ShowNotification(string message, bool success)
         {
+            IsLoading = false; // stop loading
+
             NotificationMessage = message;
             IsProjectCompiled = success;
             IsNotificationVisible = true;
