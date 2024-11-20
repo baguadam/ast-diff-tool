@@ -1,6 +1,9 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
+using ASTDiffTool.Shared;
 using ASTDiffTool.ViewModels;
+using ASTDiffTool.ViewModels.Events;
+using ASTDiffTool.ViewModels.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
@@ -13,16 +16,19 @@ namespace ASTDiffTool.ViewModels
     {
         private readonly IFileDialogService _fileDialogService;
         private readonly ICPlusPlusService _cPlusPlusService;
+        private readonly IEventAggregator _eventAggregator;
 
         private readonly NewProjectModel _projectModel;
 
         public NewProjectPageViewModel(
             IFileDialogService fileDialogService,
             ICPlusPlusService cPlusPlusService,
+            IEventAggregator eventAggregator,
             NewProjectModel projectModel)
         {
             _fileDialogService = fileDialogService;
             _cPlusPlusService = cPlusPlusService;
+            _eventAggregator = eventAggregator;
 
             // initialize Model
             _projectModel = projectModel;
@@ -259,6 +265,9 @@ namespace ASTDiffTool.ViewModels
                 }
 
                 // if both succeeded
+                var projectCompilationEvent = new ProjectCompilationEvent(true);
+                _eventAggregator.Publish(projectCompilationEvent);
+
                 await ShowNotification("Compilation completed successfully!", true);
                 IsProjectCompiled = true;
             }

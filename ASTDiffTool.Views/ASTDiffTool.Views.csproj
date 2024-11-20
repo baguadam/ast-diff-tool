@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="Neo4j.Driver" Version="5.26.1" />
   </ItemGroup>
 
   <ItemGroup>
