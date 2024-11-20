@@ -9,5 +9,7 @@ namespace ASTDiffTool.Services.Interfaces
     public interface INeo4jService
     {
         Task<int> GetNodeCountAsync();
+        Task<int> GetNodesByAstOriginAsync(string astOrigin);
+        Task<int> GetNodesByDifferenceTypeAsync(string differenceType);
     }
 }

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.Services
 {
+    using Neo4j.Driver;
+    using System.Diagnostics;
+
     public class Neo4jService : INeo4jService
     {
         private readonly IDriver _driver;
@@ -17,45 +20,73 @@ namespace ASTDiffTool.Services
             _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(username, password));
         }
 
-        #region Queries
         public async Task<int> GetNodeCountAsync()
         {
-            var query = "MATCH (n: Node) RETURN COUNT(n) AS nodeCount";
-            return await ExecuteQuerySingleResultAsync<int>(query, "nodeCount");
-        }
-        #endregion
+            const string query = "MATCH (n:Node) RETURN count(n) AS count";
 
-        private async Task<T> ExecuteQuerySingleResultAsync<T>(string query, string fieldName)
-        {
-            await using var session = _driver.AsyncSession();
-            return await session.ExecuteReadAsync(async tx =>
+            using var session = _driver.AsyncSession();
+            try
             {
-                var result = await tx.RunAsync(query);
-                return (T)Convert.ChangeType(await result.SingleAsync(r => r[fieldName]), typeof(T));
-            });
-        }
-
-        private async Task<Dictionary<TKey, TValue>> ExecuteQueryMultipleResultsAsync<TKey, TValue>(
-            string query,
-            string keyFieldName,
-            string valueFieldName)
-        {
-            await using var session = _driver.AsyncSession();
-            return await session.ExecuteReadAsync(async tx =>
+                var result = await session.RunAsync(query);
+                var record = await result.SingleAsync();
+                return record["count"].As<int>();
+            }
+            catch (Exception ex)
             {
-                var result = await tx.RunAsync(query);
-                var dict = new Dictionary<TKey, TValue>();
-                await foreach (var record in result)
-                {
-                    dict[(TKey)record[keyFieldName]] = (TValue)Convert.ChangeType(record[valueFieldName], typeof(TValue));
-                }
-                return dict;
-            });
+                Debug.WriteLine($"Error querying total node count: {ex.Message}");
+                return 0;
+            }
         }
 
-        public async Task CloseAsync()
+        public async Task<int> GetNodesByAstOriginAsync(string astOrigin)
         {
-            await _driver.DisposeAsync();
+            const string query = @"
+            MATCH (n:Node)
+            WHERE n.astOrigin = $astOrigin
+            RETURN count(n) AS count";
+
+            var parameters = new { astOrigin };
+
+            using var session = _driver.AsyncSession();
+            try
+            {
+                var result = await session.RunAsync(query, parameters);
+                var record = await result.SingleAsync();
+                return record["count"].As<int>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error querying nodes by AST origin: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<int> GetNodesByDifferenceTypeAsync(string differenceType)
+        {
+            const string query = @"
+            MATCH (n:Node)
+            WHERE n.diffType = $differenceType
+            RETURN count(n) AS count";
+
+            var parameters = new { differenceType };
+
+            using var session = _driver.AsyncSession();
+            try
+            {
+                var result = await session.RunAsync(query, parameters);
+                var record = await result.SingleAsync();
+                return record["count"].As<int>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error querying nodes by difference type: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public void Dispose()
+        {
+            _driver?.Dispose();
         }
     }
 }

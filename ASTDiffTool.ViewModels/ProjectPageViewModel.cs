@@ -17,6 +17,8 @@ namespace ASTDiffTool.ViewModels
         public ProjectPageViewModel(INeo4jService neo4jService)
         {
             _neo4jService = neo4jService;
+
+            InitializeAsync(); // initialize at creation
         }
 
         #region Properties
@@ -35,21 +37,47 @@ namespace ASTDiffTool.ViewModels
             }
 
         }
+
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                if (_isLoading != value)
+                {
+                    _isLoading = value;
+                    OnPropertyChanged(nameof(IsLoading));
+                }
+            }
+        }
         #endregion
 
         #region Commands
         [RelayCommand]
         public async Task LoadDatabaseInfoAsync()
         {
+            await InitializeAsync();
+        }
+        #endregion
+
+        private async Task InitializeAsync()
+        {
+            IsLoading = true;
+
             try
             {
+                // Query initial data
                 TotalNodeCount = await _neo4jService.GetNodeCountAsync();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error loading database info: {ex.Message}");
+                Debug.WriteLine($"Failed to load database information: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
-        #endregion
     }
 }
