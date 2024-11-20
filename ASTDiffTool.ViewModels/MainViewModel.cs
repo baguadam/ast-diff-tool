@@ -58,18 +58,6 @@ namespace ASTDiffTool.ViewModels
 
         #region Commands
         [RelayCommand]
-        public void NavigateASTPage()
-        {
-            _navigationService.NavigateTo<ASTPageViewModel>();
-        }
-
-        [RelayCommand]
-        public void NavigatePreprocessedCodePage()
-        {
-            _navigationService.NavigateTo<PreprocessedCodePageViewModel>();
-        }
-
-        [RelayCommand]
         public void NavigateProjectPage()
         {
             _navigationService.NavigateTo<ProjectPageViewModel>();

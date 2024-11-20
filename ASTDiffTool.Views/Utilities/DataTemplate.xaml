@@ -3,14 +3,6 @@
                     xmlns:vm="clr-namespace:ASTDiffTool.ViewModels;assembly=ASTDiffTool.ViewModels"
                     xmlns:view="clr-namespace:ASTDiffTool.Views">
     
-    <DataTemplate DataType="{x:Type vm:ASTPageViewModel}">
-        <view:ASTPage />
-    </DataTemplate>    
-    
-    <DataTemplate DataType="{x:Type vm:PreprocessedCodePageViewModel}">
-        <view:PreprocessedCodePage />
-    </DataTemplate>    
-    
     <DataTemplate DataType="{x:Type vm:ProjectPageViewModel}">
         <view:ProjectPage />
     </DataTemplate>    
