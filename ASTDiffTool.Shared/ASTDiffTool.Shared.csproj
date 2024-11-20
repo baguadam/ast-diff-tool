@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ASTDiffTool.Models\ASTDiffTool.Models.csproj" />
-    <ProjectReference Include="..\ASTDiffTool.Shared\ASTDiffTool.Shared.csproj" />
-  </ItemGroup>
-
 </Project>

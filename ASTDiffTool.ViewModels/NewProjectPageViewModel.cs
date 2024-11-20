@@ -1,177 +1,302 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
-using ASTDiffTool.ViewModels.Events;
-using ASTDiffTool.ViewModels.Interfaces;
+using ASTDiffTool.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
-    public partial class NewProjectPageViewModel(IFileDialogService fileDialogService,
-        INavigationService navigationService,
-        IEventAggregator eventAggregator,
-        ProjectSettings projectSettings) : ViewModelBase
+    public partial class NewProjectPageViewModel : ViewModelBase
     {
-        private readonly ProjectSettings _projectSettings = projectSettings;
-        private readonly IFileDialogService _fileDialogService = fileDialogService;
-        private readonly INavigationService _navigationService = navigationService;
-        private readonly IEventAggregator _eventAggregator = eventAggregator;
+        private readonly IFileDialogService _fileDialogService;
+        private readonly ICPlusPlusService _cPlusPlusService;
 
-        private bool _hasSelectedFile = false;
-        private string _notificationMessage;
-        private bool _isNotificationVisible;
+        private readonly NewProjectModel _projectModel;
+
+        public NewProjectPageViewModel(
+            IFileDialogService fileDialogService,
+            ICPlusPlusService cPlusPlusService,
+            NewProjectModel projectModel)
+        {
+            _fileDialogService = fileDialogService;
+            _cPlusPlusService = cPlusPlusService;
+
+            // initialize Model
+            _projectModel = projectModel;
+
+            // initialize available C++ standards
+            AllStandards = new List<string> { "c++98", "c++03", "c++11", "c++14", "c++17", "c++20" };
+        }
 
         #region Properties
-        public int FirstSelectedStandard
-        {
-            get => _projectSettings.FirstSelectedStandard;
-            set
-            {
-                _projectSettings.FirstSelectedStandard = value;
-                OnPropertyChanged(nameof(FirstSelectedStandard));
-            }
-        }
-
-        public int SecondSelectedStandard
-        {
-            get => _projectSettings.SecondSelectedStandard;
-            set
-            {
-                _projectSettings.SecondSelectedStandard = value;
-                OnPropertyChanged(nameof(SecondSelectedStandard));
-            }
-        }
-
-        public bool IsStoreAssemblyChecked
-        {
-            get => _projectSettings.IsStoreAssemblyChecked;
-            set
-            {
-                _projectSettings.IsStoreAssemblyChecked = value;
-                OnPropertyChanged(nameof(IsStoreAssemblyChecked));
-            }
-        }
-
-        public bool IsStorePreprocessedCodeChecked
-        {
-            get => _projectSettings.IsStorePreprocessedCodeChecked;
-            set
-            {
-                _projectSettings.IsStorePreprocessedCodeChecked = value;
-                OnPropertyChanged(nameof(IsStorePreprocessedCodeChecked));
-            }
-        }
 
         public string CompilationDatabasePath
         {
-            get => _projectSettings.CompilationDatabasePath;
+            get => _projectModel.CompilationDatabasePath;
             set
             {
-                _projectSettings.CompilationDatabasePath = value;
-                OnPropertyChanged(nameof(CompilationDatabasePath));
+                if (_projectModel.CompilationDatabasePath != value)
+                {
+                    _projectModel.CompilationDatabasePath = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(CanCompile));
+                }
             }
         }
 
-        public bool HasSelectedFile
+        public string MainFilePath
         {
-            get => _hasSelectedFile;
+            get => _projectModel.MainFilePath;
             set
             {
-                _hasSelectedFile = value;
-                OnPropertyChanged(nameof(HasSelectedFile));
+                if (_projectModel.MainFilePath != value)
+                {
+                    _projectModel.MainFilePath = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(CanCompile));
+                }
             }
         }
 
-        public IList<string> AllStandards
+        public string ProjectName
         {
-            get => _projectSettings.AllStandards;
+            get => _projectModel.ProjectName;
+            set
+            {
+                if (_projectModel.ProjectName != value)
+                {
+                    _projectModel.ProjectName = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(CanCompile));
+                }
+            }
         }
 
+        public string FirstSelectedStandard
+        {
+            get => _projectModel.FirstSelectedStandard;
+            set
+            {
+                if (_projectModel.FirstSelectedStandard != value)
+                {
+                    _projectModel.FirstSelectedStandard = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(CanCompile));
+                }
+            }
+        }
+
+        public string SecondSelectedStandard
+        {
+            get => _projectModel.SecondSelectedStandard;
+            set
+            {
+                if (_projectModel.SecondSelectedStandard != value)
+                {
+                    _projectModel.SecondSelectedStandard = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(CanCompile));
+                }
+            }
+        }
+
+        public string ProjectResultPath
+        {
+            get => _projectModel.ProjectResultPath;
+            set
+            {
+                if (_projectModel.ProjectResultPath != value)
+                {
+                    _projectModel.ProjectResultPath = value;
+                    OnPropertyChanged(nameof(ProjectResultPath));
+                }
+            }
+        }
+
+        public List<string> AllStandards { get; }
+
+        public bool CanCompile => _projectModel.IsComplete;
+
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                if (_isLoading != value)
+                {
+                    _isLoading = value;
+                    OnPropertyChanged(nameof(IsLoading));
+                }
+            }
+        }
+
+        private string _notificationMessage;
         public string NotificationMessage
         {
             get => _notificationMessage;
             set
             {
-                _notificationMessage = value;
-                OnPropertyChanged(nameof(NotificationMessage));
+                if (_notificationMessage != value)
+                {
+                    _notificationMessage = value;
+                    OnPropertyChanged(nameof(NotificationMessage));
+                }
             }
         }
 
+        private bool _isNotificationVisible;
         public bool IsNotificationVisible
         {
             get => _isNotificationVisible;
             set
             {
-                _isNotificationVisible = value;
-                OnPropertyChanged(nameof(IsNotificationVisible));
+                if (_isNotificationVisible != value)
+                {
+                    _isNotificationVisible = value;
+                    OnPropertyChanged(nameof(IsNotificationVisible));
+                }
+            }
+        }
+
+        private bool _isProjectCompiled;
+        public bool IsProjectCompiled
+        {
+            get => _isProjectCompiled;
+            set
+            {
+                if (_isProjectCompiled != value) 
+                {
+                    _isProjectCompiled = value;
+                    OnPropertyChanged(nameof(IsProjectCompiled));
+                }
+            }
+        }
+
+        private string _cPlusPlusToolState;
+        public string CPlusPlusToolState
+        {
+            get => _cPlusPlusToolState;
+            set
+            {
+                if (_cPlusPlusToolState != value)
+                {
+                    _cPlusPlusToolState = value;
+                    OnPropertyChanged(nameof(CPlusPlusToolState));
+                } 
             }
         }
 
         #endregion
 
         #region Commands
-        /// <summary>
-        /// Command to handle loading the compilation database for the project
-        /// </summary>
-        [RelayCommand]
-        public void LoadCompilationDatabase()
-        {
-            var filePath = _fileDialogService.OpenFile("Compilation Database File (*.json)|*.json");
 
+        [RelayCommand]
+        public void SelectCompilationDatabase()
+        {
+            string? filePath = _fileDialogService.OpenFile("Compilation Database File (*.json)|*.json");
             if (!string.IsNullOrEmpty(filePath))
             {
-                HasSelectedFile = true;
                 CompilationDatabasePath = filePath;
-                _projectSettings.CompilationDatabasePath = filePath;
-
-                NotificationMessage = "File selected successfully!";
             }
-            else
+        }
+
+        [RelayCommand]
+        public void SelectMainFile()
+        {
+            string? filePath = _fileDialogService.OpenFile("C++ Source File (*.cpp)|*.cpp");
+            if (!string.IsNullOrEmpty(filePath))
             {
-                NotificationMessage = "Failed to select file!";
+                MainFilePath = filePath;
+            }
+        }
+
+        [RelayCommand]
+        public async Task CompileProject()
+        {
+            if (!CanCompile)
+            {
+                await ShowNotification("Please ensure all inputs are provided before compiling.", false);
+                return;
             }
 
+            IsLoading = true;
+
+            try
+            {
+                // Step 1: Running AST Dump Tool
+                CPlusPlusToolState = "Dumping ASTs of the trees...";
+                bool isDumpSuccessful = await RunCPlusPlusToolAsync(() =>
+                    _cPlusPlusService.RunASTDumpTool(
+                        _projectModel.CompilationDatabasePath,
+                        _projectModel.MainFilePath,
+                        _projectModel.ProjectName,
+                        _projectModel.FirstSelectedStandard,
+                        _projectModel.SecondSelectedStandard));
+
+                ProjectResultPath = _cPlusPlusService.ProjectResultPath; // path is constructed at the beginning
+
+                if (!isDumpSuccessful)
+                {
+                    await ShowNotification($"Dump Tool failed! See logs: {ProjectResultPath}", false);
+                    return;
+                }
+
+                // Step 2: Running AST Tree Comparer Tool
+                CPlusPlusToolState = "Comparing ASTs and writing results...";
+                bool isComparerSuccessful = await RunCPlusPlusToolAsync(() =>
+                    _cPlusPlusService.RunComparerTool(
+                        _projectModel.FirstSelectedStandard,
+                        _projectModel.SecondSelectedStandard));
+
+                if (!isComparerSuccessful)
+                {
+                    await ShowNotification($"Comparer Tool failed! See logs: {ProjectResultPath}", false);
+                    return;
+                }
+
+                // if both succeeded
+                await ShowNotification("Compilation completed successfully!", true);
+                IsProjectCompiled = true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error during compilation: {ex.Message}");
+                await ShowNotification($"An error occurred during compilation! See logs: {ProjectResultPath}", false);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+        #endregion
+
+        #region Helper methods
+        private async Task<bool> RunCPlusPlusToolAsync(Func<bool> toolAction)
+        {
+            try
+            {
+                return await Task.Run(toolAction);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Tool execution error: {ex.Message}");
+                return false;
+            }
+        }
+
+        private async Task ShowNotification(string message, bool success)
+        {
+            IsLoading = false; // stop loading
+
+            NotificationMessage = message;
+            IsProjectCompiled = success;
             IsNotificationVisible = true;
-
-            // The text is supposed to visible for 3 seconds
-            Task.Delay(5000).ContinueWith(_ => IsNotificationVisible = false);
-        }
-
-        /// <summary>
-        /// Command to handle loading a saved project
-        /// </summary>
-        [RelayCommand]
-        public void LoadSavedProject()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Command to handle compiling the loaded C++ project
-        /// </summary>
-        [RelayCommand]
-        public void CompileProject()
-        {
-            Debug.WriteLine($"Compilation settings: {AllStandards[FirstSelectedStandard]}, {AllStandards[SecondSelectedStandard]} \n" +
-                $"Assembly: {IsStoreAssemblyChecked} \n" +
-                $"Preprocessed: {IsStorePreprocessedCodeChecked} \n" +
-                $"Compilation Database path: {CompilationDatabasePath}");
-
-            bool isSuccessful = true; // right now mocking the compilation with a true value here
-            // publishing an event that contains the result of the compilation
-            var projectCompilationEvent = new ProjectCompilationEvent(isSuccessful);
-            _eventAggregator.Publish(projectCompilationEvent);
-
-            if (isSuccessful)
-            {
-                _navigationService.NavigateTo<ASTPageViewModel>(); // in case of successful compilation, navigate to AST View            
-            }
+            await Task.Delay(3000);
+            IsNotificationVisible = false;
         }
         #endregion
     }

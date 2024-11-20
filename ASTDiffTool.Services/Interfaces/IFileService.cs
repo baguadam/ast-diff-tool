@@ -1,5 +1,4 @@
-﻿using ASTDiffTool.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +8,10 @@ namespace ASTDiffTool.Services.Interfaces
 {
     public interface IFileService
     {
-        Task<IList<LineModel>> ReadLinesFromFileAsync(string filePath);
+        string ReadFile(string filePath);
+        void WriteFile(string filePath, string content);
+        string CreateTemporaryFile(string directory, string fileName);
+        void EnsureDirectoryExists(string directoryPath);
+        void DeleteFile(string filePath);
     }
 }

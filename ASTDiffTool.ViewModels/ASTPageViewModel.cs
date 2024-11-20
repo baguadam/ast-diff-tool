@@ -15,7 +15,6 @@ namespace ASTDiffTool.ViewModels
     public partial class ASTPageViewModel : ViewModelBase
     {
         private readonly Project _project;
-        private readonly IFileService _fileService;
 
         private ObservableCollection<LineModel> _firstStandardLines;
         private ObservableCollection<LineModel> _secondStandardLines;
@@ -42,12 +41,9 @@ namespace ASTDiffTool.ViewModels
         }
         #endregion
 
-        public ASTPageViewModel(IFileService fileService, Project project)
+        public ASTPageViewModel(Project project)
         {
             _project = project;
-            _fileService = fileService;
-
-            ReadASTsFromFile();
         }
 
         public int NumberOfDifferences
@@ -64,15 +60,6 @@ namespace ASTDiffTool.ViewModels
         public void JumpToSourceCode()
         {
             Debug.WriteLine($"Line is clicked!");
-        }
-
-        private async void ReadASTsFromFile()
-        {
-            var firstStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Ádám\\Egyetem - 07\\SZAKDOLGOZAT\\ASTDiffTool\\asts\\vector1.txt");
-            var secondStandardData = await _fileService.ReadLinesFromFileAsync("C:\\Users\\bagua\\OneDrive - Eotvos Lorand Tudomanyegyetem\\Ádám\\Egyetem - 07\\SZAKDOLGOZAT\\ASTDiffTool\\asts\\vector2.txt");
-
-            FirstStandardLines = new ObservableCollection<LineModel>(firstStandardData);
-            SecondStandardLines = new ObservableCollection<LineModel>(secondStandardData);
         }
     }
 }
