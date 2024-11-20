@@ -43,7 +43,7 @@ namespace ASTDiffTool.Services
         {
             const string query = @"
             MATCH (n:Node)
-            WHERE n.astOrigin = $astOrigin
+            WHERE n.ast = $astOrigin
             RETURN count(n) AS count";
 
             var parameters = new { astOrigin = astOrigin.ToDatabaseString() };
