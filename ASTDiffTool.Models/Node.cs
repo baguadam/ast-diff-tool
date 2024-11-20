@@ -19,6 +19,8 @@ namespace ASTDiffTool.Models
         public Node? Parent { get; set; }
         public List<Node> Children { get; set; } = [];
 
+        public string UniqueKey => $"{EnhancedKey}|{TopologicalOrder}";
+
         public override string ToString()
         {
             return $"{Type} - {EnhancedKey} - {Path} {LineNumber}:{ColumnNumber}";

@@ -98,9 +98,10 @@ namespace ASTDiffTool.Services
             {
                 var root = MapNode(record["root"].As<INode>());
 
-                if (!nodeDictionary.ContainsKey(root.EnhancedKey))
+                // use UniqueKey for the dictionary (calculated from EnhancedKey + TopologicalOrder)
+                if (!nodeDictionary.ContainsKey(root.UniqueKey))
                 {
-                    nodeDictionary[root.EnhancedKey] = root;
+                    nodeDictionary[root.UniqueKey] = root;
                 }
 
                 var children = record["children"].As<List<INode>>();
@@ -108,12 +109,13 @@ namespace ASTDiffTool.Services
                 {
                     var childNode = MapNode(child);
 
-                    if (!nodeDictionary.ContainsKey(childNode.EnhancedKey))
+                    // use UniqueKey for children as well (calculated from EnhancedKey + TopologicalOrder)
+                    if (!nodeDictionary.ContainsKey(childNode.UniqueKey))
                     {
-                        nodeDictionary[childNode.EnhancedKey] = childNode;
+                        nodeDictionary[childNode.UniqueKey] = childNode;
                     }
 
-                    if (nodeDictionary.TryGetValue(root.EnhancedKey, out var parentNode))
+                    if (nodeDictionary.TryGetValue(root.UniqueKey, out var parentNode))
                     {
                         childNode.Parent = parentNode;
                         parentNode.Children.Add(childNode);
@@ -121,6 +123,7 @@ namespace ASTDiffTool.Services
                 }
             }
 
+            // return top-level nodes
             return nodeDictionary.Values.Where(n => n.Parent == null).ToList();
         }
 

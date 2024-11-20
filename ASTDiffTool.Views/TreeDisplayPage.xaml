@@ -60,9 +60,9 @@
                                 <TreeView.ItemTemplate>
                                     <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding enhancedKey}" FontWeight="Bold" Margin="5,0,5,0" />
-                                            <TextBlock Text="{Binding type}" Margin="5,0,5,0" />
-                                            <TextBlock Text="{Binding differenceType}" Foreground="Gray" />
+                                            <TextBlock Text="{Binding EnhancedKey}" FontWeight="Bold" Margin="5,0,5,0" />
+                                            <TextBlock Text="{Binding Type}" Margin="5,0,5,0" />
+                                            <TextBlock Text="{Binding DifferenceType}" Foreground="Gray" />
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
                                 </TreeView.ItemTemplate>
@@ -74,7 +74,7 @@
                 <!-- Pagination Controls -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 20, 0, 0">
                     <Button Content="Previous" 
-                            Command="{Binding PreviousPageCommand}" 
+                            Command="{Binding GoToPreviousPageCommand}" 
                             IsEnabled="{Binding CanGoToPreviousPage}" 
                             Style="{StaticResource ButtonStyle}" 
                             Margin="5" 
@@ -84,7 +84,7 @@
                                VerticalAlignment="Center" 
                                Margin="10" />
                     <Button Content="Next" 
-                            Command="{Binding NextPageCommand}" 
+                            Command="{Binding GoToNextPageCommand}" 
                             IsEnabled="{Binding CanGoToNextPage}" 
                             Style="{StaticResource ButtonStyle}" 
                             Margin="5" 
