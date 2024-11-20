@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.Services
 {
+    using ASTDiffTool.Shared;
     using Neo4j.Driver;
     using System.Diagnostics;
 
@@ -38,14 +39,14 @@ namespace ASTDiffTool.Services
             }
         }
 
-        public async Task<int> GetNodesByAstOriginAsync(string astOrigin)
+        public async Task<int> GetNodesByAstOriginAsync(ASTOrigins astOrigin)
         {
             const string query = @"
             MATCH (n:Node)
             WHERE n.astOrigin = $astOrigin
             RETURN count(n) AS count";
 
-            var parameters = new { astOrigin };
+            var parameters = new { astOrigin = astOrigin.ToDatabaseString() };
 
             using var session = _driver.AsyncSession();
             try
@@ -61,14 +62,14 @@ namespace ASTDiffTool.Services
             }
         }
 
-        public async Task<int> GetNodesByDifferenceTypeAsync(string differenceType)
+        public async Task<int> GetNodesByDifferenceTypeAsync(Differences differenceType)
         {
             const string query = @"
             MATCH (n:Node)
             WHERE n.diffType = $differenceType
             RETURN count(n) AS count";
 
-            var parameters = new { differenceType };
+            var parameters = new { differenceType = differenceType.ToDatabaseString() };
 
             using var session = _driver.AsyncSession();
             try
