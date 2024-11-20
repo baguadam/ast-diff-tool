@@ -1,11 +1,9 @@
-﻿using ASTDiffTool.Services.Interfaces;
+﻿using ASTDiffTool.Models;
+using ASTDiffTool.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
@@ -13,15 +11,14 @@ namespace ASTDiffTool.ViewModels
     public partial class ProjectPageViewModel : ViewModelBase
     {
         private readonly INeo4jService _neo4jService;
+        private readonly ProjectDatabaseInfoModel _databaseInfo;
 
         public ProjectPageViewModel(INeo4jService neo4jService)
         {
             _neo4jService = neo4jService;
+            _databaseInfo = new ProjectDatabaseInfoModel();
 
-            Task.Run(async () =>
-            {
-                await LoadDatabaseInfoAsync(); // initialize at creation
-            });
+            Task.Run(LoadDatabaseInfoAsync);
         }
 
         #region Properties
@@ -37,7 +34,6 @@ namespace ASTDiffTool.ViewModels
                     OnPropertyChanged(nameof(TotalNodeCount));
                 }
             }
-
         }
 
         private int _nodesInFirstAST;
@@ -46,7 +42,7 @@ namespace ASTDiffTool.ViewModels
             get => _nodesInFirstAST;
             set
             {
-                if (value != _nodesInFirstAST)
+                if (_nodesInFirstAST != value)
                 {
                     _nodesInFirstAST = value;
                     OnPropertyChanged(nameof(NodesInFirstAST));
@@ -54,14 +50,13 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
-
         private int _nodesInSecondAST;
         public int NodesInSecondAST
         {
             get => _nodesInSecondAST;
             set
             {
-                if (value != _nodesInSecondAST)
+                if (_nodesInSecondAST != value)
                 {
                     _nodesInSecondAST = value;
                     OnPropertyChanged(nameof(NodesInSecondAST));
@@ -75,7 +70,7 @@ namespace ASTDiffTool.ViewModels
             get => _onlyInFirstAST;
             set
             {
-                if (value != _onlyInFirstAST)
+                if (_onlyInFirstAST != value)
                 {
                     _onlyInFirstAST = value;
                     OnPropertyChanged(nameof(OnlyInFirstAST));
@@ -89,7 +84,7 @@ namespace ASTDiffTool.ViewModels
             get => _onlyInSecondAST;
             set
             {
-                if (value != _onlyInSecondAST)
+                if (_onlyInSecondAST != value)
                 {
                     _onlyInSecondAST = value;
                     OnPropertyChanged(nameof(OnlyInSecondAST));
@@ -103,7 +98,7 @@ namespace ASTDiffTool.ViewModels
             get => _differentParents;
             set
             {
-                if (value != _differentParents)
+                if (_differentParents != value)
                 {
                     _differentParents = value;
                     OnPropertyChanged(nameof(DifferentParents));
@@ -111,15 +106,15 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
-        private int _differentSourceLocation;
+        private int _differentSourceLocations;
         public int DifferentSourceLocations
         {
-            get => _differentSourceLocation;
+            get => _differentSourceLocations;
             set
             {
-                if (value != _differentSourceLocation)
+                if (value != _differentSourceLocations)
                 {
-                    _differentSourceLocation = value;
+                    _differentSourceLocations = value;
                     OnPropertyChanged(nameof(DifferentSourceLocations));
                 }
             }
@@ -148,13 +143,23 @@ namespace ASTDiffTool.ViewModels
 
             try
             {
-                TotalNodeCount = await _neo4jService.GetNodeCountAsync();
-                NodesInFirstAST = await _neo4jService.GetNodesByAstOriginAsync(Shared.ASTOrigins.FIRST_AST);
-                NodesInSecondAST = await _neo4jService.GetNodesByAstOriginAsync(Shared.ASTOrigins.SECOND_AST);
-                OnlyInFirstAST = await _neo4jService.GetNodesByDifferenceTypeAsync(Shared.Differences.ONLY_IN_FIRST_AST);
-                OnlyInSecondAST = await _neo4jService.GetNodesByDifferenceTypeAsync(Shared.Differences.ONLY_IN_SECOND_AST);
-                DifferentParents = await _neo4jService.GetNodesByDifferenceTypeAsync(Shared.Differences.DIFFERENT_PARENTS);
-                DifferentSourceLocations = await _neo4jService.GetNodesByDifferenceTypeAsync(Shared.Differences.DIFFERENT_SOURCE_LOCATIONS);
+                // update the internal model
+                _databaseInfo.TotalNodeCount = await _neo4jService.GetNodeCountAsync();
+                _databaseInfo.NodesInFirstAST = await _neo4jService.GetNodesByAstOriginAsync(Shared.ASTOrigins.FIRST_AST);
+                _databaseInfo.NodesInSecondAST = await _neo4jService.GetNodesByAstOriginAsync(Shared.ASTOrigins.SECOND_AST);
+                _databaseInfo.OnlyInFirstAST = await _neo4jService.GetNodesByDifferenceTypeAsync(Shared.Differences.ONLY_IN_FIRST_AST);
+                _databaseInfo.OnlyInSecondAST = await _neo4jService.GetNodesByDifferenceTypeAsync(Shared.Differences.ONLY_IN_SECOND_AST);
+                _databaseInfo.DifferentParents = await _neo4jService.GetNodesByDifferenceTypeAsync(Shared.Differences.DIFFERENT_PARENTS);
+                _databaseInfo.DifferentSourceLocations = await _neo4jService.GetNodesByDifferenceTypeAsync(Shared.Differences.DIFFERENT_SOURCE_LOCATIONS);
+
+                // reflect data into ViewModel properties
+                TotalNodeCount = _databaseInfo.TotalNodeCount;
+                NodesInFirstAST = _databaseInfo.NodesInFirstAST;
+                NodesInSecondAST = _databaseInfo.NodesInSecondAST;
+                OnlyInFirstAST = _databaseInfo.OnlyInFirstAST;
+                OnlyInSecondAST = _databaseInfo.OnlyInSecondAST;
+                DifferentParents = _databaseInfo.DifferentParents;
+                DifferentSourceLocations = _databaseInfo.DifferentSourceLocations;
             }
             catch (Exception ex)
             {

@@ -27,6 +27,7 @@ namespace ASTDiffTool
 
         private MainViewModel _mainViewModel = null!;
         private NewProjectModel _projectSettings = null!;
+        private ProjectDatabaseInfoModel _projectDatabase = null!;
         private MainWindow _view = null!;
 
         protected override void OnStartup(StartupEventArgs e)
