@@ -24,7 +24,7 @@ namespace ASTDiffTool.Shared
                 nodeLookup[parentUniqueKey] = existingParentNode;
 
                 // highest level node
-                if (parentNode.IsHighLevel)
+                if (parentNode.IsHighLevel &&!RootNodes.Contains(existingParentNode))
                 {
                     RootNodes.Add(existingParentNode);
                 }

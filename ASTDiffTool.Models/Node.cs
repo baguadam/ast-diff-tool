@@ -20,8 +20,13 @@ namespace ASTDiffTool.Models
         public bool IsHighLevel { get; set; }
         public string DifferenceType { get; set; }
         public string AstOrigin { get; set; }
-
         
         public IList<Node> Children { get; set; } = new List<Node>();
+        public bool HasItems => Children != null && Children.Count > 0;
+
+        public override string ToString()
+        {
+            return $"{Kind} (Topological order: {TopologicalOrder})";
+        }
     }
 }

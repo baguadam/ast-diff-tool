@@ -7,6 +7,98 @@
              d:DesignHeight="700" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        
+        <!-- Style for the Expand/Collapse Toggle Button -->
+        <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid Width="16" Height="16">
+                            <Path x:Name="ExpandPath" Data="M 4 8 L 12 8 M 8 4 L 8 12" 
+                                  Stroke="Black" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ExpandPath" Property="Data" Value="M 4 8 L 12 8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+
+        <!-- TreeViewItem style -->
+        <Style TargetType="TreeViewItem">
+            <Setter Property="Margin" Value="0,5,0,5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="BorderBrush" Value="#D3D3D3"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TreeViewItem">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="Border" 
+                                    Grid.Row="0" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    Background="{TemplateBinding Background}">
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <ToggleButton x:Name="Expander"
+                                                      ClickMode="Press"
+                                                      IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      Visibility="{Binding HasItems, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                      Style="{StaticResource ExpandCollapseToggleStyle}"/>
+                                        <TextBlock Text="{Binding Path=Header, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                   FontSize="16"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource DarkFontColor}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="5,0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                                        <TextBlock Text="{Binding EnhancedKey}" 
+                                                   FontSize="14" 
+                                                   Foreground="#666" 
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock FontSize="14" 
+                                                   Foreground="#666" 
+                                                   VerticalAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0}, {1}:{2}">
+                                                    <Binding Path="Path"/>
+                                                    <Binding Path="LineNumber"/>
+                                                    <Binding Path="ColumnNumber"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Margin="20,0,0,0"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsExpanded" Value="False">
+                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -43,37 +135,36 @@
                 </StackPanel>
 
                 <!-- TreeView Section -->
-                <StackPanel Margin="0, 10, 0, 20">
-                    <TextBlock Text="Nodes:" 
-                               Style="{StaticResource TextStyle}" 
-                               FontSize="18" />
-                    <Border Background="#EEE" 
-                            BorderBrush="{StaticResource DarkBorderColor}" 
-                            BorderThickness="1" 
-                            CornerRadius="5" 
-                            Padding="10" 
-                            Margin="0,10,0,0"
-                            Width="750" Height="400">
-                        <TreeView ItemsSource="{Binding CurrentNodes}" 
-                                  ScrollViewer.CanContentScroll="True"
-                                  Background="Transparent">
-                            <TreeView.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling" />
-                                </ItemsPanelTemplate>
-                            </TreeView.ItemsPanel>
-                            <TreeView.ItemTemplate>
-                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                    <StackPanel Orientation="Horizontal" Margin="5,0">
-                                        <TextBlock Text="{Binding Kind}" FontWeight="Bold" FontSize="16" Margin="5,0" />
-                                        <TextBlock Text="{Binding EnhancedKey}" FontSize="14" Margin="10,0" />
-                                    </StackPanel>
-                                </HierarchicalDataTemplate>
-                            </TreeView.ItemTemplate>
-                        </TreeView>
-
-                    </Border>
-                </StackPanel>
+                <Border Background="#EEE" 
+                        BorderBrush="{StaticResource DarkBorderColor}" 
+                        BorderThickness="1" 
+                        CornerRadius="5" 
+                        Padding="10" 
+                        Margin="0,10,0,0"
+                        Width="750" Height="400">
+                    <TreeView ItemsSource="{Binding CurrentNodes}" 
+                              ScrollViewer.CanContentScroll="True"
+                              Background="Transparent">
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="{Binding Kind}" FontWeight="Bold" FontSize="16" Foreground="{StaticResource DarkFontColor}" Margin="5,0"/>
+                                    <TextBlock Text="{Binding EnhancedKey}" FontSize="14" Foreground="#666" Margin="10,0"/>
+                                    <!--Path related infos-->
+                                    <TextBlock Margin="10,0" FontSize="14" Foreground="#666">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}, {1}:{2}">
+                                                <Binding Path="Path"/>
+                                                <Binding Path="LineNumber"/>
+                                                <Binding Path="ColumnNumber"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Border>
 
                 <!-- Pagination Controls -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 20, 0, 0">

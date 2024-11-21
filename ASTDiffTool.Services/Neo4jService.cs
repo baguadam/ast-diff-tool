@@ -77,17 +77,19 @@ namespace ASTDiffTool.Services
                 var rootNode = record["root"].As<INode>();
                 Node root = CreateNodeFromRecord(rootNode);
 
-                // add the root node to the TreeBuilder
-                if (!treeBuilder.RootNodes.Contains(root))
-                {
-                    treeBuilder.RootNodes.Add(root);
-                }
-
                 // cache to store already-created nodes by their IDs
-                var nodeCache = new Dictionary<string, Node>
+                var nodeCache = new Dictionary<string, Node>();
+
+                // check for root node existance
+                if (!nodeCache.ContainsKey(rootNode.ElementId))
                 {
-                    { rootNode.ElementId, root }
-                };
+                    nodeCache[rootNode.ElementId] = root;
+
+                    if (!treeBuilder.RootNodes.Contains(root))
+                    {
+                        treeBuilder.RootNodes.Add(root);
+                    }
+                }
 
                 // extract paths and add relationships
                 var paths = record["paths"].As<List<IPath>>();
