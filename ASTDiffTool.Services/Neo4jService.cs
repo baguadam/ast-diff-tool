@@ -58,11 +58,8 @@ namespace ASTDiffTool.Services
                 ORDER BY root.topologicalOrder
                 SKIP $skip
                 LIMIT $limit
-                MATCH path = (root)-[:HAS_CHILD*0..]->(descendant)
-                WITH root, descendant, path
-                UNWIND relationships(path) AS rel
-                WITH DISTINCT rel
-                RETURN startNode(rel) AS parent, endNode(rel) AS child";
+                OPTIONAL MATCH path = (root)-[:HAS_CHILD*0..]->(descendant)
+                RETURN root, collect(distinct path) AS paths";
 
             var parameters = new Dictionary<string, object>()
             {
@@ -71,24 +68,60 @@ namespace ASTDiffTool.Services
                 { "limit", pageSize },
             };
 
-            var treeBuilder = new TreeBuilder(); // local tree builder
+            var treeBuilder = new TreeBuilder(); // local TreeBuilder
 
             using var session = _driver.AsyncSession();
             var result = await session.RunAsync(query, parameters);
             await result.ForEachAsync(record =>
             {
-                // extract parent and child for each record
-                var parent = record["parent"].As<INode>();
-                var child = record["child"].As<INode>();
+                // extract the root node from the record
+                var rootNode = record["root"].As<INode>();
+                Node root = CreateNodeFromRecord(rootNode);
 
-                // create the nodes
-                Node parentNode = CreateNodeFromRecord(parent);
-                Node childNode = CreateNodeFromRecord(child);
+                // add the root node to the TreeBuilder
+                if (!treeBuilder.RootNodes.Contains(root))
+                {
+                    treeBuilder.RootNodes.Add(root);
+                }
 
-                treeBuilder.AddRelationship(parentNode, childNode);
+                // cache to store already-created nodes by their IDs
+                var nodeCache = new Dictionary<string, Node>
+                {
+                    { rootNode.ElementId, root }
+                };
+
+                // extract paths and add relationships
+                var paths = record["paths"].As<List<IPath>>();
+                foreach (var path in paths)
+                {
+                    foreach (var relationship in path.Relationships)
+                    {
+                        // get start and end node IDs
+                        var startNodeId = relationship.StartNodeElementId;
+                        var endNodeId = relationship.EndNodeElementId;
+
+                        // get or create parent node from cache
+                        if (!nodeCache.TryGetValue(startNodeId, out Node parentNode))
+                        {
+                            var parentNeo4jNode = path.Nodes.First(node => node.ElementId == startNodeId);
+                            parentNode = CreateNodeFromRecord(parentNeo4jNode);
+                            nodeCache[startNodeId] = parentNode;
+                        }
+
+                        // get or create child node from cache
+                        if (!nodeCache.TryGetValue(endNodeId, out Node childNode))
+                        {
+                            var childNeo4jNode = path.Nodes.First(node => node.ElementId == endNodeId);
+                            childNode = CreateNodeFromRecord(childNeo4jNode);
+                            nodeCache[endNodeId] = childNode;
+                        }
+
+                        // add the relationship to TreeBuilder
+                        treeBuilder.AddRelationship(parentNode, childNode);
+                    }
+                }
             });
 
-            // return only the root nodes of the constructed tree
             return treeBuilder.RootNodes;
         }
 

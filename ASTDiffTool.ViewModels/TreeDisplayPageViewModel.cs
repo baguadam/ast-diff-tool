@@ -78,8 +78,7 @@ namespace ASTDiffTool.ViewModels
             {
                 if (_currentPage != value)
                 {
-                    _currentPage = value < 1 ? 1 : value; // prevent setting page for less than 1
-
+                    _currentPage = value;
                     OnPropertyChanged(nameof(CurrentPage));
                     UpdatePageInfo();
                 }
@@ -180,7 +179,7 @@ namespace ASTDiffTool.ViewModels
         [RelayCommand]
         private async Task GoToPreviousPage()
         {
-            if (CanGoToPreviousPage && CurrentPage > 1)
+            if (CanGoToPreviousPage)
             {
                 CurrentPage--;
                 await LoadNodesAsync();
