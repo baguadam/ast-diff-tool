@@ -71,7 +71,7 @@ namespace ASTDiffTool.Services
                 { "limit", pageSize },
             };
 
-            var treeBuilder = new TreeBuilder(); // local treebuilder
+            var treeBuilder = new TreeBuilder(); // local tree builder
 
             using var session = _driver.AsyncSession();
             var result = await session.RunAsync(query, parameters);

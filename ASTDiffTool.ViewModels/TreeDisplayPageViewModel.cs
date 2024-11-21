@@ -1,13 +1,10 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using ASTDiffTool.Models;
+﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.Shared;
-using CommunityToolkit.Mvvm.ComponentModel;
+using ASTDiffTool.ViewModels;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace ASTDiffTool.ViewModels
 {
@@ -81,7 +78,8 @@ namespace ASTDiffTool.ViewModels
             {
                 if (_currentPage != value)
                 {
-                    _currentPage = value;
+                    _currentPage = value < 1 ? 1 : value; // prevent setting page for less than 1
+
                     OnPropertyChanged(nameof(CurrentPage));
                     UpdatePageInfo();
                 }
@@ -142,32 +140,22 @@ namespace ASTDiffTool.ViewModels
             {
                 List<Node> nodes;
 
-                // Fetch nodes based on the selected difference type
+                // fetch nodes based on the selected types
                 if (SelectedDifferenceType == Differences.ONLY_IN_FIRST_AST || SelectedDifferenceType == Differences.ONLY_IN_SECOND_AST)
                 {
-                    nodes = await _neo4jService.GetHighestLevelSubtreesAsync(SelectedDifferenceType, CurrentPage - 1);
+                    nodes = await _neo4jService.GetHighestLevelSubtreesAsync(SelectedDifferenceType, CurrentPage);
                 }
                 else
                 {
-                    nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(SelectedDifferenceType, CurrentPage - 1);
+                    nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(SelectedDifferenceType, CurrentPage);
                 }
 
-                // Update pagination controls
+                // pagination control update
                 CanGoToPreviousPage = CurrentPage > 1;
                 CanGoToNextPage = nodes.Count >= 100;
 
-                // Assign nodes directly if they are already hierarchical
+                // observable collections for the tree structure
                 CurrentNodes = new ObservableCollection<Node>(nodes);
-
-                // DEBUG
-                foreach (var node in CurrentNodes)
-                {
-                    Debug.WriteLine($"Node: {node.EnhancedKey} - topological order: {node.TopologicalOrder}, Children Count: {node.Children.Count}");
-                    foreach (var child in node.Children)
-                    {
-                        Debug.WriteLine($"  Child: {child.EnhancedKey}");
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -180,22 +168,22 @@ namespace ASTDiffTool.ViewModels
         }
 
         [RelayCommand]
-        private void GoToNextPage()
+        private async Task GoToNextPage()
         {
             if (CanGoToNextPage)
             {
                 CurrentPage++;
-                Task.Run(LoadNodesAsync);
+                await LoadNodesAsync();
             }
         }
 
         [RelayCommand]
-        private void GoToPreviousPage()
+        private async Task GoToPreviousPage()
         {
-            if (CanGoToPreviousPage)
+            if (CanGoToPreviousPage && CurrentPage > 1)
             {
                 CurrentPage--;
-                LoadNodesCommand.Execute(null);
+                await LoadNodesAsync();
             }
         }
 
