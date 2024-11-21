@@ -23,7 +23,7 @@ namespace ASTDiffTool.Shared
                 existingParentNode = parentNode;
                 nodeLookup[parentUniqueKey] = existingParentNode;
 
-                // in case of highest level nodes
+                // highest level node
                 if (parentNode.IsHighLevel)
                 {
                     RootNodes.Add(existingParentNode);
@@ -36,8 +36,11 @@ namespace ASTDiffTool.Shared
                 nodeLookup[childUniqueKey] = existingChildNode;
             }
 
-            // add node to parent's children List
-            existingParentNode.Children.Add(childNode);
+            // avoid duplave paths
+            if (!existingParentNode.Children.Contains(existingChildNode))
+            {
+                existingParentNode.Children.Add(existingChildNode);
+            }
         }
     }
 }

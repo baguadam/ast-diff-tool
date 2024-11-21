@@ -13,7 +13,6 @@ namespace ASTDiffTool.Services
     public class Neo4jService : INeo4jService, IDisposable
     {
         private readonly IDriver _driver;
-        private readonly int _pageSize = 100;
 
         public Neo4jService(string uri, string username, string password)
         {
@@ -49,7 +48,7 @@ namespace ASTDiffTool.Services
             return await ExecuteSingleValueQueryAsync<int>(query, new { differenceType = differenceType.ToDatabaseString() }, "count");
         }
 
-        public async Task<List<Node>> GetHighestLevelSubtreesAsync(Differences differenceType, int page, int pageSize)
+        public async Task<List<Node>> GetHighestLevelSubtreesAsync(Differences differenceType, int page, int pageSize = 20)
         {
             const string query = @"
                 MATCH (root:Node {diffType: $differenceType})
@@ -125,7 +124,7 @@ namespace ASTDiffTool.Services
             return treeBuilder.RootNodes;
         }
 
-        public async Task<List<Node>> GetFlatNodesByDifferenceTypeAsync(Differences differenceType, int page, int pageSize = 100)
+        public async Task<List<Node>> GetFlatNodesByDifferenceTypeAsync(Differences differenceType, int page, int pageSize = 20)
         {
             var query = @"
                 MATCH (node:Node {diffType: $differenceType})

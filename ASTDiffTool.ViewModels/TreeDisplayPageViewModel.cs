@@ -151,7 +151,7 @@ namespace ASTDiffTool.ViewModels
 
                 // pagination control update
                 CanGoToPreviousPage = CurrentPage > 1;
-                CanGoToNextPage = nodes.Count >= 100;
+                CanGoToNextPage = nodes.Count >= 20;
 
                 // observable collections for the tree structure
                 CurrentNodes = new ObservableCollection<Node>(nodes);
