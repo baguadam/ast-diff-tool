@@ -49,15 +49,79 @@ namespace ASTDiffTool.Services
             return await ExecuteSingleValueQueryAsync<int>(query, new { differenceType = differenceType.ToDatabaseString() }, "count");
         }
 
-        public async Task<List<Node>> GetSubtreesByDifferenceTypeAsync(Differences differenceType, int page, int pageSize = 100)
+        public async Task<List<Node>> GetHighestLevelSubtreesAsync(Differences differenceType, int page, int pageSize)
         {
-            var query = @"
-                MATCH (root:Node {diffType: $differenceType, isHighLevel: true})
-                OPTIONAL MATCH (root)-[:HAS_CHILD*]->(child:Node)
-                RETURN root, collect(child) AS children
-                SKIP $skip LIMIT $limit";
+            const string query = @"
+        MATCH (root:Node {diffType: $diffType})
+        WHERE root.isHighLevel = true
+        WITH root
+        ORDER BY root.enhancedKey
+        SKIP $skip
+        LIMIT $limit
+        OPTIONAL MATCH (parent:Node)-[rel:HAS_CHILD]->(child:Node)
+        WHERE parent.diffType = $diffType
+        WITH root, collect({parent: parent, child: child}) AS relationships
+        RETURN root, relationships";
 
-            return await QueryHierarchicalNodesAsync(query, new { differenceType = differenceType.ToDatabaseString(), skip = (page - 1) * pageSize, limit = pageSize });
+            var parameters = new Dictionary<string, object>
+    {
+        { "diffType", differenceType.ToDatabaseString() },
+        { "skip", Math.Max(0, page * pageSize) },
+        { "limit", pageSize }
+    };
+
+            var nodesMap = new Dictionary<string, Node>();
+
+            using var session = _driver.AsyncSession();
+            await session.ExecuteReadAsync(async tx =>
+            {
+                var result = await tx.RunAsync(query, parameters);
+
+                while (await result.FetchAsync())
+                {
+                    var rootNodeRecord = result.Current["root"].As<INode>();
+                    var rootNode = CreateNodeFromRecord(rootNodeRecord);
+                    var rootKey = CreateCompositeKey(rootNode.EnhancedKey, rootNode.TopologicalOrder);
+
+                    if (!nodesMap.ContainsKey(rootKey))
+                    {
+                        nodesMap[rootKey] = rootNode;
+                    }
+
+                    var relationships = result.Current["relationships"].As<IList<IDictionary<string, INode>>>();
+
+                    foreach (var relationship in relationships)
+                    {
+                        var parentRecord = relationship["parent"];
+                        var childRecord = relationship["child"];
+
+                        var parentNode = CreateNodeFromRecord(parentRecord);
+                        var childNode = CreateNodeFromRecord(childRecord);
+
+                        var parentKey = CreateCompositeKey(parentNode.EnhancedKey, parentNode.TopologicalOrder);
+                        var childKey = CreateCompositeKey(childNode.EnhancedKey, childNode.TopologicalOrder);
+
+                        if (!nodesMap.ContainsKey(parentKey))
+                        {
+                            nodesMap[parentKey] = parentNode;
+                        }
+
+                        if (!nodesMap.ContainsKey(childKey))
+                        {
+                            nodesMap[childKey] = childNode;
+                        }
+
+                        // Link child to parent
+                        if (!nodesMap[parentKey].Children.Contains(nodesMap[childKey]))
+                        {
+                            nodesMap[parentKey].Children.Add(nodesMap[childKey]);
+                        }
+                    }
+                }
+            });
+
+            // Return only the root nodes
+            return nodesMap.Values.Where(node => node.IsHighLevel).ToList();
         }
 
         public async Task<List<Node>> GetFlatNodesByDifferenceTypeAsync(Differences differenceType, int page, int pageSize = 100)
@@ -82,49 +146,10 @@ namespace ASTDiffTool.Services
             var nodes = new List<Node>();
             await foreach (var record in result)
             {
-                nodes.Add(MapNode(record["node"].As<INode>()));
+                nodes.Add(CreateNodeFromRecord(record["node"].As<INode>()));
             }
 
             return nodes;
-        }
-
-        private async Task<List<Node>> QueryHierarchicalNodesAsync(string query, object parameters)
-        {
-            using var session = _driver.AsyncSession();
-            var result = await session.RunAsync(query, parameters);
-
-            var nodeDictionary = new Dictionary<string, Node>();
-            await foreach (var record in result)
-            {
-                var root = MapNode(record["root"].As<INode>());
-
-                // use UniqueKey for the dictionary (calculated from EnhancedKey + TopologicalOrder)
-                if (!nodeDictionary.ContainsKey(root.UniqueKey))
-                {
-                    nodeDictionary[root.UniqueKey] = root;
-                }
-
-                var children = record["children"].As<List<INode>>();
-                foreach (var child in children)
-                {
-                    var childNode = MapNode(child);
-
-                    // use UniqueKey for children as well (calculated from EnhancedKey + TopologicalOrder)
-                    if (!nodeDictionary.ContainsKey(childNode.UniqueKey))
-                    {
-                        nodeDictionary[childNode.UniqueKey] = childNode;
-                    }
-
-                    if (nodeDictionary.TryGetValue(root.UniqueKey, out var parentNode))
-                    {
-                        childNode.Parent = parentNode;
-                        parentNode.Children.Add(childNode);
-                    }
-                }
-            }
-
-            // return top-level nodes
-            return nodeDictionary.Values.Where(n => n.Parent == null).ToList();
         }
 
         private async Task<T> ExecuteSingleValueQueryAsync<T>(string query, object parameters, string returnKey)
@@ -143,19 +168,28 @@ namespace ASTDiffTool.Services
             }
         }
 
-        private static Node MapNode(INode node)
+        private Node CreateNodeFromRecord(INode record)
         {
             return new Node
             {
-                EnhancedKey = node["enhancedKey"].As<string>(),
-                Type = node["type"].As<string>(),
-                DifferenceType = node["diffType"].As<string>(),
-                TopologicalOrder = node["topologicalOrder"].As<int>(),
-                Path = node["path"].As<string>(),
-                LineNumber = node["lineNumber"].As<int>(),
-                ColumnNumber = node["columnNumber"].As<int>(),
-                IsHighLevel = node["isHighLevel"].As<bool>()
+                EnhancedKey = record["enhancedKey"].As<string>(),
+                TopologicalOrder = record["topologicalOrder"].As<int>(),
+                Type = record["type"].As<string>(),
+                Kind = record["kind"].As<string>(),
+                Usr = record["usr"].As<string>(),
+                Path = record["path"].As<string>(),
+                LineNumber = record["lineNumber"].As<int>(),
+                ColumnNumber = record["columnNumber"].As<int>(),
+                IsHighLevel = record["isHighLevel"].As<bool>(),
+                DifferenceType = record["diffType"].As<string>(),
+                AstOrigin = record["ast"].As<string>(),
+                Children = new List<Node>() // Initialize children list
             };
+        }
+
+        private string CreateCompositeKey(string enhancedKey, int topologicalOrder)
+        {
+            return $"{enhancedKey}_{topologicalOrder}";
         }
 
         #endregion

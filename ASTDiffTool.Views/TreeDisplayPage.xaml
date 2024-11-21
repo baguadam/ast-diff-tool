@@ -1,9 +1,9 @@
 ﻿<UserControl x:Class="ASTDiffTool.Views.TreeDisplayPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -17,13 +17,13 @@
                 BorderThickness="0"
                 HorizontalAlignment="Center" 
                 VerticalAlignment="Center"
-                Width="700">
+                Width="800" Height="700">
             <Border.Effect>
                 <DropShadowEffect Color="Black" Direction="45" ShadowDepth="5" Opacity="0.5" BlurRadius="10" />
             </Border.Effect>
 
             <StackPanel>
-                <!--Header-->
+                <!-- Header -->
                 <TextBlock Text="View AST Nodes" 
                            FontSize="24" 
                            FontWeight="Bold" 
@@ -52,22 +52,28 @@
                             BorderThickness="1" 
                             CornerRadius="5" 
                             Padding="10" 
-                            Margin="0,10,0,0">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                            <TreeView ItemsSource="{Binding CurrentNodes}" VirtualizingStackPanel.IsVirtualizing="True"
-                                      VirtualizingStackPanel.VirtualizationMode="Recycling" 
-                                      ScrollViewer.CanContentScroll="True">
-                                <TreeView.ItemTemplate>
-                                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding EnhancedKey}" FontWeight="Bold" Margin="5,0,5,0" />
-                                            <TextBlock Text="{Binding Type}" Margin="5,0,5,0" />
-                                            <TextBlock Text="{Binding DifferenceType}" Foreground="Gray" />
-                                        </StackPanel>
-                                    </HierarchicalDataTemplate>
-                                </TreeView.ItemTemplate>
-                            </TreeView>
-                        </ScrollViewer>
+                            Margin="0,10,0,0"
+                            Width="750" Height="400">
+                        <TreeView ItemsSource="{Binding CurrentNodes}" 
+                                  VirtualizingStackPanel.IsVirtualizing="True"
+                                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                  ScrollViewer.CanContentScroll="True"
+                                  Background="Transparent">
+                            <TreeView.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                    <StackPanel Orientation="Horizontal" Margin="5,0">
+                                        <TextBlock Text="{Binding Kind}" FontWeight="Bold" FontSize="16" Margin="5,0" />
+                                        <TextBlock Text="{Binding EnhancedKey}" FontSize="14" Margin="10,0" />
+                                    </StackPanel>
+                                </HierarchicalDataTemplate>
+                            </TreeView.ItemTemplate>
+                            <TreeView.Resources>
+                                <!-- Make all TreeViewItems expanded by default -->
+                                <Style TargetType="TreeViewItem">
+                                    <Setter Property="IsExpanded" Value="True" />
+                                </Style>
+                            </TreeView.Resources>
+                        </TreeView>
                     </Border>
                 </StackPanel>
 

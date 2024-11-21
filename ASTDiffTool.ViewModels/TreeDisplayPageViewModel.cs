@@ -133,7 +133,6 @@ namespace ASTDiffTool.ViewModels
         #endregion
 
         #region Commands
-
         [RelayCommand]
         private async Task LoadNodesAsync()
         {
@@ -143,22 +142,32 @@ namespace ASTDiffTool.ViewModels
             {
                 List<Node> nodes;
 
-                // data is fetched based on the selected difference type
+                // Fetch nodes based on the selected difference type
                 if (SelectedDifferenceType == Differences.ONLY_IN_FIRST_AST || SelectedDifferenceType == Differences.ONLY_IN_SECOND_AST)
                 {
-                    nodes = await _neo4jService.GetSubtreesByDifferenceTypeAsync(SelectedDifferenceType, CurrentPage);
+                    nodes = await _neo4jService.GetHighestLevelSubtreesAsync(SelectedDifferenceType, CurrentPage - 1);
                 }
                 else
                 {
-                    nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(SelectedDifferenceType, CurrentPage);
+                    nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(SelectedDifferenceType, CurrentPage - 1);
                 }
 
-                // pagination control update
+                // Update pagination controls
                 CanGoToPreviousPage = CurrentPage > 1;
                 CanGoToNextPage = nodes.Count >= 100;
 
-                // data binding
+                // Assign nodes directly if they are already hierarchical
                 CurrentNodes = new ObservableCollection<Node>(nodes);
+
+                // DEBUG
+                foreach (var node in CurrentNodes)
+                {
+                    Debug.WriteLine($"Node: {node.EnhancedKey} - topological order: {node.TopologicalOrder}, Children Count: {node.Children.Count}");
+                    foreach (var child in node.Children)
+                    {
+                        Debug.WriteLine($"  Child: {child.EnhancedKey}");
+                    }
+                }
             }
             catch (Exception ex)
             {
