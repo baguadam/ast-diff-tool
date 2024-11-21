@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:ASTDiffTool"
         xmlns:controls="clr-namespace:ASTDiffTool.Views.UserControls"
         mc:Ignorable="d"
-        Title="AST Differential Tool" Height="800" Width="1000"
+        Title="AST Differential Tool" Height="1000" Width="1200"
         Background="{StaticResource PrimarBackgroundColor}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
