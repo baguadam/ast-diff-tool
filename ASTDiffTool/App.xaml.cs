@@ -76,8 +76,7 @@ namespace ASTDiffTool
             services.AddSingleton<ILoggerService, LoggerService>();
 
             // neo4j connection
-            services.AddSingleton<INeo4jService>(provider =>
-                new Neo4jService(neo4jUri, neo4jUsername, decryptedPassword));
+            services.AddScoped<INeo4jService, Neo4jService>(provider => new Neo4jService("your_neo4j_uri", "username", "password"));
 
             services.AddSingleton<NewProjectPageViewModel>();
             services.AddSingleton<ProjectPageViewModel>();

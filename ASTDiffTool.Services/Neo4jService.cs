@@ -32,9 +32,9 @@ namespace ASTDiffTool.Services
         public async Task<int> GetNodesByAstOriginAsync(ASTOrigins astOrigin)
         {
             const string query = @"
-            MATCH (n:Node)
-            WHERE n.ast = $astOrigin
-            RETURN count(n) AS count";
+                MATCH (n:Node)
+                WHERE n.ast = $astOrigin
+                RETURN count(n) AS count";
 
             return await ExecuteSingleValueQueryAsync<int>(query, new { astOrigin = astOrigin.ToDatabaseString() }, "count");
         }
@@ -42,9 +42,9 @@ namespace ASTDiffTool.Services
         public async Task<int> GetNodesByDifferenceTypeAsync(Differences differenceType)
         {
             const string query = @"
-            MATCH (n:Node)
-            WHERE n.diffType = $differenceType
-            RETURN count(n) AS count";
+                MATCH (n:Node)
+                WHERE n.diffType = $differenceType
+                RETURN count(n) AS count";
 
             return await ExecuteSingleValueQueryAsync<int>(query, new { differenceType = differenceType.ToDatabaseString() }, "count");
         }
@@ -52,76 +52,44 @@ namespace ASTDiffTool.Services
         public async Task<List<Node>> GetHighestLevelSubtreesAsync(Differences differenceType, int page, int pageSize)
         {
             const string query = @"
-        MATCH (root:Node {diffType: $diffType})
-        WHERE root.isHighLevel = true
-        WITH root
-        ORDER BY root.enhancedKey
-        SKIP $skip
-        LIMIT $limit
-        OPTIONAL MATCH (parent:Node)-[rel:HAS_CHILD]->(child:Node)
-        WHERE parent.diffType = $diffType
-        WITH root, collect({parent: parent, child: child}) AS relationships
-        RETURN root, relationships";
+                MATCH (root:Node {diffType: $differenceType})
+                WHERE root.isHighLevel = true
+                WITH root
+                ORDER BY root.topologicalOrder
+                SKIP $skip
+                LIMIT $limit
+                MATCH path = (root)-[:HAS_CHILD*0..]->(descendant)
+                WITH root, descendant, path
+                UNWIND relationships(path) AS rel
+                WITH DISTINCT rel
+                RETURN startNode(rel) AS parent, endNode(rel) AS child";
 
-            var parameters = new Dictionary<string, object>
-    {
-        { "diffType", differenceType.ToDatabaseString() },
-        { "skip", Math.Max(0, page * pageSize) },
-        { "limit", pageSize }
-    };
+            var parameters = new Dictionary<string, object>()
+            {
+                { "differenceType", differenceType.ToDatabaseString() },
+                { "skip", (page - 1) * pageSize },
+                { "limit", pageSize },
+            };
 
-            var nodesMap = new Dictionary<string, Node>();
+            var treeBuilder = new TreeBuilder(); // local treebuilder
 
             using var session = _driver.AsyncSession();
-            await session.ExecuteReadAsync(async tx =>
+            var result = await session.RunAsync(query, parameters);
+            await result.ForEachAsync(record =>
             {
-                var result = await tx.RunAsync(query, parameters);
+                // extract parent and child for each record
+                var parent = record["parent"].As<INode>();
+                var child = record["child"].As<INode>();
 
-                while (await result.FetchAsync())
-                {
-                    var rootNodeRecord = result.Current["root"].As<INode>();
-                    var rootNode = CreateNodeFromRecord(rootNodeRecord);
-                    var rootKey = CreateCompositeKey(rootNode.EnhancedKey, rootNode.TopologicalOrder);
+                // create the nodes
+                Node parentNode = CreateNodeFromRecord(parent);
+                Node childNode = CreateNodeFromRecord(child);
 
-                    if (!nodesMap.ContainsKey(rootKey))
-                    {
-                        nodesMap[rootKey] = rootNode;
-                    }
-
-                    var relationships = result.Current["relationships"].As<IList<IDictionary<string, INode>>>();
-
-                    foreach (var relationship in relationships)
-                    {
-                        var parentRecord = relationship["parent"];
-                        var childRecord = relationship["child"];
-
-                        var parentNode = CreateNodeFromRecord(parentRecord);
-                        var childNode = CreateNodeFromRecord(childRecord);
-
-                        var parentKey = CreateCompositeKey(parentNode.EnhancedKey, parentNode.TopologicalOrder);
-                        var childKey = CreateCompositeKey(childNode.EnhancedKey, childNode.TopologicalOrder);
-
-                        if (!nodesMap.ContainsKey(parentKey))
-                        {
-                            nodesMap[parentKey] = parentNode;
-                        }
-
-                        if (!nodesMap.ContainsKey(childKey))
-                        {
-                            nodesMap[childKey] = childNode;
-                        }
-
-                        // Link child to parent
-                        if (!nodesMap[parentKey].Children.Contains(nodesMap[childKey]))
-                        {
-                            nodesMap[parentKey].Children.Add(nodesMap[childKey]);
-                        }
-                    }
-                }
+                treeBuilder.AddRelationship(parentNode, childNode);
             });
 
-            // Return only the root nodes
-            return nodesMap.Values.Where(node => node.IsHighLevel).ToList();
+            // return only the root nodes of the constructed tree
+            return treeBuilder.RootNodes;
         }
 
         public async Task<List<Node>> GetFlatNodesByDifferenceTypeAsync(Differences differenceType, int page, int pageSize = 100)
@@ -183,13 +151,8 @@ namespace ASTDiffTool.Services
                 IsHighLevel = record["isHighLevel"].As<bool>(),
                 DifferenceType = record["diffType"].As<string>(),
                 AstOrigin = record["ast"].As<string>(),
-                Children = new List<Node>() // Initialize children list
+                Children = new List<Node>() // initialize children list
             };
-        }
-
-        private string CreateCompositeKey(string enhancedKey, int topologicalOrder)
-        {
-            return $"{enhancedKey}_{topologicalOrder}";
         }
 
         #endregion
