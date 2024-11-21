@@ -30,8 +30,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
 
+        
         <!-- TreeViewItem style -->
         <Style TargetType="TreeViewItem">
             <Setter Property="Margin" Value="0,5,0,5"/>
@@ -109,7 +109,7 @@
                 BorderThickness="0"
                 HorizontalAlignment="Center" 
                 VerticalAlignment="Center"
-                Width="900" Height="800">
+                Width="900" Height="700">
             <Border.Effect>
                 <DropShadowEffect Color="Black" Direction="45" ShadowDepth="5" Opacity="0.5" BlurRadius="10" />
             </Border.Effect>
@@ -144,6 +144,7 @@
                         Width="800" Height="500">
                     <TreeView ItemsSource="{Binding CurrentNodes}" 
                               ScrollViewer.CanContentScroll="True"
+                              BorderThickness="0"
                               Background="Transparent">
                         <TreeView.ItemTemplate>
                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
