@@ -29,6 +29,52 @@ namespace ASTDiffTool.Tests
         }
 
         [Fact]
+        public async Task GetNodeCountAsync_ShouldReturnOneAfterAddingOneNode()
+        {
+            await ClearDatabase();
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: "None")
+            });
+
+            var count = await _neo4jService.GetNodeCountAsync();
+            Assert.Equal(1, count);
+        }
+
+        [Fact]
+        public async Task GetNodeCountAsync_ShouldReturnCorrectCountAfterAddingMultipleNodes()
+        {
+            await ClearDatabase();
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: "None"),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: "None"),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: "None")
+            });
+
+            var count = await _neo4jService.GetNodeCountAsync();
+            Assert.Equal(3, count);
+        }
+
+        [Fact]
+        public async Task GetNodeCountAsync_ShouldReturnZeroAfterAddingAndRemovingNodes()
+        {
+            await ClearDatabase();
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: "None"),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: "None")
+            });
+
+            var countAfterAdding = await _neo4jService.GetNodeCountAsync();
+            Assert.Equal(2, countAfterAdding);
+
+            await ClearDatabase();
+            var countAfterClearing = await _neo4jService.GetNodeCountAsync();
+            Assert.Equal(0, countAfterClearing);
+        }
+
+        [Fact]
         public async Task GetNodesByAstOriginAsync_ShouldReturnCorrectCount()
         {
             await ClearDatabase();
@@ -168,7 +214,7 @@ namespace ASTDiffTool.Tests
             }
         }
 
-        
+
         private (string Label, Dictionary<string, object> Properties) CreateTestNode(
             string ast,
             string diffType,
