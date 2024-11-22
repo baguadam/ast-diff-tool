@@ -35,8 +35,8 @@ namespace ASTDiffTool.Tests
 
             await SeedDatabase(new[]
             {
-                ("Node", new Dictionary<string, object> { { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() }, { "diffType", "None" } }),
-                ("Node", new Dictionary<string, object> { { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() }, { "diffType", "None" } })
+                CreateTestNode(ASTOrigins.FIRST_AST.ToDatabaseString(), "None"),
+                CreateTestNode(ASTOrigins.FIRST_AST.ToDatabaseString(), "None")
             });
 
             var count = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.FIRST_AST);
@@ -50,8 +50,8 @@ namespace ASTDiffTool.Tests
 
             await SeedDatabase(new[]
             {
-                ("Node", new Dictionary<string, object> { { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() }, { "diffType", Differences.ONLY_IN_FIRST_AST.ToDatabaseString() } }),
-                ("Node", new Dictionary<string, object> { { "ast", ASTOrigins.SECOND_AST.ToDatabaseString() }, { "diffType", Differences.ONLY_IN_FIRST_AST.ToDatabaseString() } })
+                CreateTestNode(ASTOrigins.FIRST_AST.ToDatabaseString(), Differences.ONLY_IN_FIRST_AST.ToDatabaseString()),
+                CreateTestNode(ASTOrigins.SECOND_AST.ToDatabaseString(), Differences.ONLY_IN_FIRST_AST.ToDatabaseString())
             });
 
             var count = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST);
@@ -63,37 +63,34 @@ namespace ASTDiffTool.Tests
         {
             await ClearDatabase();
 
-            // Seed nodes
             await SeedDatabase(new[]
             {
-                ("Node", new Dictionary<string, object>
-                {
-                    { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() },
-                    { "diffType", Differences.DIFFERENT_PARENTS.ToDatabaseString() },
-                    { "enhancedKey", "someValue" },
-                    { "topologicalOrder", 1 },
-                    { "type", "defaultType" },
-                    { "kind", "defaultKind" },
-                    { "usr", "defaultUsr" },
-                    { "path", "defaultPath" },
-                    { "lineNumber", 10 },
-                    { "columnNumber", 5 },
-                    { "isHighLevel", false }
-                }),
-                ("Node", new Dictionary<string, object>
-                {
-                    { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() },
-                    { "diffType", Differences.DIFFERENT_PARENTS.ToDatabaseString() },
-                    { "enhancedKey", "anotherValue" },
-                    { "topologicalOrder", 2 },
-                    { "type", "defaultType" },
-                    { "kind", "defaultKind" },
-                    { "usr", "anotherUsr" },
-                    { "path", "anotherPath" },
-                    { "lineNumber", 15 },
-                    { "columnNumber", 3 },
-                    { "isHighLevel", true }
-                })
+                CreateTestNode(
+                    ast: ASTOrigins.FIRST_AST.ToDatabaseString(),
+                    diffType: Differences.DIFFERENT_PARENTS.ToDatabaseString(),
+                    enhancedKey: "someValue",
+                    topologicalOrder: 1,
+                    type: "defaultType",
+                    kind: "defaultKind",
+                    usr: "defaultUsr",
+                    path: "defaultPath",
+                    lineNumber: 10,
+                    columnNumber: 5,
+                    isHighLevel: false
+                ),
+                CreateTestNode(
+                    ast: ASTOrigins.FIRST_AST.ToDatabaseString(),
+                    diffType: Differences.DIFFERENT_PARENTS.ToDatabaseString(),
+                    enhancedKey: "anotherValue",
+                    topologicalOrder: 2,
+                    type: "defaultType",
+                    kind: "defaultKind",
+                    usr: "anotherUsr",
+                    path: "anotherPath",
+                    lineNumber: 15,
+                    columnNumber: 3,
+                    isHighLevel: true
+                )
             });
 
             var nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(Differences.DIFFERENT_PARENTS, 1, 10);
@@ -107,34 +104,32 @@ namespace ASTDiffTool.Tests
 
             await SeedDatabase(new[]
             {
-                ("Node", new Dictionary<string, object>
-                {
-                    { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() },
-                    { "diffType", Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString() },
-                    { "isHighLevel", true },
-                    { "enhancedKey", "someValue" },
-                    { "topologicalOrder", 1 },
-                    { "type", "defaultType" },
-                    { "kind", "defaultKind" },
-                    { "usr", "usr1" },
-                    { "path", "defaultPath" },
-                    { "lineNumber", 1 },
-                    { "columnNumber", 1 }
-                }),
-                ("Node", new Dictionary<string, object>
-                {
-                    { "ast", ASTOrigins.SECOND_AST.ToDatabaseString() },
-                    { "diffType", Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString() },
-                    { "isHighLevel", false },
-                    { "enhancedKey", "anotherValue" },
-                    { "topologicalOrder", 2 },
-                    { "type", "defaultType" },
-                    { "kind", "defaultKind" },
-                    { "usr", "usr2" },
-                    { "path", "anotherPath" },
-                    { "lineNumber", 2 },
-                    { "columnNumber", 2 }
-                })
+                CreateTestNode(
+                    ast: ASTOrigins.FIRST_AST.ToDatabaseString(),
+                    diffType: Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString(),
+                    enhancedKey: "someValue",
+                    topologicalOrder: 1,
+                    type: "defaultType",
+                    kind: "defaultKind",
+                    usr: "usr1",
+                    path: "defaultPath",
+                    lineNumber: 1,
+                    columnNumber: 1,
+                    isHighLevel: true
+                ),
+                CreateTestNode(
+                    ast: ASTOrigins.SECOND_AST.ToDatabaseString(),
+                    diffType: Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString(),
+                    enhancedKey: "anotherValue",
+                    topologicalOrder: 2,
+                    type: "defaultType",
+                    kind: "defaultKind",
+                    usr: "usr2",
+                    path: "anotherPath",
+                    lineNumber: 2,
+                    columnNumber: 2,
+                    isHighLevel: false
+                )
             });
 
             var subtrees = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.DIFFERENT_SOURCE_LOCATIONS, 1, 10);
@@ -171,6 +166,39 @@ namespace ASTDiffTool.Tests
             {
                 await session.CloseAsync();
             }
+        }
+
+        
+        private (string Label, Dictionary<string, object> Properties) CreateTestNode(
+            string ast,
+            string diffType,
+            string enhancedKey = "defaultEnhancedKey",
+            int topologicalOrder = 0,
+            string type = "defaultType",
+            string kind = "defaultKind",
+            string usr = "defaultUsr",
+            string path = "defaultPath",
+            int lineNumber = 1,
+            int columnNumber = 1,
+            bool isHighLevel = false)
+        {
+            return (
+                "Node",
+                new Dictionary<string, object>
+                {
+                    { "ast", ast },
+                    { "diffType", diffType },
+                    { "enhancedKey", enhancedKey },
+                    { "topologicalOrder", topologicalOrder },
+                    { "type", type },
+                    { "kind", kind },
+                    { "usr", usr },
+                    { "path", path },
+                    { "lineNumber", lineNumber },
+                    { "columnNumber", columnNumber },
+                    { "isHighLevel", isHighLevel }
+                }
+            );
         }
     }
 }
