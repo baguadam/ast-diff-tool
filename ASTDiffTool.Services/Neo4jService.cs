@@ -19,6 +19,11 @@ namespace ASTDiffTool.Services
             _driver = GraphDatabase.Driver(uri, AuthTokens.Basic(username, password));
         }
 
+        public Neo4jService(IDriver driver)
+        {
+            _driver = driver;
+        }
+
         #region Public Queries
 
         public async Task<int> GetNodeCountAsync()
