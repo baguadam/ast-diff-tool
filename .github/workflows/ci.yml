@@ -3,68 +3,61 @@ name: CI Pipeline for ASTDiffTool
 on:
   push:
     branches:
-      - "**" # Trigger for all branches
+      - "**"
   pull_request:
     branches:
-      - "**" # Trigger for all pull requests
+      - "**"
 
 jobs:
-  start-neo4j:
-    runs-on: ubuntu-latest
-    services:
-      neo4j:
-        image: neo4j:5.5
-        ports:
-          - 7687:7687
-        options: --health-cmd "cypher-shell -u neo4j -p testpassword 'RETURN 1'" --health-interval 10s --health-timeout 5s --health-retries 5
-        env:
-          NEO4J_AUTH: "neo4j/testpassword"
-
-    outputs:
-      neo4j-host: ${{ steps.neo4j-details.outputs.neo4j-host }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      # Output the address of the neo4j service for the Windows job
-      - name: Output Neo4j Service Details
-        id: neo4j-details
-        run: echo "::set-output name=neo4j-host::$(echo localhost)"
-
   build-and-test:
-    needs: start-neo4j
     runs-on: windows-latest
 
     steps:
+      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      # Set up .NET SDK (Using .NET 8.0)
       - name: Set up .NET 8 SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: "8.0.x"
 
-      - name: Install Docker on Windows
+      # Create appsettings.json using secrets
+      - name: Create appsettings.json
         run: |
-          Start-Process -Wait -FilePath "powershell.exe" -ArgumentList "-command", "Invoke-WebRequest -UseBasicParsing -OutFile dockerInstall.ps1 https://get.docker.com/windows.ps1; .\dockerInstall.ps1"
-          Start-Service docker
+          echo "{
+            \"Encryption\": {
+              \"Key\": \"${{ secrets.ENCRYPTION_KEY }}\",
+              \"IV\": \"${{ secrets.ENCRYPTION_IV }}\"
+            },
+            \"Neo4j\": {
+              \"Uri\": \"${{ secrets.NEO4J_URI }}\",
+              \"Username\": \"${{ secrets.NEO4J_USERNAME }}\",
+              \"Password\": \"${{ secrets.NEO4J_PASSWORD }}\"
+            }
+          }" > D:\a\ast-diff-tool\ast-diff-tool\ASTDiffTool\appsettings.json
         shell: pwsh
 
+      # Install dependencies
       - name: Install dependencies
         run: dotnet restore
         env:
           EnableWindowsTargeting: true
 
+      # Build the project
       - name: Build the project
         run: dotnet build --no-restore --configuration Release
         env:
           EnableWindowsTargeting: true
 
+      # Run tests
       - name: Run tests
         run: dotnet test --no-restore --verbosity normal
         env:
           EnableWindowsTargeting: true
-          NEO4J_URL: "bolt://localhost:7687"
-          NEO4J_USER: "neo4j"
-          NEO4J_PASSWORD: "testpassword"
+
+      # Clean up appsettings.json to remove sensitive information
+      - name: Clean up appsettings.json
+        run: Remove-Item -Path "D:\a\ast-diff-tool\ast-diff-tool\ASTDiffTool\appsettings.json" -Force
+        shell: pwsh
