@@ -13,6 +13,7 @@ namespace ASTDiffTool.Services
     public class Neo4jService : INeo4jService, IDisposable
     {
         private readonly IDriver _driver;
+        public IDriver Driver => _driver; // read-only for testing
 
         public Neo4jService(string uri, string username, string password)
         {

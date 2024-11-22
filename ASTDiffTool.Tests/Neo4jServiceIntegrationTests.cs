@@ -1,40 +1,176 @@
 ﻿using ASTDiffTool.Services;
-using Neo4j.Driver;
+using ASTDiffTool.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace ASTDiffTool.Tests
 {
-    public class Neo4jServiceIntegrationTests : IClassFixture<Neo4jTestFixture>
+    [Collection("Neo4j collection")]
+    public class Neo4jServiceTests : IClassFixture<Neo4jTestFixture>
     {
-        private readonly IDriver _driver;
+        private readonly Neo4jService _neo4jService;
+        private readonly Neo4jTestFixture _fixture;
 
-        public Neo4jServiceIntegrationTests()
+        public Neo4jServiceTests(Neo4jTestFixture fixture)
         {
-            _driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("neo4j", "testpassword"));
+            _fixture = fixture;
+            _neo4jService = new Neo4jService("bolt://localhost:7688", "neo4j", "testpassword"); // neo4j is initialized after fixture
         }
 
         [Fact]
-        public async Task GetNodeCountAsync_ReturnsCorrectCount()
+        public async Task GetNodeCountAsync_ShouldReturnZeroInitially()
         {
-            // seed the database
-            var seedQuery = @"
-            CREATE (n:Node {name: 'Test Node', diffType: 'SomeType'}),
-                   (m:Node {name: 'Another Node', diffType: 'AnotherType'})";
+            await ClearDatabase();
+            var count = await _neo4jService.GetNodeCountAsync();
+            Assert.Equal(0, count);
+        }
 
-            using var session = _driver.AsyncSession();
-            await session.RunAsync(seedQuery);
+        [Fact]
+        public async Task GetNodesByAstOriginAsync_ShouldReturnCorrectCount()
+        {
+            await ClearDatabase();
 
-            var service = new Neo4jService(_driver);
+            await SeedDatabase(new[]
+            {
+                ("Node", new Dictionary<string, object> { { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() }, { "diffType", "None" } }),
+                ("Node", new Dictionary<string, object> { { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() }, { "diffType", "None" } })
+            });
 
-            // call service method
-            var count = await service.GetNodeCountAsync();
-
-            // assert
+            var count = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.FIRST_AST);
             Assert.Equal(2, count);
+        }
+
+        [Fact]
+        public async Task GetNodesByDifferenceTypeAsync_ShouldReturnCorrectCount()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                ("Node", new Dictionary<string, object> { { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() }, { "diffType", Differences.ONLY_IN_FIRST_AST.ToDatabaseString() } }),
+                ("Node", new Dictionary<string, object> { { "ast", ASTOrigins.SECOND_AST.ToDatabaseString() }, { "diffType", Differences.ONLY_IN_FIRST_AST.ToDatabaseString() } })
+            });
+
+            var count = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST);
+            Assert.Equal(2, count);
+        }
+
+        [Fact]
+        public async Task GetFlatNodesByDifferenceTypeAsync_ShouldReturnFlatNodes()
+        {
+            await ClearDatabase();
+
+            // Seed nodes
+            await SeedDatabase(new[]
+            {
+                ("Node", new Dictionary<string, object>
+                {
+                    { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() },
+                    { "diffType", Differences.DIFFERENT_PARENTS.ToDatabaseString() },
+                    { "enhancedKey", "someValue" },
+                    { "topologicalOrder", 1 },
+                    { "type", "defaultType" },
+                    { "kind", "defaultKind" },
+                    { "usr", "defaultUsr" },
+                    { "path", "defaultPath" },
+                    { "lineNumber", 10 },
+                    { "columnNumber", 5 },
+                    { "isHighLevel", false }
+                }),
+                ("Node", new Dictionary<string, object>
+                {
+                    { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() },
+                    { "diffType", Differences.DIFFERENT_PARENTS.ToDatabaseString() },
+                    { "enhancedKey", "anotherValue" },
+                    { "topologicalOrder", 2 },
+                    { "type", "defaultType" },
+                    { "kind", "defaultKind" },
+                    { "usr", "anotherUsr" },
+                    { "path", "anotherPath" },
+                    { "lineNumber", 15 },
+                    { "columnNumber", 3 },
+                    { "isHighLevel", true }
+                })
+            });
+
+            var nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(Differences.DIFFERENT_PARENTS, 1, 10);
+            Assert.Equal(2, nodes.Count);
+        }
+
+        [Fact]
+        public async Task GetHighestLevelSubtreesAsync_ShouldReturnCorrectSubtrees()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                ("Node", new Dictionary<string, object>
+                {
+                    { "ast", ASTOrigins.FIRST_AST.ToDatabaseString() },
+                    { "diffType", Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString() },
+                    { "isHighLevel", true },
+                    { "enhancedKey", "someValue" },
+                    { "topologicalOrder", 1 },
+                    { "type", "defaultType" },
+                    { "kind", "defaultKind" },
+                    { "usr", "usr1" },
+                    { "path", "defaultPath" },
+                    { "lineNumber", 1 },
+                    { "columnNumber", 1 }
+                }),
+                ("Node", new Dictionary<string, object>
+                {
+                    { "ast", ASTOrigins.SECOND_AST.ToDatabaseString() },
+                    { "diffType", Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString() },
+                    { "isHighLevel", false },
+                    { "enhancedKey", "anotherValue" },
+                    { "topologicalOrder", 2 },
+                    { "type", "defaultType" },
+                    { "kind", "defaultKind" },
+                    { "usr", "usr2" },
+                    { "path", "anotherPath" },
+                    { "lineNumber", 2 },
+                    { "columnNumber", 2 }
+                })
+            });
+
+            var subtrees = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.DIFFERENT_SOURCE_LOCATIONS, 1, 10);
+            Assert.Single(subtrees);
+        }
+
+        private async Task ClearDatabase()
+        {
+            const string query = "MATCH (n) DETACH DELETE n";
+            using var session = _neo4jService.Driver.AsyncSession();
+            try
+            {
+                await session.RunAsync(query);
+            }
+            finally
+            {
+                await session.CloseAsync();
+            }
+        }
+
+        private async Task SeedDatabase(IEnumerable<(string Label, Dictionary<string, object> Properties)> nodes)
+        {
+            using var session = _neo4jService.Driver.AsyncSession();
+            try
+            {
+                foreach (var (label, properties) in nodes)
+                {
+                    var props = string.Join(", ", properties.Keys.Select(key => $"{key}: ${key}"));
+                    var query = $"CREATE (:{label} {{{props}}})";
+                    await session.RunAsync(query, properties);
+                }
+            }
+            finally
+            {
+                await session.CloseAsync();
+            }
         }
     }
 }
