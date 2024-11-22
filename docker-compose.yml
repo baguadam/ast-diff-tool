@@ -1,12 +1,12 @@
-version: "3.8" # Set the version to a more recent one for compatibility
+version: "3.8"
 
 services:
   neo4j:
     image: neo4j:5.5
-    container_name: neo4j-test # Ensures this container has a unique name
+    container_name: neo4j-test
     ports:
-      - "7688:7687" # Maps Neo4j's default Bolt port to avoid conflicts
-      - "7475:7474" # Maps Neo4j's default HTTP web interface to avoid conflicts
+      - "7688:7687"
+      - "7475:7474"
     environment:
       - NEO4J_AUTH=neo4j/testpassword
     volumes:

@@ -7,22 +7,51 @@ namespace ASTDiffTool.Tests
 {
     public class Neo4jTestFixture : IAsyncLifetime
     {
-        public async Task InitializeAsync()
-        {
-            Console.WriteLine("Starting Neo4j Docker container...");
-            RunDockerComposeCommand("up -d --remove-orphans");
+        private readonly IDriver _driver;
+        private readonly bool _isLocalEnvironment;
 
-            Console.WriteLine("Waiting for Neo4j to become healthy...");
-            await WaitForNeo4jHealthAsync();
-            Console.WriteLine("Neo4j is healthy and ready.");
+        public IDriver Driver => _driver;
+
+        public Neo4jTestFixture()
+        {
+            // local or CI
+            _isLocalEnvironment = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"));
+
+            if (_isLocalEnvironment)
+            {
+                // local environment
+                Console.WriteLine("Starting Neo4j Docker container locally...");
+                RunDockerComposeCommand("up -d --remove-orphans");
+
+                _driver = GraphDatabase.Driver("bolt://localhost:7688", AuthTokens.Basic("neo4j", "testpassword"));
+            }
+            else
+            {
+                // CI/CD, Neo4j is already running
+                _driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("neo4j", "testpassword"));
+            }
         }
 
-        public Task DisposeAsync()
+        public async Task InitializeAsync()
         {
-            Console.WriteLine("Stopping and removing Neo4j Docker container...");
-            RunDockerComposeCommand("down --remove-orphans");
-            Console.WriteLine("Neo4j container stopped.");
-            return Task.CompletedTask;
+            if (_isLocalEnvironment)
+            {
+                Console.WriteLine("Waiting for Neo4j to become healthy locally...");
+                await WaitForNeo4jHealthAsync();
+            }
+
+            Console.WriteLine("Neo4j is ready.");
+        }
+
+        public async Task DisposeAsync()
+        {
+            if (_isLocalEnvironment)
+            {
+                Console.WriteLine("Stopping and removing Neo4j Docker container locally...");
+                RunDockerComposeCommand("down --remove-orphans");
+            }
+
+            await _driver.DisposeAsync();
         }
 
         private static void RunDockerComposeCommand(string args)
@@ -59,8 +88,8 @@ namespace ASTDiffTool.Tests
 
         private static async Task WaitForNeo4jHealthAsync()
         {
-            const int maxRetries = 30;
-            const int delayMilliseconds = 5000; // delay for startup
+            const int maxRetries = 20;
+            const int delayMilliseconds = 3000;
 
             for (int i = 0; i < maxRetries; i++)
             {
@@ -73,7 +102,7 @@ namespace ASTDiffTool.Tests
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Neo4j is not ready yet (attempt {i + 1}/{maxRetries}): {ex.Message}. Retrying in {delayMilliseconds / 1000} seconds...");
+                    Console.WriteLine($"Neo4j is not ready yet. Retrying in {delayMilliseconds / 1000} seconds... Attempt {i + 1}/{maxRetries}. Error: {ex.Message}");
                     await Task.Delay(delayMilliseconds);
                 }
             }
