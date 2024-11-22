@@ -268,43 +268,85 @@ namespace ASTDiffTool.Tests
             Assert.Equal(1, countDifferentSourceLocations);
         }
 
+        /*****************************************
+         * GetFlatNodesByDifferenceTypeAsync()
+        *****************************************/
         [Fact]
-        public async Task GetFlatNodesByDifferenceTypeAsync_ShouldReturnFlatNodes()
+        public async Task GetFlatNodesByDifferenceTypeAsync_ShouldReturnEmptyList_WhenNoNodesExist()
+        {
+            await ClearDatabase();
+
+            var nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 10);
+            Assert.Empty(nodes);
+        }
+
+        [Fact]
+        public async Task GetFlatNodesByDifferenceTypeAsync_ShouldReturnEmptyList_WhenRequestingPageBeyondData()
         {
             await ClearDatabase();
 
             await SeedDatabase(new[]
             {
-                CreateTestNode(
-                    ast: ASTOrigins.FIRST_AST.ToDatabaseString(),
-                    diffType: Differences.DIFFERENT_PARENTS.ToDatabaseString(),
-                    enhancedKey: "someValue",
-                    topologicalOrder: 1,
-                    type: "defaultType",
-                    kind: "defaultKind",
-                    usr: "defaultUsr",
-                    path: "defaultPath",
-                    lineNumber: 10,
-                    columnNumber: 5,
-                    isHighLevel: false
-                ),
-                CreateTestNode(
-                    ast: ASTOrigins.FIRST_AST.ToDatabaseString(),
-                    diffType: Differences.DIFFERENT_PARENTS.ToDatabaseString(),
-                    enhancedKey: "anotherValue",
-                    topologicalOrder: 2,
-                    type: "defaultType",
-                    kind: "defaultKind",
-                    usr: "anotherUsr",
-                    path: "anotherPath",
-                    lineNumber: 15,
-                    columnNumber: 3,
-                    isHighLevel: true
-                )
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString())
             });
 
-            var nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(Differences.DIFFERENT_PARENTS, 1, 10);
+            var nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST, page: 2, pageSize: 10);
+            Assert.Empty(nodes);
+        }
+
+        [Fact]
+        public async Task GetFlatNodesByDifferenceTypeAsync_ShouldReturnCorrectNodes_WhenNodesExistWithoutPagination()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString())
+            });
+
+            var nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 10);
             Assert.Equal(2, nodes.Count);
+            Assert.All(nodes, node => Assert.Equal(Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), node.DifferenceType));
+        }
+
+        [Fact]
+        public async Task GetFlatNodesByDifferenceTypeAsync_ShouldReturnCorrectNodes_WhenUsingPagination()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString())
+            });
+
+            // page 1 with page size 2
+            var nodesPage1 = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 2);
+            Assert.Equal(2, nodesPage1.Count);
+
+            // page 2 with page size 2
+            var nodesPage2 = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST, page: 2, pageSize: 2);
+            Assert.Single(nodesPage2);
+        }
+
+        [Fact]
+        public async Task GetFlatNodesByDifferenceTypeAsync_ShouldReturnCorrectNodes_WhenNodesWithMixedDifferencesExist()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_SECOND_AST.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.DIFFERENT_PARENTS.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString())
+            });
+
+            var nodes = await _neo4jService.GetFlatNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 10);
+            Assert.Single(nodes);
+            Assert.All(nodes, node => Assert.Equal(Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), node.DifferenceType));
         }
 
         [Fact]
