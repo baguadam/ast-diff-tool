@@ -1,0 +1,63 @@
+name: CI Pipeline for ASTDiffTool
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    services:
+      neo4j:
+        image: neo4j:5.5
+        ports:
+          - 7687:7687
+          - 7474:7474
+        options: --health-cmd "cypher-shell -u neo4j -p testpassword 'RETURN 1'" --health-interval 10s --health-timeout 5s --health-retries 5
+        env:
+          NEO4J_AUTH: "neo4j/testpassword"
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Set up .NET SDK (Using .NET 8.0)
+      - name: Set up .NET 8 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.x"
+
+      # Install dependencies
+      - name: Install dependencies
+        run: dotnet restore
+
+      # Wait for Neo4j to be healthy
+      - name: Wait for Neo4j to be healthy
+        shell: pwsh
+        run: |
+          Write-Host "Waiting for Neo4j to be healthy..."
+          for ($i=0; $i -lt 10; $i++) {
+            $health = docker inspect --format='{{json .State.Health.Status}}' $(docker-compose ps -q neo4j)
+            if ($health -eq '"healthy"') {
+              Write-Host "Neo4j is healthy"
+              break
+            }
+            else {
+              Write-Host "Waiting for Neo4j to become healthy..."
+              Start-Sleep -Seconds 10
+            }
+          }
+
+      # Build the application
+      - name: Build the project
+        run: dotnet build --no-restore --configuration Release
+
+      # Run tests
+      - name: Run tests
+        run: dotnet test --no-restore --verbosity normal
