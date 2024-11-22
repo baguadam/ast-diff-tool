@@ -10,5 +10,9 @@
     <DataTemplate DataType="{x:Type vm:NewProjectPageViewModel}">
         <view:NewProjectPage />
     </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:TreeDisplayPageViewModel}">
+        <view:TreeDisplayPage />
+    </DataTemplate>
     
 </ResourceDictionary>

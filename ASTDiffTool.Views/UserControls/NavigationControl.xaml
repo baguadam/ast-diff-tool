@@ -54,7 +54,26 @@
                            Style="{StaticResource TextStyle}"
                            Foreground="{StaticResource LightFontColor}"/>
             </utils:NavigationButton>
-            
+
+            <!--TREE DISPLAY PAGE-->
+            <utils:NavigationButton Command="{Binding NavigateTreeDisplayPageCommand}"
+                                    GroupName="NavigationGroup">
+                <utils:NavigationButton.Style>
+                    <Style TargetType="utils:NavigationButton" BasedOn="{StaticResource NavBtnStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentViewModel, Converter={StaticResource IsType}, ConverterParameter={x:Type vm:TreeDisplayPageViewModel}}" Value="True">
+                                <Setter Property="IsChecked"
+                                    Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </utils:NavigationButton.Style>
+
+                <TextBlock Text="Tree Display" 
+                           Style="{StaticResource TextStyle}"
+                           Foreground="{StaticResource LightFontColor}"/>
+            </utils:NavigationButton>
+
         </StackPanel>
     </StackPanel>
 </UserControl>

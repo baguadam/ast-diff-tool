@@ -68,6 +68,12 @@ namespace ASTDiffTool.ViewModels
         {
             _navigationService.NavigateTo<NewProjectPageViewModel>();
         }
+
+        [RelayCommand]
+        public void NavigateTreeDisplayPage()
+        {
+            _navigationService.NavigateTo<TreeDisplayPageViewModel>();
+        }
         #endregion
 
         #region Event handlers

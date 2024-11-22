@@ -10,4 +10,8 @@
     <PackageReference Include="Neo4j.Driver" Version="5.26.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ASTDiffTool.Models\ASTDiffTool.Models.csproj" />
+  </ItemGroup>
+
 </Project>
