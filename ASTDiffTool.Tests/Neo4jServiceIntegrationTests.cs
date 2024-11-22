@@ -13,11 +13,17 @@ namespace ASTDiffTool.Tests
     {
         private readonly Neo4jService _neo4jService;
         private readonly Neo4jTestFixture _fixture;
+        private readonly bool _isLocalEnvironment;
 
         public Neo4jServiceTests(Neo4jTestFixture fixture)
         {
             _fixture = fixture;
-            _neo4jService = new Neo4jService("bolt://localhost:7688", "neo4j", "testpassword"); // neo4j is initialized after fixture
+            
+            // local or CI
+            _isLocalEnvironment = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"));
+            string uri = !_isLocalEnvironment ? "bolt://localhost:7688" : "bolt://localhost:7687";
+
+            _neo4jService = new Neo4jService(uri, "neo4j", "testpassword"); // neo4j is initialized after fixture
         }
 
         [Fact]
@@ -90,18 +96,71 @@ namespace ASTDiffTool.Tests
         }
 
         [Fact]
-        public async Task GetNodesByDifferenceTypeAsync_ShouldReturnCorrectCount()
+        public async Task GetNodesByAstOriginAsync_ShouldReturnZero_WhenNoNodesExist()
+        {
+            await ClearDatabase();
+
+            var countFirstAst = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.FIRST_AST);
+            var countSecondAst = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.SECOND_AST);
+
+            Assert.Equal(0, countFirstAst);
+            Assert.Equal(0, countSecondAst);
+        }
+
+        [Fact]
+        public async Task GetNodesByAstOriginAsync_ShouldReturnCorrectCount_WhenNodesExistFromFirstAstOnly()
         {
             await ClearDatabase();
 
             await SeedDatabase(new[]
             {
-                CreateTestNode(ASTOrigins.FIRST_AST.ToDatabaseString(), Differences.ONLY_IN_FIRST_AST.ToDatabaseString()),
-                CreateTestNode(ASTOrigins.SECOND_AST.ToDatabaseString(), Differences.ONLY_IN_FIRST_AST.ToDatabaseString())
+                CreateTestNode(ASTOrigins.FIRST_AST.ToDatabaseString(), "None"),
+                CreateTestNode(ASTOrigins.FIRST_AST.ToDatabaseString(), "None")
             });
 
-            var count = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST);
-            Assert.Equal(2, count);
+            var countFirstAst = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.FIRST_AST);
+            var countSecondAst = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.SECOND_AST);
+
+            Assert.Equal(2, countFirstAst);
+            Assert.Equal(0, countSecondAst);
+        }
+
+        [Fact]
+        public async Task GetNodesByAstOriginAsync_ShouldReturnCorrectCount_WhenNodesExistFromSecondAstOnly()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ASTOrigins.SECOND_AST.ToDatabaseString(), "None"),
+                CreateTestNode(ASTOrigins.SECOND_AST.ToDatabaseString(), "None")
+            });
+
+            var countFirstAst = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.FIRST_AST);
+            var countSecondAst = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.SECOND_AST);
+
+            Assert.Equal(0, countFirstAst);
+            Assert.Equal(2, countSecondAst);
+        }
+
+        [Fact]
+        public async Task GetNodesByAstOriginAsync_ShouldReturnCorrectCount_WhenNodesExistFromBothAsts()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ASTOrigins.FIRST_AST.ToDatabaseString(), "None"),
+                CreateTestNode(ASTOrigins.SECOND_AST.ToDatabaseString(), "None"),
+                CreateTestNode(ASTOrigins.FIRST_AST.ToDatabaseString(), "None"),
+                CreateTestNode(ASTOrigins.SECOND_AST.ToDatabaseString(), "None")
+            });
+
+            var countFirstAst = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.FIRST_AST);
+            var countSecondAst = await _neo4jService.GetNodesByAstOriginAsync(ASTOrigins.SECOND_AST);
+
+            Assert.Equal(2, countFirstAst);
+            Assert.Equal(2, countSecondAst);
         }
 
         [Fact]
