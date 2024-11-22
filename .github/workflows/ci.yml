@@ -3,71 +3,68 @@ name: CI Pipeline for ASTDiffTool
 on:
   push:
     branches:
-      - "**"
+      - "**" # Trigger for all branches
   pull_request:
     branches:
-      - "**"
+      - "**" # Trigger for all pull requests
 
 jobs:
-  build-and-test:
-    runs-on: windows-latest
+  start-neo4j:
+    runs-on: ubuntu-latest
+    services:
+      neo4j:
+        image: neo4j:5.5
+        ports:
+          - 7687:7687
+        options: --health-cmd "cypher-shell -u neo4j -p testpassword 'RETURN 1'" --health-interval 10s --health-timeout 5s --health-retries 5
+        env:
+          NEO4J_AUTH: "neo4j/testpassword"
+
+    outputs:
+      neo4j-host: ${{ steps.neo4j-details.outputs.neo4j-host }}
 
     steps:
-      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Set up .NET SDK (Using .NET 8.0)
+      # Output the address of the neo4j service for the Windows job
+      - name: Output Neo4j Service Details
+        id: neo4j-details
+        run: echo "::set-output name=neo4j-host::$(echo localhost)"
+
+  build-and-test:
+    needs: start-neo4j
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Set up .NET 8 SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "8.0.x" # Use .NET 8.0
+          dotnet-version: "8.0.x"
 
-      # Install Docker on Windows runner
       - name: Install Docker on Windows
         run: |
           Start-Process -Wait -FilePath "powershell.exe" -ArgumentList "-command", "Invoke-WebRequest -UseBasicParsing -OutFile dockerInstall.ps1 https://get.docker.com/windows.ps1; .\dockerInstall.ps1"
           Start-Service docker
-
-      # Start Neo4j Container
-      - name: Start Neo4j container
-        run: |
-          docker pull neo4j:5.5
-          docker run -d --name neo4j-test -p 7687:7687 -e NEO4J_AUTH=neo4j/testpassword neo4j:5.5
         shell: pwsh
 
-      # Wait for Neo4j to be healthy
-      - name: Wait for Neo4j to be healthy
-        shell: pwsh
-        run: |
-          Write-Host "Waiting for Neo4j to be healthy..."
-          for ($i=0; $i -lt 10; $i++) {
-            $health = docker inspect --format='{{json .State.Health.Status}}' neo4j-test
-            if ($health -eq '"healthy"') {
-              Write-Host "Neo4j is healthy"
-              break
-            }
-            else {
-              Write-Host "Waiting for Neo4j to become healthy..."
-              Start-Sleep -Seconds 10
-            }
-          }
-
-      # Install dependencies
       - name: Install dependencies
         run: dotnet restore
+        env:
+          EnableWindowsTargeting: true
 
-      # Build the application
       - name: Build the project
         run: dotnet build --no-restore --configuration Release
+        env:
+          EnableWindowsTargeting: true
 
-      # Run tests
       - name: Run tests
         run: dotnet test --no-restore --verbosity normal
-
-      # Clean up the Neo4j container
-      - name: Clean up Docker container
-        shell: pwsh
-        run: |
-          docker stop neo4j-test
-          docker rm neo4j-test
+        env:
+          EnableWindowsTargeting: true
+          NEO4J_URL: "bolt://localhost:7687"
+          NEO4J_USER: "neo4j"
+          NEO4J_PASSWORD: "testpassword"
