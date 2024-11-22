@@ -21,11 +21,14 @@ namespace ASTDiffTool.Tests
             
             // local or CI
             _isLocalEnvironment = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"));
-            string uri = !_isLocalEnvironment ? "bolt://localhost:7688" : "bolt://localhost:7687";
+            string uri = _isLocalEnvironment ? "bolt://localhost:7688" : "bolt://localhost:7687";
 
             _neo4jService = new Neo4jService(uri, "neo4j", "testpassword"); // neo4j is initialized after fixture
         }
 
+        /*****************************************
+         * GetNodeCountAsync()
+        *****************************************/
         [Fact]
         public async Task GetNodeCountAsync_ShouldReturnZeroInitially()
         {
@@ -80,6 +83,9 @@ namespace ASTDiffTool.Tests
             Assert.Equal(0, countAfterClearing);
         }
 
+        /*****************************************
+         * GetNodesByAstOriginAsync()
+        *****************************************/
         [Fact]
         public async Task GetNodesByAstOriginAsync_ShouldReturnCorrectCount()
         {
@@ -161,6 +167,105 @@ namespace ASTDiffTool.Tests
 
             Assert.Equal(2, countFirstAst);
             Assert.Equal(2, countSecondAst);
+        }
+
+        /*****************************************
+         * GetNodesByDifferenceTypeAsync()
+        *****************************************/
+        [Fact]
+        public async Task GetNodesByDifferenceTypeAsync_ShouldReturnZero_WhenNoNodesExist()
+        {
+            await ClearDatabase();
+
+            foreach (Differences difference in Enum.GetValues(typeof(Differences)))
+            {
+                var count = await _neo4jService.GetNodesByDifferenceTypeAsync(difference);
+                Assert.Equal(0, count);
+            }
+        }
+
+        [Fact]
+        public async Task GetNodesByDifferenceTypeAsync_ShouldReturnCorrectCount_WhenNodesExistFromOnlyInFirstAst()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString())
+            });
+
+            var count = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST);
+            Assert.Equal(2, count);
+        }
+
+        [Fact]
+        public async Task GetNodesByDifferenceTypeAsync_ShouldReturnCorrectCount_WhenNodesExistFromOnlyInSecondAst()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_SECOND_AST.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_SECOND_AST.ToDatabaseString())
+            });
+
+            var count = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.ONLY_IN_SECOND_AST);
+            Assert.Equal(2, count);
+        }
+
+        [Fact]
+        public async Task GetNodesByDifferenceTypeAsync_ShouldReturnCorrectCount_WhenNodesExistFromDifferentParents()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.DIFFERENT_PARENTS.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.DIFFERENT_PARENTS.ToDatabaseString())
+            });
+
+            var count = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.DIFFERENT_PARENTS);
+            Assert.Equal(2, count);
+        }
+
+        [Fact]
+        public async Task GetNodesByDifferenceTypeAsync_ShouldReturnCorrectCount_WhenNodesExistFromDifferentSourceLocations()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString())
+            });
+
+            var count = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.DIFFERENT_SOURCE_LOCATIONS);
+            Assert.Equal(2, count);
+        }
+
+        [Fact]
+        public async Task GetNodesByDifferenceTypeAsync_ShouldReturnCorrectCount_WhenNodesExistWithMixedDifferences()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_SECOND_AST.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.DIFFERENT_PARENTS.ToDatabaseString()),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString())
+            });
+
+            var countOnlyInFirstAst = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.ONLY_IN_FIRST_AST);
+            var countOnlyInSecondAst = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.ONLY_IN_SECOND_AST);
+            var countDifferentParents = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.DIFFERENT_PARENTS);
+            var countDifferentSourceLocations = await _neo4jService.GetNodesByDifferenceTypeAsync(Differences.DIFFERENT_SOURCE_LOCATIONS);
+
+            Assert.Equal(1, countOnlyInFirstAst);
+            Assert.Equal(1, countOnlyInSecondAst);
+            Assert.Equal(1, countDifferentParents);
+            Assert.Equal(1, countDifferentSourceLocations);
         }
 
         [Fact]
