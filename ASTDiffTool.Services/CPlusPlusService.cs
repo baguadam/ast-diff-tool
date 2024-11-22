@@ -7,6 +7,10 @@ using System.Text.RegularExpressions;
 
 namespace ASTDiffTool.Services
 {
+    /// <summary>
+    /// Provides functionality to interact with the C++ analysis tools, runs them as processes, provides information about 
+    /// the output of the runs.
+    /// </summary>
     public class CPlusPlusService : ICPlusPlusService
     {
         private readonly IFileService _fileService;
@@ -19,8 +23,16 @@ namespace ASTDiffTool.Services
         private readonly string DUMP_LOG_FILE = "dump_tool_log.txt";
         private readonly string COMPARER_LOG_FILE = "comparer_tool_log.txt";
 
+        /// <summary>
+        /// Gets or sets the path where the project results are stored.
+        /// </summary>
         public string ProjectResultPath { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CPlusPlusService"/> class.
+        /// </summary>
+        /// <param name="fileService">Service to handle file operations.</param>
+        /// <param name="loggerService">Service to handle logging operations.</param>
         public CPlusPlusService(IFileService fileService, ILoggerService loggerService)
         {
             _fileService = fileService;
@@ -32,6 +44,15 @@ namespace ASTDiffTool.Services
             _baseASTDirectoryPath = CPlusPlusToolPaths.BASE_AST_DIRECTORY_PATH;
         }
 
+        /// <summary>
+        /// Runs the AST Dump Tool twice, once for each specified C++ standard.
+        /// </summary>
+        /// <param name="compilationDatabasePath">Path to the compilation database JSON file.</param>
+        /// <param name="mainPath">Main source file path to analyze.</param>
+        /// <param name="projectName">Name of the project being analyzed.</param>
+        /// <param name="firstStandard">The first C++ standard (e.g., "c++17") to use for AST generation.</param>
+        /// <param name="secondStandard">The second C++ standard (e.g., "c++20") to use for AST generation.</param>
+        /// <returns>True if both executions are successful; otherwise, false.</returns>
         public bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string projectName, string firstStandard, string secondStandard)
         {
             try
@@ -62,6 +83,12 @@ namespace ASTDiffTool.Services
             }
         }
 
+        /// <summary>
+        /// Runs the AST Tree Comparer Tool to compare the ASTs generated for two different C++ standards.
+        /// </summary>
+        /// <param name="firstStandard">Path to the first C++ standard (e.g., "c++17").</param>
+        /// <param name="secondStandard">Path to the second C++ standard (e.g., "c++20").</param>
+        /// <returns>True if the tool execution is successful; otherwise, false.</returns>
         public bool RunComparerTool(string firstStandard, string secondStandard)
         {
             try
@@ -81,6 +108,13 @@ namespace ASTDiffTool.Services
             }
         }
 
+        /// <summary>
+        /// Executes a command-line tool and logs its output.
+        /// </summary>
+        /// <param name="toolPath">The path to the tool to execute.</param>
+        /// <param name="arguments">Arguments to pass to the tool.</param>
+        /// <param name="logFileName">The name of the log file to store the tool's output.</param>
+        /// <returns>True if the tool execution is successful; otherwise, false.</returns>
         private bool ExecuteTool(string toolPath, string arguments, string logFileName)
         {
             try
@@ -122,6 +156,12 @@ namespace ASTDiffTool.Services
             }
         }
 
+        /// <summary>
+        /// Ensures the project directory exists for storing output files.
+        /// If it doesn't exist, it will be created.
+        /// </summary>
+        /// <param name="projectName">The name of the project.</param>
+        /// <returns>The path to the project directory.</returns>
         private string EnsureProjectDirectoryExists(string projectName)
         {
             string projectDirectory = Path.Combine(_baseASTDirectoryPath, projectName);

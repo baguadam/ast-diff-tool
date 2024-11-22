@@ -8,8 +8,17 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.Services
 {
+    /// <summary>
+    /// Class responsible for logging to a given file the outputs.
+    /// </summary>
     public class LoggerService : ILoggerService
     {
+        /// <summary>
+        /// Method to log with time stamp.
+        /// </summary>
+        /// <param name="filePath">The path to the file</param>
+        /// <param name="output">The output</param>
+        /// <param name="error">The errors if any</param>
         public void Log(string filePath, string output, string error)
         {
             try
