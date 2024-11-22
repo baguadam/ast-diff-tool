@@ -137,7 +137,7 @@ namespace ASTDiffTool.ViewModels
 
         #region Commands
         [RelayCommand]
-        private async Task LoadDatabaseInfoAsync()
+        public async Task LoadDatabaseInfoAsync()
         {
             IsLoading = true;
 
