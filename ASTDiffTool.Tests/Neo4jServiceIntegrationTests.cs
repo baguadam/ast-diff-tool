@@ -9,13 +9,13 @@ using Xunit;
 namespace ASTDiffTool.Tests
 {
     [Collection("Neo4j collection")]
-    public class Neo4jServiceTests : IClassFixture<Neo4jTestFixture>
+    public class Neo4jServiceIntegrationTests : IClassFixture<Neo4jTestFixture>
     {
         private readonly Neo4jService _neo4jService;
         private readonly Neo4jTestFixture _fixture;
         private readonly bool _isLocalEnvironment;
 
-        public Neo4jServiceTests(Neo4jTestFixture fixture)
+        public Neo4jServiceIntegrationTests(Neo4jTestFixture fixture)
         {
             _fixture = fixture;
             
@@ -349,45 +349,108 @@ namespace ASTDiffTool.Tests
             Assert.All(nodes, node => Assert.Equal(Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), node.DifferenceType));
         }
 
+        /*****************************************
+         * GetHighestLevelSubtreesAsync()
+        *****************************************/
         [Fact]
-        public async Task GetHighestLevelSubtreesAsync_ShouldReturnCorrectSubtrees()
+        public async Task GetHighestLevelSubtreesAsync_ShouldReturnEmptyList_WhenNoNodesExist()
+        {
+            await ClearDatabase();
+
+            var subtrees = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 10);
+            Assert.Empty(subtrees);
+        }
+
+        [Fact]
+        public async Task GetHighestLevelSubtreesAsync_ShouldReturnEmptyList_WhenNoHighLevelNodesExist()
         {
             await ClearDatabase();
 
             await SeedDatabase(new[]
             {
-                CreateTestNode(
-                    ast: ASTOrigins.FIRST_AST.ToDatabaseString(),
-                    diffType: Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString(),
-                    enhancedKey: "someValue",
-                    topologicalOrder: 1,
-                    type: "defaultType",
-                    kind: "defaultKind",
-                    usr: "usr1",
-                    path: "defaultPath",
-                    lineNumber: 1,
-                    columnNumber: 1,
-                    isHighLevel: true
-                ),
-                CreateTestNode(
-                    ast: ASTOrigins.SECOND_AST.ToDatabaseString(),
-                    diffType: Differences.DIFFERENT_SOURCE_LOCATIONS.ToDatabaseString(),
-                    enhancedKey: "anotherValue",
-                    topologicalOrder: 2,
-                    type: "defaultType",
-                    kind: "defaultKind",
-                    usr: "usr2",
-                    path: "anotherPath",
-                    lineNumber: 2,
-                    columnNumber: 2,
-                    isHighLevel: false
-                )
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), isHighLevel: false),
+                CreateTestNode(ast: ASTOrigins.SECOND_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), isHighLevel: false)
             });
 
-            var subtrees = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.DIFFERENT_SOURCE_LOCATIONS, 1, 10);
-            Assert.Single(subtrees);
+            var subtrees = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 10);
+            Assert.Empty(subtrees);
         }
 
+        [Fact]
+        public async Task GetHighestLevelSubtreesAsync_ShouldReturnHighLevelNodes_WhenTheyExistWithoutRelationships()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), isHighLevel: true),
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), isHighLevel: true)
+            });
+
+            var subtrees = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 10);
+            Assert.Equal(2, subtrees.Count);
+            Assert.All(subtrees, node => Assert.True(node.IsHighLevel));
+        }
+
+        [Fact]
+        public async Task GetHighestLevelSubtreesAsync_ShouldReturnSubtree_WhenHighLevelNodesWithDescendantsExist()
+        {
+            await ClearDatabase();
+
+            var rootNode = CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), isHighLevel: true, enhancedKey: "root1", topologicalOrder: 1);
+            var childNode1 = CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), enhancedKey: "child1", topologicalOrder: 2);
+            var childNode2 = CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), enhancedKey: "child2", topologicalOrder: 3);
+
+            await SeedDatabase(new[] { rootNode, childNode1, childNode2 });
+            await CreateRelationship(rootNode, childNode1);
+            await CreateRelationship(rootNode, childNode2);
+
+            var subtrees = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 10);
+            Assert.Single(subtrees);
+
+            var root = subtrees.First();
+            Assert.True(root.IsHighLevel);
+            Assert.Equal(2, root.Children.Count);
+        }
+
+        [Fact]
+        public async Task GetHighestLevelSubtreesAsync_ShouldReturnOnlyRequestedDifferenceType_WhenMixedDifferencesExist()
+        {
+            await ClearDatabase();
+
+            var rootNode = CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), isHighLevel: true, enhancedKey: "root1", topologicalOrder: 1);
+            var childNode = CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_SECOND_AST.ToDatabaseString(), isHighLevel: false, enhancedKey: "child1", topologicalOrder: 2);
+
+            await SeedDatabase(new[] { rootNode, childNode });
+            await CreateRelationship(rootNode, childNode);
+
+            var subtrees = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 10);
+            Assert.Single(subtrees);
+            Assert.All(subtrees, node => Assert.Equal(Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), node.DifferenceType));
+        }
+
+        [Fact]
+        public async Task GetHighestLevelSubtreesAsync_ShouldHandlePaginationCorrectly()
+        {
+            await ClearDatabase();
+
+            await SeedDatabase(new[]
+            {
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), isHighLevel: true, enhancedKey: "root1", topologicalOrder: 1),
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), isHighLevel: true, enhancedKey: "root2", topologicalOrder: 2),
+                CreateTestNode(ast: ASTOrigins.FIRST_AST.ToDatabaseString(), diffType: Differences.ONLY_IN_FIRST_AST.ToDatabaseString(), isHighLevel: true, enhancedKey: "root3", topologicalOrder: 3)
+            });
+
+            var subtreesPage1 = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.ONLY_IN_FIRST_AST, page: 1, pageSize: 2);
+            var subtreesPage2 = await _neo4jService.GetHighestLevelSubtreesAsync(Differences.ONLY_IN_FIRST_AST, page: 2, pageSize: 2);
+
+            Assert.Equal(2, subtreesPage1.Count);
+            Assert.Single(subtreesPage2);
+        }
+
+        /*****************************************
+         * HELPER METHODS
+        *****************************************/
         private async Task ClearDatabase()
         {
             const string query = "MATCH (n) DETACH DELETE n";
@@ -420,7 +483,6 @@ namespace ASTDiffTool.Tests
             }
         }
 
-
         private (string Label, Dictionary<string, object> Properties) CreateTestNode(
             string ast,
             string diffType,
@@ -451,6 +513,32 @@ namespace ASTDiffTool.Tests
                     { "isHighLevel", isHighLevel }
                 }
             );
+        }
+
+        private async Task CreateRelationship((string Label, Dictionary<string, object> Properties) parentNode, (string Label, Dictionary<string, object> Properties) childNode)
+        {
+            using var session = _neo4jService.Driver.AsyncSession();
+            try
+            {
+                var query = @"
+                    MATCH (a:Node {enhancedKey: $parentKey, topologicalOrder: $parentOrder})
+                    MATCH (b:Node {enhancedKey: $childKey, topologicalOrder: $childOrder})
+                    CREATE (a)-[:HAS_CHILD]->(b)";
+
+                var parameters = new
+                {
+                    parentKey = parentNode.Properties["enhancedKey"],
+                    parentOrder = parentNode.Properties["topologicalOrder"],
+                    childKey = childNode.Properties["enhancedKey"],
+                    childOrder = childNode.Properties["topologicalOrder"]
+                };
+
+                await session.RunAsync(query, parameters);
+            }
+            finally
+            {
+                await session.CloseAsync();
+            }
         }
     }
 }
