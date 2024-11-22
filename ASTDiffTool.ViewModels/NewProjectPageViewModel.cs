@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
+    /// <summary>
+    /// ViewModel responsible for managing the creation and compilation of a new project.
+    /// </summary>
     public partial class NewProjectPageViewModel : ViewModelBase
     {
         private readonly IFileDialogService _fileDialogService;
@@ -20,6 +23,13 @@ namespace ASTDiffTool.ViewModels
 
         private readonly NewProjectModel _projectModel;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NewProjectPageViewModel"/> class.
+        /// </summary>
+        /// <param name="fileDialogService">Service for opening file dialogs.</param>
+        /// <param name="cPlusPlusService">Service responsible for compiling and comparing ASTs.</param>
+        /// <param name="eventAggregator">Service to publish events within the application.</param>
+        /// <param name="projectModel">Model that represents the project data.</param>
         public NewProjectPageViewModel(
             IFileDialogService fileDialogService,
             ICPlusPlusService cPlusPlusService,
@@ -38,7 +48,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         #region Properties
-
+        /// <summary>
+        /// The path to the compilation database file.
+        /// </summary>
         public string CompilationDatabasePath
         {
             get => _projectModel.CompilationDatabasePath;
@@ -53,6 +65,9 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// The path to the main file of the project.
+        /// </summary>
         public string MainFilePath
         {
             get => _projectModel.MainFilePath;
@@ -67,6 +82,9 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// The name of the project. 
+        /// </summary>
         public string ProjectName
         {
             get => _projectModel.ProjectName;
@@ -81,6 +99,9 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// The first standard that is selected for AST dump.
+        /// </summary>
         public string FirstSelectedStandard
         {
             get => _projectModel.FirstSelectedStandard;
@@ -95,6 +116,9 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// The second standard that is selected for AST dump.
+        /// </summary>
         public string SecondSelectedStandard
         {
             get => _projectModel.SecondSelectedStandard;
@@ -109,6 +133,9 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// The path of the folder that contains the dumped ASTs and logs.
+        /// </summary>
         public string ProjectResultPath
         {
             get => _projectModel.ProjectResultPath;
@@ -122,11 +149,20 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// List of the available standards for selection.
+        /// </summary>
         public List<string> AllStandards { get; }
 
+        /// <summary>
+        /// Indicates whether the project is ready for compilation.
+        /// </summary>
         public bool CanCompile => _projectModel.IsComplete;
 
         private bool _isLoading;
+        /// <summary>
+        /// Indicates whether the project is loading.
+        /// </summary>
         public bool IsLoading
         {
             get => _isLoading;
@@ -141,6 +177,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private string _notificationMessage;
+        /// <summary>
+        /// The notification message that is displayed in a popup.
+        /// </summary>
         public string NotificationMessage
         {
             get => _notificationMessage;
@@ -155,6 +194,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private bool _isNotificationVisible;
+        /// <summary>
+        /// Indicates whether the notification should be displayed.
+        /// </summary>
         public bool IsNotificationVisible
         {
             get => _isNotificationVisible;
@@ -169,6 +211,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private bool _isProjectCompiled;
+        /// <summary>
+        /// Indicates whether compilation has completed successfully.
+        /// </summary>
         public bool IsProjectCompiled
         {
             get => _isProjectCompiled;
@@ -183,6 +228,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private string _cPlusPlusToolState;
+        /// <summary>
+        /// The state of the CPlusPlus tool.
+        /// </summary>
         public string CPlusPlusToolState
         {
             get => _cPlusPlusToolState;
@@ -195,11 +243,12 @@ namespace ASTDiffTool.ViewModels
                 } 
             }
         }
-
         #endregion
 
         #region Commands
-
+        /// <summary>
+        /// Command to select the compilation database.
+        /// </summary>
         [RelayCommand]
         public void SelectCompilationDatabase()
         {
@@ -210,6 +259,9 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command to select the main project file.
+        /// </summary>
         [RelayCommand]
         public void SelectMainFile()
         {
@@ -220,6 +272,9 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command to compile the project, runs the C++ tools with the selected parameters
+        /// </summary>
         [RelayCommand]
         public async Task CompileProject()
         {
@@ -284,6 +339,11 @@ namespace ASTDiffTool.ViewModels
         #endregion
 
         #region Helper methods
+        /// <summary>
+        /// Runs the C++ tools async.
+        /// </summary>
+        /// <param name="toolAction">Delegate to run the necessary tool</param>
+        /// <returns></returns>
         private async Task<bool> RunCPlusPlusToolAsync(Func<bool> toolAction)
         {
             try
@@ -297,6 +357,11 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// Helper method to set the notification values.
+        /// </summary>
+        /// <param name="message">The message</param>
+        /// <param name="success">Whether it is success or fail</param>
         private async Task ShowNotification(string message, bool success)
         {
             IsLoading = false; // stop loading
