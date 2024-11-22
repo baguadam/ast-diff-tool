@@ -8,11 +8,18 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.ViewModels
 {
+    /// <summary>
+    /// ViewModel for managing information about the current project, related to the ProjectPage.
+    /// </summary>
     public partial class ProjectPageViewModel : ViewModelBase
     {
         private readonly INeo4jService _neo4jService;
         private readonly ProjectDatabaseInfoModel _databaseInfo;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProjectPageViewModel"/> class.
+        /// </summary>
+        /// <param name="neo4jService">Service responsible for interacting with the Neo4j database.</param>
         public ProjectPageViewModel(INeo4jService neo4jService)
         {
             _neo4jService = neo4jService;
@@ -23,6 +30,9 @@ namespace ASTDiffTool.ViewModels
 
         #region Properties
         private int _totalNodeCount;
+        /// <summary>
+        /// Total count of nodes in the database.
+        /// </summary>
         public int TotalNodeCount
         {
             get => _totalNodeCount;
@@ -37,6 +47,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private int _nodesInFirstAST;
+        /// <summary>
+        /// Count of the nodes related to the first AST.
+        /// </summary>
         public int NodesInFirstAST
         {
             get => _nodesInFirstAST;
@@ -51,6 +64,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private int _nodesInSecondAST;
+        /// <summary>
+        /// Count of the nodes related to the second AST.
+        /// </summary>
         public int NodesInSecondAST
         {
             get => _nodesInSecondAST;
@@ -65,6 +81,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private int _onlyInFirstAST;
+        /// <summary>
+        /// Count of the nodes only present in the first AST.
+        /// </summary>
         public int OnlyInFirstAST
         {
             get => _onlyInFirstAST;
@@ -79,6 +98,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private int _onlyInSecondAST;
+        /// <summary>
+        /// Count of the nodes only present in the second AST.
+        /// </summary>
         public int OnlyInSecondAST
         {
             get => _onlyInSecondAST;
@@ -93,6 +115,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private int _differentParents;
+        /// <summary>
+        /// Count of the nodes with different parents.
+        /// </summary>
         public int DifferentParents
         {
             get => _differentParents;
@@ -107,6 +132,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private int _differentSourceLocations;
+        /// <summary>
+        /// Count of the nodes with different source locations.
+        /// </summary>
         public int DifferentSourceLocations
         {
             get => _differentSourceLocations;
@@ -121,6 +149,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private bool _isLoading;
+        /// <summary>
+        /// Indicates whether the nodes are being queried.
+        /// </summary>
         public bool IsLoading
         {
             get => _isLoading;
@@ -136,8 +167,11 @@ namespace ASTDiffTool.ViewModels
         #endregion
 
         #region Commands
+        /// <summary>
+        /// Command to load information about the database and update the properties
+        /// </summary>
         [RelayCommand]
-        private async Task LoadDatabaseInfoAsync()
+        public async Task LoadDatabaseInfoAsync()
         {
             IsLoading = true;
 

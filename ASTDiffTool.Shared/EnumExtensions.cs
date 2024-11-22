@@ -6,8 +6,17 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.Shared
 {
+    /// <summary>
+    /// Static class used for converting enums into strings.
+    /// </summary>
     public static class EnumExtensions
     {
+        /// <summary>
+        /// Converts the AST into a string that can be used for database queries.
+        /// </summary>
+        /// <param name="origin">The AST value</param>
+        /// <returns>The string of the AST value</returns>
+        /// <exception cref="ArgumentOutOfRangeException">In case of not existing enum value</exception>
         public static string ToDatabaseString(this ASTOrigins origin)
         {
             return origin switch
@@ -18,6 +27,12 @@ namespace ASTDiffTool.Shared
             };
         }
 
+        /// <summary>
+        /// Convert the DifferenceType into a string that can be used in database queries.
+        /// </summary>
+        /// <param name="difference">The type of the difference</param>
+        /// <returns>The converted string</returns>
+        /// <exception cref="ArgumentOutOfRangeException">In case of not existing enum value</exception>
         public static string ToDatabaseString(this Differences difference)
         {
             return difference switch

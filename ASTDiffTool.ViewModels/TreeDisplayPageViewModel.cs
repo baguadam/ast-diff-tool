@@ -8,10 +8,17 @@ using System.Diagnostics;
 
 namespace ASTDiffTool.ViewModels
 {
+    /// <summary>
+    /// ViewModel responsible for handling the functionalities for TreeDisplayPage.
+    /// </summary>
     public partial class TreeDisplayPageViewModel : ViewModelBase
     {
         private readonly INeo4jService _neo4jService;
 
+        /// <summary>
+        /// Initialize a new instance of the class.
+        /// </summary>
+        /// <param name="neo4jService">Service that is responsible for interacting the Neo4j database</param>
         public TreeDisplayPageViewModel(INeo4jService neo4jService)
         {
             _neo4jService = neo4jService;
@@ -22,10 +29,15 @@ namespace ASTDiffTool.ViewModels
         }
 
         #region Properties
-
+        /// <summary>
+        /// Collection of possible difference types.
+        /// </summary>
         public ObservableCollection<Differences> DifferenceTypes { get; }
 
         private Differences _selectedDifferenceType;
+        /// <summary>
+        /// The currently selected difference type that is used to filter the nodes.
+        /// </summary>
         public Differences SelectedDifferenceType
         {
             get => _selectedDifferenceType;
@@ -43,6 +55,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private ObservableCollection<Node> _currentNodes = new();
+        /// <summary>
+        /// Collection of the currently displayed nodes on the page.
+        /// </summary>
         public ObservableCollection<Node> CurrentNodes
         {
             get => _currentNodes;
@@ -57,6 +72,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private bool _isLoading;
+        /// <summary>
+        /// Indicates whether the nodes are currently being queried.
+        /// </summary>
         public bool IsLoading
         {
             get => _isLoading;
@@ -71,6 +89,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private int _currentPage = 1;
+        /// <summary>
+        /// The number of the current page.
+        /// </summary>
         public int CurrentPage
         {
             get => _currentPage;
@@ -86,6 +107,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private string _currentPageInfo = "Page 1";
+        /// <summary>
+        /// Displayed between the pagination buttons, info about the page.
+        /// </summary>
         public string CurrentPageInfo
         {
             get => _currentPageInfo;
@@ -100,6 +124,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private bool _canGoToNextPage = true;
+        /// <summary>
+        /// Indicated whether the user can navigate to the next page.
+        /// </summary>
         public bool CanGoToNextPage
         {
             get => _canGoToNextPage;
@@ -114,6 +141,9 @@ namespace ASTDiffTool.ViewModels
         }
 
         private bool _canGoToPreviousPage = false;
+        /// <summary>
+        /// Indicates whether the user can navigate to the previous page.
+        /// </summary>
         public bool CanGoToPreviousPage
         {
             get => _canGoToPreviousPage;
@@ -126,12 +156,14 @@ namespace ASTDiffTool.ViewModels
                 }
             }
         }
-
         #endregion
 
         #region Commands
+        /// <summary>
+        /// Loads the node from the Neo4j database based on the selected difference type, updates pagination.
+        /// </summary>
         [RelayCommand]
-        private async Task LoadNodesAsync()
+        public async Task LoadNodesAsync()
         {
             IsLoading = true;
 
@@ -166,6 +198,9 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command navigate to the next page.
+        /// </summary>
         [RelayCommand]
         private async Task GoToNextPage()
         {
@@ -176,6 +211,9 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        /// <summary>
+        /// Command navigate to the previous page.
+        /// </summary>
         [RelayCommand]
         private async Task GoToPreviousPage()
         {
@@ -185,16 +223,16 @@ namespace ASTDiffTool.ViewModels
                 await LoadNodesAsync();
             }
         }
-
         #endregion
 
         #region Private Helpers
-
+        /// <summary>
+        /// Helper method to update the information about the current page.
+        /// </summary>
         private void UpdatePageInfo()
         {
             CurrentPageInfo = $"Page {CurrentPage}";
         }
-
         #endregion
     }
 }

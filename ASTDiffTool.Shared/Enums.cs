@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 
 namespace ASTDiffTool.Shared
 {
+    /// <summary>
+    /// Enum that contains the possible values of ASTs.
+    /// </summary>
     public enum ASTOrigins
     {
         FIRST_AST,
         SECOND_AST
     }
 
+    /// <summary>
+    /// Enum that contains the possible detected differences.
+    /// </summary>
     public enum Differences
     {
         ONLY_IN_FIRST_AST,

@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  neo4j:
+    image: neo4j:5.5
+    container_name: neo4j-test
+    ports:
+      - "7688:7687"
+      - "7475:7474"
+    environment:
+      - NEO4J_AUTH=neo4j/testpassword
+    volumes:
+      - neo4j-test-data:/data
+      - neo4j-test-logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:7474/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  neo4j-test-data:
+  neo4j-test-logs:
