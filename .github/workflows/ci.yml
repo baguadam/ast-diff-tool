@@ -21,12 +21,14 @@ jobs:
         with:
           dotnet-version: "7.0"
 
-      - name: Download and Install Java 17
+      - name: Download and Extract Java 17
         run: |
-          curl -L -o temurin.msi https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8.1%2B1/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.msi
-          msiexec /i temurin.msi /quiet /qn /norestart
-          setx JAVA_HOME "C:\Program Files\Eclipse Adoptium\jdk-17.0.8.1-hotspot"
-          setx PATH "%JAVA_HOME%\bin;%PATH%"
+          curl -L -o openjdk.zip https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8.1%2B1/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.zip
+          mkdir openjdk
+          tar -xf openjdk.zip -C openjdk --strip-components=1
+          echo "Extracted OpenJDK to openjdk directory"
+          set JAVA_HOME=%cd%\openjdk
+          set PATH=%JAVA_HOME%\bin;%PATH%
         shell: cmd
 
       - name: Verify Java Version
