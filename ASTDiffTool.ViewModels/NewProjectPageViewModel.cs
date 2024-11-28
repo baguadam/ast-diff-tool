@@ -329,7 +329,7 @@ namespace ASTDiffTool.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error during compilation: {ex.Message}");
-                await ShowNotification($"An error occurred during compilation! See logs: {ProjectResultPath}", false);
+                await ShowNotification($"An error occurred during compilation! See logs: {ProjectResultPath} \n Error: {ex.Message}", false);
             }
             finally
             {
