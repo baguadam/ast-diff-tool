@@ -46,7 +46,8 @@ namespace ASTDiffTool
         {
             // get neo4j password:
             string neo4jPassword = Environment.GetEnvironmentVariable("NEO4J_PASSWORD") ?? "default_password";
-            string neo4jUri = "http://localhost:7474";
+            string neo4jUri = "bolt://localhost:7687";
+
             string neo4jUsername = "neo4j";
 
             // *********************************************
