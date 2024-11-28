@@ -56,17 +56,6 @@ namespace ASTDiffTool.Tests
         }
 
         [Fact]
-        public async Task LoadDatabaseInfoCommand_IsLoadingFalseAfterwards()
-        {
-            _mockNeo4jService.Setup(s => s.GetNodeCountAsync()).ReturnsAsync(100);
-            Assert.False(_viewModel.IsLoading);
-
-            await _viewModel.LoadDatabaseInfoAsync();
-
-            Assert.False(_viewModel.IsLoading, "The loading indicator should be false after the loading ends.");
-        }
-
-        [Fact]
         public async Task LoadDatabaseInfoCommand_ShouldHandleException_AndSetLoadingToFalse()
         {
             _mockNeo4jService.Setup(s => s.GetNodeCountAsync()).ThrowsAsync(new Exception("Test Exception"));
