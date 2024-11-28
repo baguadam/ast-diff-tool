@@ -9,7 +9,7 @@ on:
       - "**"
 
 jobs:
-  wpf-tests:
+  run-tests:
     runs-on: windows-latest
 
     steps:
@@ -19,41 +19,15 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "7.0"
-
-      - name: Download and Extract Java 17
-        run: |
-          curl -L -o openjdk.zip https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8.1%2B1/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.zip
-          mkdir openjdk
-          tar -xf openjdk.zip -C openjdk --strip-components=1
-          echo "Extracted OpenJDK to openjdk directory"
-          set JAVA_HOME=%cd%\openjdk
-          set PATH=%JAVA_HOME%\bin;%PATH%
-        shell: cmd
-
-      - name: Verify Java Version
-        run: java -version
-
-      - name: Download and Extract Neo4j
-        run: |
-          curl -L -o neo4j.zip https://neo4j.com/artifact.php?name=neo4j-community-5.5.0-windows.zip
-          mkdir neo4j
-          tar -xf neo4j.zip -C neo4j --strip-components=1
-          dir neo4j
-          dir neo4j\bin
-
-      - name: Install and Start Neo4j
-        run: |
-          cmd /c "neo4j\bin\neo4j.bat install-service"
-          cmd /c "neo4j\bin\neo4j.bat start"
-        env:
-          NEO4J_AUTH: "neo4j/testpassword"
+          dotnet-version: '8.0'
 
       - name: Install dependencies
         run: dotnet restore
 
-      - name: Run WPF tests
+      - name: Run tests
         env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
           CI: true
-          NEO4J_AUTH: "neo4j/testpassword"
-        run: dotnet test
+        run: dotnet test --filter Category=WPFIntegration

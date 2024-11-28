@@ -18,12 +18,31 @@ namespace ASTDiffTool.Tests
         public Neo4jServiceIntegrationTests(Neo4jTestFixture fixture)
         {
             _fixture = fixture;
-            
+
             // local or CI
             _isLocalEnvironment = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"));
-            string uri = _isLocalEnvironment ? "bolt://localhost:7688" : "bolt://localhost:7687";
 
-            _neo4jService = new Neo4jService(uri, "neo4j", "testpassword"); // neo4j is initialized after fixture
+            string uri, username, password;
+
+            if (_isLocalEnvironment)
+            {
+                // local configs
+                uri = "bolt://localhost:7688";
+                username = "neo4j";
+                password = "testpassword";
+            }
+            else
+            {
+                // CI env variables
+                uri = Environment.GetEnvironmentVariable("NEO4J_URI")
+                      ?? throw new InvalidOperationException("Environment variable 'NEO4J_URI' is not set.");
+                username = Environment.GetEnvironmentVariable("NEO4J_USERNAME")
+                           ?? throw new InvalidOperationException("Environment variable 'NEO4J_USERNAME' is not set.");
+                password = Environment.GetEnvironmentVariable("NEO4J_PASSWORD")
+                           ?? throw new InvalidOperationException("Environment variable 'NEO4J_PASSWORD' is not set.");
+            }
+
+            _neo4jService = new Neo4jService(uri, username, password);
         }
 
         /*****************************************
