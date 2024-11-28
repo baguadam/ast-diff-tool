@@ -28,7 +28,7 @@ jobs:
           tar -xf neo4j.zip -C neo4j --strip-components=1
 
       - name: Debug Neo4j Directory
-        run: dir neo4j\bin
+        run: dir neo4j
 
       - name: Start Neo4j
         run: |
