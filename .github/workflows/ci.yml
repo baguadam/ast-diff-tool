@@ -1,4 +1,4 @@
-name: Run Integration Tests
+name: Run Tests
 
 on:
   push:
@@ -10,13 +10,13 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     services:
       neo4j:
         image: neo4j:5.5
         ports:
-          - 7687:7687 # Bolt protocol
+          - 7687:7687
         env:
           NEO4J_AUTH: "neo4j/testpassword"
 
@@ -27,7 +27,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "8.0"
+          dotnet-version: '7.0'
 
       - name: Install dependencies
         run: dotnet restore
