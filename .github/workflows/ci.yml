@@ -1,0 +1,38 @@
+name: Run Integration Tests
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      neo4j:
+        image: neo4j:5.5
+        ports:
+          - 7687:7687 # Bolt protocol
+        env:
+          NEO4J_AUTH: "neo4j/testpassword"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0"
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Run tests
+        env:
+          CI: true
+        run: dotnet test
