@@ -1,4 +1,4 @@
-name: Run Tests
+name: Build and Run Tests
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - "**"
 
 jobs:
-  run-tests:
+  build-and-test:
     runs-on: windows-latest
 
     steps:
@@ -21,6 +21,9 @@ jobs:
         with:
           dotnet-version: "8.0"
 
+      - name: Build solution
+        run: dotnet build --configuration Release
+
       - name: Install dependencies
         run: dotnet restore
 
@@ -30,4 +33,11 @@ jobs:
           NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
           NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
           CI: true
-        run: dotnet test
+        run: dotnet test --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
+
+      - name: Publish test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestResults
+          path: ./TestResults
