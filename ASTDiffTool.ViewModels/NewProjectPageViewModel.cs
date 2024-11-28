@@ -20,7 +20,6 @@ namespace ASTDiffTool.ViewModels
         private readonly IFileDialogService _fileDialogService;
         private readonly ICPlusPlusService _cPlusPlusService;
         private readonly IEventAggregator _eventAggregator;
-
         private readonly NewProjectModel _projectModel;
 
         /// <summary>

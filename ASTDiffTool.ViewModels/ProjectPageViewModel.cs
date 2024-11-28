@@ -31,6 +31,7 @@ namespace ASTDiffTool.ViewModels
             _eventAggregator = eventAggregator;
             _databaseInfo = new ProjectDatabaseInfoModel();
 
+            _eventAggregator.Subscribe<ProjectCompilationEvent>(HandleProjectCompiled);
             Task.Run(LoadDatabaseInfoAsync);
         }
 
@@ -210,6 +211,20 @@ namespace ASTDiffTool.ViewModels
             finally
             {
                 IsLoading = false;
+            }
+        }
+        #endregion
+
+        #region Helper methods
+        /// <summary>
+        /// Handles the project compilation event, in case of success, retrieves the nodes from the database. 
+        /// </summary>
+        /// <param name="compilationEvent">Event containing the result of the project compilation.</param>
+        private async void HandleProjectCompiled(ProjectCompilationEvent compilationEvent)
+        {
+            if (compilationEvent.IsSuccessful)
+            {
+                await LoadDatabaseInfoAsync();
             }
         }
         #endregion

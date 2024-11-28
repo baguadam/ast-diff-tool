@@ -31,6 +31,7 @@ namespace ASTDiffTool.ViewModels
             DifferenceTypes = new ObservableCollection<Differences>(Enum.GetValues(typeof(Differences)).Cast<Differences>());
             SelectedDifferenceType = Differences.ONLY_IN_FIRST_AST; // default selection
 
+            _eventAggregator.Subscribe<ProjectCompilationEvent>(HandleProjectCompiled);
             Task.Run(LoadNodesAsync);
         }
 
@@ -240,6 +241,18 @@ namespace ASTDiffTool.ViewModels
         private void UpdatePageInfo()
         {
             CurrentPageInfo = $"Page {CurrentPage}";
+        }
+
+        /// <summary>
+        /// Handles the project compilation event, in case of success, retrieves the nodes from the database. 
+        /// </summary>
+        /// <param name="compilationEvent">Event containing the result of the project compilation.</param>
+        private async void HandleProjectCompiled(ProjectCompilationEvent compilationEvent)
+        {
+            if (compilationEvent.IsSuccessful)
+            {
+                await LoadNodesAsync();
+            }
         }
         #endregion
     }
