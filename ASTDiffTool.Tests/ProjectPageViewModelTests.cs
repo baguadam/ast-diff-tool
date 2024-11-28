@@ -19,6 +19,8 @@ namespace ASTDiffTool.Tests
         public ProjectPageViewModelTests()
         {
             _mockNeo4jService = new Mock<INeo4jService>();
+            _mockNavigationService = new Mock<INavigationService>();
+            _mockEventAggregator = new Mock<IEventAggregator>();
 
             _viewModel = new ProjectPageViewModel(_mockNeo4jService.Object, _mockNavigationService.Object, _mockEventAggregator.Object);
         }
