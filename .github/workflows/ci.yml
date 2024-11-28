@@ -27,6 +27,9 @@ jobs:
           mkdir neo4j
           tar -xf neo4j.zip -C neo4j --strip-components=1
 
+      - name: Debug Neo4j Directory
+        run: dir neo4j\bin
+
       - name: Start Neo4j
         run: |
           cmd /c "neo4j\bin\neo4j.bat install-service"
