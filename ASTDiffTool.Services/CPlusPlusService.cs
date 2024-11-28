@@ -36,19 +36,10 @@ namespace ASTDiffTool.Services
             _commandsHandler = new CompileCommandsHandler(fileService);
         }
 
-        private string DumpToolPath => _dumpToolPath ??= GetPath(CPlusPlusToolPaths.DUMP_TOOL_PATH);
-        private string ComparerToolPath => _comparerToolPath ??= GetPath(CPlusPlusToolPaths.COMPARER_TOOL_PATH);
-        private string BaseASTDirectoryPath => _baseASTDirectoryPath ??= GetPath(CPlusPlusToolPaths.BASE_AST_DIRECTORY_PATH);
-        private string TempASTPath => _tempASTPath ??= GetPath(CPlusPlusToolPaths.TEMP_AST_PATH);
-
-        private string GetPath(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new InvalidOperationException("The TOOL_PATH environment variable must be set to initialize tool paths.");
-            }
-            return path;
-        }
+        private string DumpToolPath => CPlusPlusToolPaths.DumpToolPath;
+        private string ComparerToolPath => CPlusPlusToolPaths.ComparerToolPath;
+        private string BaseASTDirectoryPath => CPlusPlusToolPaths.BaseASTDirectoryPath;
+        private string TempASTPath => CPlusPlusToolPaths.TempASTPath;
 
         /// <summary>
         /// Runs the AST Dump Tool twice, once for each specified C++ standard.
@@ -82,10 +73,9 @@ namespace ASTDiffTool.Services
 
                 return resultFirst && resultSecond;
             }
-            catch (Exception ex) 
+            catch (Exception) 
             {
-                Debug.WriteLine($"Exception occurred while running AST Dump Tool: {ex.Message}");
-                return false;
+                throw;
             }
         }
 
@@ -107,10 +97,9 @@ namespace ASTDiffTool.Services
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.WriteLine($"Exception occurred while running AST Tree Comparer: {ex.Message}");
-                return false;
+                throw;
             }
         }
 
@@ -155,10 +144,9 @@ namespace ASTDiffTool.Services
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.WriteLine($"Exception occurred during AST Dump Tool execution: {ex.Message}");
-                return false;
+                throw;
             }
         }
 
@@ -170,9 +158,17 @@ namespace ASTDiffTool.Services
         /// <returns>The path to the project directory.</returns>
         private string EnsureProjectDirectoryExists(string projectName)
         {
-            string projectDirectory = Path.Combine(BaseASTDirectoryPath, projectName);
-            _fileService.EnsureDirectoryExists(projectDirectory);
-            return projectDirectory;
+            try
+            {
+                string projectDirectory = Path.Combine(BaseASTDirectoryPath, projectName);
+                _fileService.EnsureDirectoryExists(projectDirectory);
+                return projectDirectory;
+
+            }
+            catch(Exception)
+            {
+                throw;
+            }
         }
     }
 }

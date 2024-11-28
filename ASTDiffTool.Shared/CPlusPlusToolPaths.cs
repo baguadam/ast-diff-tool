@@ -8,27 +8,25 @@ namespace ASTDiffTool.Shared
     /// </summary>
     public static class CPlusPlusToolPaths
     {
-        private static readonly string TOOL_PATH = GetToolPath();
-
         /// <summary>
         /// Gets the path to the dump tool.
         /// </summary>
-        public static readonly string DUMP_TOOL_PATH = NormalizePath(Path.Combine(TOOL_PATH, "dump-tool\\build\\clang_ast_tool.exe"));
+        public static string DumpToolPath => NormalizePath(Path.Combine(GetToolPath(), "dump-tool\\build\\clang_ast_tool.exe"));
 
         /// <summary>
         /// Gets the path to the comparer tool.
         /// </summary>
-        public static readonly string COMPARER_TOOL_PATH = NormalizePath(Path.Combine(TOOL_PATH, "comparer\\build\\ast-tree-comparer.exe"));
+        public static string ComparerToolPath => NormalizePath(Path.Combine(GetToolPath(), "comparer\\build\\ast-tree-comparer.exe"));
 
         /// <summary>
         /// Gets the base directory for AST projects.
         /// </summary>
-        public static readonly string BASE_AST_DIRECTORY_PATH = NormalizePath(Path.Combine(TOOL_PATH, "asts"));
+        public static string BaseASTDirectoryPath => NormalizePath(Path.Combine(GetToolPath(), "asts"));
 
         /// <summary>
         /// Gets the path to the temporary AST directory.
         /// </summary>
-        public static readonly string TEMP_AST_PATH = NormalizePath(Path.Combine(Path.GetTempPath(), "AST"));
+        public static string TempASTPath => NormalizePath(Path.Combine(Path.GetTempPath(), "AST"));
 
         /// <summary>
         /// Resolves the base tool path from the environment variable.

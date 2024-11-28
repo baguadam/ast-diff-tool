@@ -2,6 +2,8 @@
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.Shared;
 using ASTDiffTool.ViewModels;
+using ASTDiffTool.ViewModels.Events;
+using ASTDiffTool.ViewModels.Interfaces;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -14,14 +16,18 @@ namespace ASTDiffTool.ViewModels
     public partial class TreeDisplayPageViewModel : ViewModelBase
     {
         private readonly INeo4jService _neo4jService;
+        private readonly INavigationService _navigationService;
+        private readonly IEventAggregator _eventAggregator;
 
         /// <summary>
         /// Initialize a new instance of the class.
         /// </summary>
         /// <param name="neo4jService">Service that is responsible for interacting the Neo4j database</param>
-        public TreeDisplayPageViewModel(INeo4jService neo4jService)
+        public TreeDisplayPageViewModel(INeo4jService neo4jService, INavigationService navigationService, IEventAggregator eventAggregator)
         {
             _neo4jService = neo4jService;
+            _eventAggregator = eventAggregator;
+            _navigationService = navigationService;
             DifferenceTypes = new ObservableCollection<Differences>(Enum.GetValues(typeof(Differences)).Cast<Differences>());
             SelectedDifferenceType = Differences.ONLY_IN_FIRST_AST; // default selection
 
@@ -190,7 +196,9 @@ namespace ASTDiffTool.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error loading nodes: {ex.Message}");
+                var databaseOperationFailure = new DatabaseFailureEvent($"Database connection is lost... \n {ex.Message}");
+                _eventAggregator.Publish(databaseOperationFailure);
+                _navigationService.NavigateTo<NewProjectPageViewModel>();
             }
             finally
             {

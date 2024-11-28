@@ -19,6 +19,8 @@ namespace ASTDiffTool.Services
         private readonly IFileService _fileService;
         private readonly CommandModifier _commandsModifier;
 
+        private string? _tempASTPath;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CompileCommandsHandler"/> class.
         /// </summary>
@@ -28,6 +30,8 @@ namespace ASTDiffTool.Services
             _fileService = fileService;
             _commandsModifier = new CommandModifier();
         }
+
+        private string TempASTPath => CPlusPlusToolPaths.TempASTPath;
 
         /// <summary>
         /// Creates a modified version of the original compile commands by changing the C++ standard.
@@ -50,8 +54,8 @@ namespace ASTDiffTool.Services
 
                 var modifiedCommands = _commandsModifier.ModifyCompileCommands(commands, standard);
 
-                _fileService.EnsureDirectoryExists(CPlusPlusToolPaths.TEMP_AST_PATH);
-                string tempFilePath = _fileService.CreateTemporaryFile(CPlusPlusToolPaths.TEMP_AST_PATH, "compile_commands.json");
+                _fileService.EnsureDirectoryExists(TempASTPath);
+                string tempFilePath = _fileService.CreateTemporaryFile(TempASTPath, "compile_commands.json");
                 _fileService.WriteFile(tempFilePath, JsonSerializer.Serialize(modifiedCommands));
 
                 return tempFilePath;

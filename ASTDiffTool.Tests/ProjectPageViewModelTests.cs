@@ -1,6 +1,7 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
 using ASTDiffTool.ViewModels;
+using ASTDiffTool.ViewModels.Interfaces;
 using Moq;
 using System;
 using System.Threading.Tasks;
@@ -11,12 +12,15 @@ namespace ASTDiffTool.Tests
     public class ProjectPageViewModelTests
     {
         private readonly Mock<INeo4jService> _mockNeo4jService;
+        private readonly Mock<INavigationService> _mockNavigationService;
+        private readonly Mock<IEventAggregator> _mockEventAggregator;
         private readonly ProjectPageViewModel _viewModel;
 
         public ProjectPageViewModelTests()
         {
             _mockNeo4jService = new Mock<INeo4jService>();
-            _viewModel = new ProjectPageViewModel(_mockNeo4jService.Object);
+
+            _viewModel = new ProjectPageViewModel(_mockNeo4jService.Object, _mockNavigationService.Object, _mockEventAggregator.Object);
         }
 
         [Fact]
