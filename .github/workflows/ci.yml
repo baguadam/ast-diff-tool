@@ -23,12 +23,15 @@ jobs:
 
       - name: Download Neo4j
         run: |
-          curl -o neo4j.zip https://neo4j.com/artifact.php?name=neo4j-community-5.5.0-windows.zip
+          curl -L -o neo4j.zip https://neo4j.com/artifact.php?name=neo4j-community-5.5.0-windows.zip
+          echo "Downloaded neo4j.zip"
+          dir
+          echo "Extracting Neo4j..."
           mkdir neo4j
           tar -xf neo4j.zip -C neo4j --strip-components=1
-
-      - name: Debug Neo4j Directory
-        run: dir neo4j
+          echo "Extraction completed. Listing contents:"
+          dir neo4j
+          dir neo4j\bin
 
       - name: Start Neo4j
         run: |
