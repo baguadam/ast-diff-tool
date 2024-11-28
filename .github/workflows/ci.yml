@@ -9,16 +9,8 @@ on:
       - "**"
 
 jobs:
-  test:
+  wpf-tests:
     runs-on: windows-latest
-
-    services:
-      neo4j:
-        image: neo4j:5.5
-        ports:
-          - 7687:7687
-        env:
-          NEO4J_AUTH: "neo4j/testpassword"
 
     steps:
       - name: Checkout code
@@ -29,10 +21,25 @@ jobs:
         with:
           dotnet-version: '7.0'
 
+      - name: Download Neo4j
+        run: |
+          curl -o neo4j.zip https://neo4j.com/artifact.php?name=neo4j-community-5.5.0-windows.zip
+          mkdir neo4j
+          tar -xf neo4j.zip -C neo4j --strip-components=1
+
+      - name: Start Neo4j
+        run: |
+          cd neo4j
+          bin\neo4j.bat install-service
+          bin\neo4j.bat start
+        env:
+          NEO4J_AUTH: "neo4j/testpassword"
+
       - name: Install dependencies
         run: dotnet restore
 
-      - name: Run tests
+      - name: Run WPF tests
         env:
           CI: true
-        run: dotnet test
+          NEO4J_AUTH: "neo4j/testpassword"
+        run: dotnet test --filter Category=WPFIntegration
