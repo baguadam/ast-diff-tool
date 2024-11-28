@@ -19,12 +19,13 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0'
+          dotnet-version: "7.0"
 
-      - name: Install Java 17
+      - name: Download and Install Java 17
         run: |
-          choco install openjdk --version=17.0.8 -y
-          setx JAVA_HOME "C:\Program Files\Eclipse Adoptium\jdk-17.0.8.7-hotspot"
+          curl -L -o temurin.msi https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8.1%2B1/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8.1_1.msi
+          msiexec /i temurin.msi /quiet /qn /norestart
+          setx JAVA_HOME "C:\Program Files\Eclipse Adoptium\jdk-17.0.8.1-hotspot"
           setx PATH "%JAVA_HOME%\bin;%PATH%"
         shell: cmd
 
