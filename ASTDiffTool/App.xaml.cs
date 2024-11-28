@@ -14,6 +14,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using static System.Net.WebRequestMethods;
 
 namespace ASTDiffTool
 {
@@ -43,25 +44,10 @@ namespace ASTDiffTool
 
         private void ConfigureServices (IServiceCollection services)
         {
-            // *********************************************
-            // LOAD APPSETTINGS.JSON
-            // *********************************************
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            services.AddSingleton<IConfiguration>(configuration); // registerint the configurations
-
-            // Get configuration values
-            string encryptionKey = configuration["Encryption:Key"]!;
-            string encryptionIV = configuration["Encryption:IV"]!;
-            string neo4jUri = configuration["Neo4j:Uri"]!;
-            string neo4jUsername = configuration["Neo4j:Username"]!;
-            string encryptedPassword = configuration["Neo4j:Password"]!;
-
-            // Decrypt the Neo4j password
-            string decryptedPassword = EncryptionHelper.Decrypt(encryptedPassword, encryptionKey, encryptionIV);
+            // get neo4j password:
+            string neo4jPassword = Environment.GetEnvironmentVariable("NEO4J_PASSWORD") ?? "default_password";
+            string neo4jUri = "http://localhost:7474";
+            string neo4jUsername = "neo4j";
 
             // *********************************************
             // REGISTERING SERVICES
@@ -77,7 +63,7 @@ namespace ASTDiffTool
 
             // neo4j connection
             services.AddSingleton<INeo4jService>(provider =>
-                new Neo4jService(neo4jUri, neo4jUsername, decryptedPassword));
+                new Neo4jService(neo4jUri, neo4jUsername, neo4jPassword));
 
             services.AddSingleton<NewProjectPageViewModel>();
             services.AddSingleton<ProjectPageViewModel>();
