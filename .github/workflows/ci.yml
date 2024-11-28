@@ -1,13 +1,3 @@
-name: Run Tests
-
-on:
-  push:
-    branches:
-      - "**"
-  pull_request:
-    branches:
-      - "**"
-
 jobs:
   wpf-tests:
     runs-on: windows-latest
@@ -19,21 +9,27 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "8.0"
+          dotnet-version: '7.0'
 
-      - name: Download Neo4j
+      - name: Install Java 17
+        run: |
+          choco install openjdk --version=17.0.8 -y
+          setx JAVA_HOME "C:\Program Files\Eclipse Adoptium\jdk-17.0.8.7-hotspot"
+          setx PATH "%JAVA_HOME%\bin;%PATH%"
+        shell: cmd
+
+      - name: Verify Java Version
+        run: java -version
+
+      - name: Download and Extract Neo4j
         run: |
           curl -L -o neo4j.zip https://neo4j.com/artifact.php?name=neo4j-community-5.5.0-windows.zip
-          echo "Downloaded neo4j.zip"
-          dir
-          echo "Extracting Neo4j..."
           mkdir neo4j
           tar -xf neo4j.zip -C neo4j --strip-components=1
-          echo "Extraction completed. Listing contents:"
           dir neo4j
           dir neo4j\bin
 
-      - name: Start Neo4j
+      - name: Install and Start Neo4j
         run: |
           cmd /c "neo4j\bin\neo4j.bat install-service"
           cmd /c "neo4j\bin\neo4j.bat start"
