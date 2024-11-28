@@ -19,7 +19,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0'
+          dotnet-version: "8.0"
 
       - name: Download Neo4j
         run: |
@@ -29,9 +29,8 @@ jobs:
 
       - name: Start Neo4j
         run: |
-          cd neo4j
-          cmd /c "bin\neo4j.bat install-service"
-          cmd /c "bin\neo4j.bat start"
+          cmd /c "neo4j\bin\neo4j.bat install-service"
+          cmd /c "neo4j\bin\neo4j.bat start"
         env:
           NEO4J_AUTH: "neo4j/testpassword"
 
