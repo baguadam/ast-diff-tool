@@ -13,36 +13,33 @@ namespace ASTDiffTool.Services
     /// </summary>
     public class CPlusPlusService : ICPlusPlusService
     {
+        private readonly string DUMP_LOG_FILE = "dump_tool_log.txt";
+        private readonly string COMPARER_LOG_FILE = "comparer_tool_log.txt";
         private readonly IFileService _fileService;
         private readonly ILoggerService _loggerService;
         private readonly CompileCommandsHandler _commandsHandler;
-        private readonly string _dumpToolPath;
-        private readonly string _comparerToolPath;
-        private readonly string _baseASTDirectoryPath;
 
-        private readonly string DUMP_LOG_FILE = "dump_tool_log.txt";
-        private readonly string COMPARER_LOG_FILE = "comparer_tool_log.txt";
+        private string? _dumpToolPath;
+        private string? _comparerToolPath;
+        private string? _baseASTDirectoryPath;
+        private string? _tempASTPath;
 
         /// <summary>
         /// Gets or sets the path where the project results are stored.
         /// </summary>
         public string ProjectResultPath { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CPlusPlusService"/> class.
-        /// </summary>
-        /// <param name="fileService">Service to handle file operations.</param>
-        /// <param name="loggerService">Service to handle logging operations.</param>
         public CPlusPlusService(IFileService fileService, ILoggerService loggerService)
         {
             _fileService = fileService;
             _loggerService = loggerService;
             _commandsHandler = new CompileCommandsHandler(fileService);
-
-            _dumpToolPath = CPlusPlusToolPaths.DUMP_TOOL_PATH;
-            _comparerToolPath = CPlusPlusToolPaths.COMPARER_TOOL_PATH;
-            _baseASTDirectoryPath = CPlusPlusToolPaths.BASE_AST_DIRECTORY_PATH;
         }
+
+        private string DumpToolPath => CPlusPlusToolPaths.DumpToolPath;
+        private string ComparerToolPath => CPlusPlusToolPaths.ComparerToolPath;
+        private string BaseASTDirectoryPath => CPlusPlusToolPaths.BaseASTDirectoryPath;
+        private string TempASTPath => CPlusPlusToolPaths.TempASTPath;
 
         /// <summary>
         /// Runs the AST Dump Tool twice, once for each specified C++ standard.
@@ -64,22 +61,21 @@ namespace ASTDiffTool.Services
 
                 // first run
                 string tempFileStd1 = _commandsHandler.CreateModifiedCompileCommands(compilationDatabasePath, firstStandard);
-                string argumentsFirst = $"-p \"{CPlusPlusToolPaths.TEMP_AST_PATH}\" \"{mainPath}\" -o \"{firstStandardOutput}\"";
-                bool resultFirst = ExecuteTool(CPlusPlusToolPaths.DUMP_TOOL_PATH, argumentsFirst, DUMP_LOG_FILE);
+                string argumentsFirst = $"-p \"{TempASTPath}\" \"{mainPath}\" -o \"{firstStandardOutput}\"";
+                bool resultFirst = ExecuteTool(DumpToolPath, argumentsFirst, DUMP_LOG_FILE);
                 _fileService.DeleteFile(tempFileStd1);
 
                 // second run
                 string tempFileStd2 = _commandsHandler.CreateModifiedCompileCommands(compilationDatabasePath, secondStandard);
-                string argumentsSecond = $"-p \"{CPlusPlusToolPaths.TEMP_AST_PATH}\" \"{mainPath}\" -o \"{secondStandardOutput}\"";
-                bool resultSecond = ExecuteTool(CPlusPlusToolPaths.DUMP_TOOL_PATH, argumentsSecond, DUMP_LOG_FILE);
+                string argumentsSecond = $"-p \"{TempASTPath}\" \"{mainPath}\" -o \"{secondStandardOutput}\"";
+                bool resultSecond = ExecuteTool(DumpToolPath, argumentsSecond, DUMP_LOG_FILE);
                 _fileService.DeleteFile(tempFileStd2);
 
                 return resultFirst && resultSecond;
             }
-            catch (Exception ex) 
+            catch (Exception) 
             {
-                Debug.WriteLine($"Exception occurred while running AST Dump Tool: {ex.Message}");
-                return false;
+                throw;
             }
         }
 
@@ -97,14 +93,13 @@ namespace ASTDiffTool.Services
                 string secondStandardOutput = Path.Combine(ProjectResultPath, $"{secondStandard}.txt");
 
                 string arguments = $"\"{firstStandardOutput}\" \"{secondStandardOutput}\"";
-                bool result = ExecuteTool(CPlusPlusToolPaths.COMPARER_TOOL_PATH, arguments, COMPARER_LOG_FILE);
+                bool result = ExecuteTool(ComparerToolPath, arguments, COMPARER_LOG_FILE);
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.WriteLine($"Exception occurred while running AST Tree Comparer: {ex.Message}");
-                return false;
+                throw;
             }
         }
 
@@ -149,10 +144,9 @@ namespace ASTDiffTool.Services
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.WriteLine($"Exception occurred during AST Dump Tool execution: {ex.Message}");
-                return false;
+                throw;
             }
         }
 
@@ -164,9 +158,17 @@ namespace ASTDiffTool.Services
         /// <returns>The path to the project directory.</returns>
         private string EnsureProjectDirectoryExists(string projectName)
         {
-            string projectDirectory = Path.Combine(_baseASTDirectoryPath, projectName);
-            _fileService.EnsureDirectoryExists(projectDirectory);
-            return projectDirectory;
+            try
+            {
+                string projectDirectory = Path.Combine(BaseASTDirectoryPath, projectName);
+                _fileService.EnsureDirectoryExists(projectDirectory);
+                return projectDirectory;
+
+            }
+            catch(Exception)
+            {
+                throw;
+            }
         }
     }
 }

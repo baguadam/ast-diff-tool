@@ -45,6 +45,9 @@ namespace ASTDiffTool.ViewModels
 
             // initialize available C++ standards
             AllStandards = new List<string> { "c++98", "c++03", "c++11", "c++14", "c++17", "c++20" };
+
+            // subscribe to the database failure event
+            _eventAggregator.Subscribe<DatabaseFailureEvent>(HandleDatabaseFailure);
         }
 
         #region Properties
@@ -290,7 +293,7 @@ namespace ASTDiffTool.ViewModels
             {
                 // Step 1: Running AST Dump Tool
                 CPlusPlusToolState = "Dumping ASTs of the trees...";
-                bool isDumpSuccessful = await RunCPlusPlusToolAsync(() =>
+                bool isDumpToolSuccessful = await RunCPlusPlusToolAsync(() =>
                     _cPlusPlusService.RunASTDumpTool(
                         _projectModel.CompilationDatabasePath,
                         _projectModel.MainFilePath,
@@ -298,38 +301,45 @@ namespace ASTDiffTool.ViewModels
                         _projectModel.FirstSelectedStandard,
                         _projectModel.SecondSelectedStandard));
 
-                ProjectResultPath = _cPlusPlusService.ProjectResultPath; // path is constructed at the beginning
+                ProjectResultPath = _cPlusPlusService.ProjectResultPath; // construct path
 
-                if (!isDumpSuccessful)
+                // in case of dump tool failure
+                if (!isDumpToolSuccessful)
                 {
                     await ShowNotification($"Dump Tool failed! See logs: {ProjectResultPath}", false);
+                    PublishCompilationEvent(false);
                     return;
                 }
 
                 // Step 2: Running AST Tree Comparer Tool
                 CPlusPlusToolState = "Comparing ASTs and writing results...";
-                bool isComparerSuccessful = await RunCPlusPlusToolAsync(() =>
+                bool isComparerToolSuccessful = await RunCPlusPlusToolAsync(() =>
                     _cPlusPlusService.RunComparerTool(
                         _projectModel.FirstSelectedStandard,
                         _projectModel.SecondSelectedStandard));
 
-                if (!isComparerSuccessful)
+                // in case of comparer tool failure
+                if (!isComparerToolSuccessful)
                 {
                     await ShowNotification($"Comparer Tool failed! See logs: {ProjectResultPath}", false);
+                    PublishCompilationEvent(false);
                     return;
                 }
 
                 // if both succeeded
-                var projectCompilationEvent = new ProjectCompilationEvent(true);
-                _eventAggregator.Publish(projectCompilationEvent);
-
+                PublishCompilationEvent(true);
                 await ShowNotification("Compilation completed successfully!", true);
                 IsProjectCompiled = true;
             }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("TOOL_PATH"))
+            {
+                PublishCompilationEvent(false);
+                await ShowNotification($"Configuration error: {ex.Message}", false);
+            }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error during compilation: {ex.Message}");
-                await ShowNotification($"An error occurred during compilation! See logs: {ProjectResultPath}", false);
+                PublishCompilationEvent(false);
+                await ShowNotification($"An error occurred during compilation! See logs: {ProjectResultPath}\nError: {ex.Message}", false);
             }
             finally
             {
@@ -353,7 +363,7 @@ namespace ASTDiffTool.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"Tool execution error: {ex.Message}");
-                return false;
+                throw;
             }
         }
 
@@ -371,6 +381,34 @@ namespace ASTDiffTool.ViewModels
             IsNotificationVisible = true;
             await Task.Delay(3000);
             IsNotificationVisible = false;
+        }
+
+        /// <summary>
+        /// Handles the compilation error that happens if any of the tools fail.
+        /// </summary>
+        /// <param name="message">Message to be displayed</param>
+        /// <param name="ex">The thrown exception</param>
+        private async Task HandleCompilationError(string message, Exception ex) 
+        {
+            await ShowNotification(message, false);
+        }
+
+        /// <summary>
+        /// Publishes an event about the result of the compilation
+        /// </summary>
+        private void PublishCompilationEvent(bool isSuccess)
+        {
+            var projectCompilationEvent = new ProjectCompilationEvent(isSuccess);
+            _eventAggregator.Publish(projectCompilationEvent);
+        }
+
+        /// <summary>
+        /// Handles database operation failure by displaying the message about it.
+        /// </summary>
+        /// <param name="dbFailEvent">The event sent</param>
+        private async void HandleDatabaseFailure(DatabaseFailureEvent dbFailEvent)
+        {
+            await ShowNotification(dbFailEvent.Message, false);
         }
         #endregion
     }

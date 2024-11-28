@@ -1,5 +1,7 @@
 ﻿using ASTDiffTool.Models;
 using ASTDiffTool.Services.Interfaces;
+using ASTDiffTool.ViewModels.Events;
+using ASTDiffTool.ViewModels.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -14,15 +16,19 @@ namespace ASTDiffTool.ViewModels
     public partial class ProjectPageViewModel : ViewModelBase
     {
         private readonly INeo4jService _neo4jService;
+        private readonly INavigationService _navigationService;
+        private readonly IEventAggregator _eventAggregator;
         private readonly ProjectDatabaseInfoModel _databaseInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProjectPageViewModel"/> class.
         /// </summary>
         /// <param name="neo4jService">Service responsible for interacting with the Neo4j database.</param>
-        public ProjectPageViewModel(INeo4jService neo4jService)
+        public ProjectPageViewModel(INeo4jService neo4jService, INavigationService navigationService, IEventAggregator eventAggregator)
         {
             _neo4jService = neo4jService;
+            _navigationService = navigationService;
+            _eventAggregator = eventAggregator;
             _databaseInfo = new ProjectDatabaseInfoModel();
 
             Task.Run(LoadDatabaseInfoAsync);
@@ -197,7 +203,9 @@ namespace ASTDiffTool.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error loading database info: {ex.Message}");
+                var databaseOperationFailure = new DatabaseFailureEvent($"Database connection is lost... \n {ex.Message}");
+                _eventAggregator.Publish(databaseOperationFailure);
+                _navigationService.NavigateTo<NewProjectPageViewModel>();
             }
             finally
             {
