@@ -19,7 +19,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0'
+          dotnet-version: "8.0"
 
       - name: Install dependencies
         run: dotnet restore
@@ -30,4 +30,4 @@ jobs:
           NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
           NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
           CI: true
-        run: dotnet test --filter Category=WPFIntegration
+        run: dotnet test
