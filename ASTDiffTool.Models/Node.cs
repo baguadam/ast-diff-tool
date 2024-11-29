@@ -78,6 +78,11 @@ namespace ASTDiffTool.Models
         public bool HasItems => Children != null && Children.Count > 0;
 
         /// <summary>
+        /// Retrieves the kind of the node combined with its topological order.
+        /// </summary>
+        public string KindWithOrder => $"{Kind} - {TopologicalOrder}";
+
+        /// <summary>
         /// Overrides the ToString() method to be displayed in the view.
         /// </summary>
         /// <returns>Combined kind and topological order</returns>

@@ -22,9 +22,6 @@ namespace ASTDiffTool.ViewModels
         private readonly INavigationService _navigationService;
         private readonly IEventAggregator _eventAggregator;
 
-        private ViewModelBase _currentViewModel;
-        private bool _isCompilationCompleted = false;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="MainViewModel"/> class.
         /// </summary>
@@ -38,11 +35,13 @@ namespace ASTDiffTool.ViewModels
             // subscribing 
             _navigationService.NavigationCompleted += OnNavigationService_NavigationCompleted;
             _eventAggregator.Subscribe<ProjectCompilationEvent>(HandleProjectCompiled);
+            _eventAggregator.Subscribe<LoadingEvent>(HandleLoadingChange);
 
             navigationService.NavigateTo<NewProjectPageViewModel>();
         }
 
         #region Properties
+        private ViewModelBase _currentViewModel;
         /// <summary>
         /// Gets or sets the currently displayed view model apart from the navigation.
         /// </summary>
@@ -56,6 +55,7 @@ namespace ASTDiffTool.ViewModels
             }
         }
 
+        private bool _isCompilationCompleted = false;
         /// <summary>
         /// Indicates whether compilation has completed.
         /// </summary>
@@ -66,6 +66,34 @@ namespace ASTDiffTool.ViewModels
             {
                 _isCompilationCompleted = value;
                 OnPropertyChanged(nameof(IsCompilationCompleted));
+            }
+        }
+
+        private bool _isLoading;
+        /// <summary>
+        /// Indicates whether the program is in a loading state. 
+        /// </summary>
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
+
+        private string _toolState;
+        /// <summary>
+        /// State of the tool to be displayed above the progress bar.
+        /// </summary>
+        public string ToolState
+        {
+            get => _toolState;
+            set
+            {
+                _toolState = value;
+                OnPropertyChanged(nameof(ToolState));
             }
         }
         #endregion
@@ -117,6 +145,16 @@ namespace ASTDiffTool.ViewModels
         private void HandleProjectCompiled(ProjectCompilationEvent compilationEvent)
         {
             IsCompilationCompleted = compilationEvent.IsSuccessful;
+        }
+
+        /// <summary>
+        /// Handles the loading state of the application.
+        /// </summary>
+        /// <param name="loadingEvent">Event containing whether the application is in a loading state</param>
+        private void HandleLoadingChange(LoadingEvent loadingEvent)
+        {
+            IsLoading = loadingEvent.IsLoading;
+            ToolState = loadingEvent.ToolState;
         }
         #endregion
     }

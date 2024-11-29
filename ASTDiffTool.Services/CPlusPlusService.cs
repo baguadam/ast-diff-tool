@@ -19,11 +19,6 @@ namespace ASTDiffTool.Services
         private readonly ILoggerService _loggerService;
         private readonly CompileCommandsHandler _commandsHandler;
 
-        private string? _dumpToolPath;
-        private string? _comparerToolPath;
-        private string? _baseASTDirectoryPath;
-        private string? _tempASTPath;
-
         /// <summary>
         /// Gets or sets the path where the project results are stored.
         /// </summary>
@@ -50,7 +45,7 @@ namespace ASTDiffTool.Services
         /// <param name="firstStandard">The first C++ standard (e.g., "c++17") to use for AST generation.</param>
         /// <param name="secondStandard">The second C++ standard (e.g., "c++20") to use for AST generation.</param>
         /// <returns>True if both executions are successful; otherwise, false.</returns>
-        public bool RunASTDumpTool(string compilationDatabasePath, string mainPath, string projectName, string firstStandard, string secondStandard)
+        public async Task<bool> RunASTDumpToolAsync(string compilationDatabasePath, string mainPath, string projectName, string firstStandard, string secondStandard)
         {
             try
             {
@@ -62,18 +57,18 @@ namespace ASTDiffTool.Services
                 // first run
                 string tempFileStd1 = _commandsHandler.CreateModifiedCompileCommands(compilationDatabasePath, firstStandard);
                 string argumentsFirst = $"-p \"{TempASTPath}\" \"{mainPath}\" -o \"{firstStandardOutput}\"";
-                bool resultFirst = ExecuteTool(DumpToolPath, argumentsFirst, DUMP_LOG_FILE);
+                bool resultFirst = await ExecuteToolAsync(DumpToolPath, argumentsFirst, DUMP_LOG_FILE);
                 _fileService.DeleteFile(tempFileStd1);
 
                 // second run
                 string tempFileStd2 = _commandsHandler.CreateModifiedCompileCommands(compilationDatabasePath, secondStandard);
                 string argumentsSecond = $"-p \"{TempASTPath}\" \"{mainPath}\" -o \"{secondStandardOutput}\"";
-                bool resultSecond = ExecuteTool(DumpToolPath, argumentsSecond, DUMP_LOG_FILE);
+                bool resultSecond = await ExecuteToolAsync(DumpToolPath, argumentsSecond, DUMP_LOG_FILE);
                 _fileService.DeleteFile(tempFileStd2);
 
                 return resultFirst && resultSecond;
             }
-            catch (Exception) 
+            catch (Exception)
             {
                 throw;
             }
@@ -85,7 +80,7 @@ namespace ASTDiffTool.Services
         /// <param name="firstStandard">Path to the first C++ standard (e.g., "c++17").</param>
         /// <param name="secondStandard">Path to the second C++ standard (e.g., "c++20").</param>
         /// <returns>True if the tool execution is successful; otherwise, false.</returns>
-        public bool RunComparerTool(string firstStandard, string secondStandard)
+        public async Task<bool> RunComparerToolAsync(string firstStandard, string secondStandard)
         {
             try
             {
@@ -93,7 +88,7 @@ namespace ASTDiffTool.Services
                 string secondStandardOutput = Path.Combine(ProjectResultPath, $"{secondStandard}.txt");
 
                 string arguments = $"\"{firstStandardOutput}\" \"{secondStandardOutput}\"";
-                bool result = ExecuteTool(ComparerToolPath, arguments, COMPARER_LOG_FILE);
+                bool result = await ExecuteToolAsync(ComparerToolPath, arguments, COMPARER_LOG_FILE);
 
                 return result;
             }
@@ -110,42 +105,56 @@ namespace ASTDiffTool.Services
         /// <param name="arguments">Arguments to pass to the tool.</param>
         /// <param name="logFileName">The name of the log file to store the tool's output.</param>
         /// <returns>True if the tool execution is successful; otherwise, false.</returns>
-        private bool ExecuteTool(string toolPath, string arguments, string logFileName)
+        private async Task<bool> ExecuteToolAsync(string toolPath, string arguments, string logFileName)
         {
+            string logFilePath = Path.Combine(ProjectResultPath, logFileName);
+
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = toolPath,
+                Arguments = arguments,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            };
+
+            using var process = new Process { StartInfo = processInfo };
+            
             try
             {
-                var processInfo = new ProcessStartInfo
-                {
-                    FileName = toolPath,
-                    Arguments = arguments,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                };
-
-                using var process = new Process { StartInfo = processInfo };
                 process.Start();
 
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
+                string output = await process.StandardOutput.ReadToEndAsync();
+                string error = await process.StandardError.ReadToEndAsync();
 
-                process.WaitForExit();
+                // timeout to avoid indefinite hanging
+                bool exited = await Task.Run(() => process.WaitForExit(90000)); // waiting for 90 seconds to finish execution 
+                if (!exited)
+                {
+                    process.Kill();
+                    throw new TimeoutException($"The process did not complete within the allocated time and was terminated.");
+                }
 
                 // logging the output to the log file
-                string logFilePath = Path.Combine(ProjectResultPath, logFileName);
                 _loggerService.Log(logFilePath, output, error);
 
                 if (process.ExitCode != 0)
                 {
-                    Debug.WriteLine($"Error: {error}");
                     return false;
                 }
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // in case of running process
+                if (!process.HasExited)
+                {
+                    process.Kill();
+                }
+
+                _loggerService.Log(logFilePath, String.Empty, $"An exception occurred during execution: {ex.Message}");
                 throw;
             }
         }
@@ -165,7 +174,7 @@ namespace ASTDiffTool.Services
                 return projectDirectory;
 
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }

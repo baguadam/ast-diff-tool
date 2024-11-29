@@ -114,7 +114,7 @@
                         Command="{Binding CompileProjectCommand}"
                         IsEnabled="{Binding CanCompile}" />
 
-                <!-- Display Current Project Result Path -->
+                <!-- display Current Project Result Path -->
                 <StackPanel Margin="0, 20, 0, 10" VerticalAlignment="Top"
                             Visibility="{Binding IsProjectCompiled, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock Text="Project Result Path:" 
@@ -138,25 +138,7 @@
             </StackPanel>
         </Border>
 
-        <!-- loading overlay -->
-        <Border Background="#AA000000"
-                Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
-                IsHitTestVisible="False">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="{Binding CPlusPlusToolState}"
-                           Foreground="White"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,10"/>
-                <ProgressBar Width="200"
-                             Height="20"
-                             IsIndeterminate="True"
-                             Foreground="LightGreen"/>
-            </StackPanel>
-        </Border>
-
-        <!--notification popup-->
+        <!-- notification popup -->
         <Popup IsOpen="{Binding IsNotificationVisible}" 
                Placement="Center"
                AllowsTransparency="True"

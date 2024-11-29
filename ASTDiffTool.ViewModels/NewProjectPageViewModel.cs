@@ -161,23 +161,6 @@ namespace ASTDiffTool.ViewModels
         /// </summary>
         public bool CanCompile => _projectModel.IsComplete;
 
-        private bool _isLoading;
-        /// <summary>
-        /// Indicates whether the project is loading.
-        /// </summary>
-        public bool IsLoading
-        {
-            get => _isLoading;
-            set
-            {
-                if (_isLoading != value)
-                {
-                    _isLoading = value;
-                    OnPropertyChanged(nameof(IsLoading));
-                }
-            }
-        }
-
         private string _notificationMessage;
         /// <summary>
         /// The notification message that is displayed in a popup.
@@ -228,23 +211,6 @@ namespace ASTDiffTool.ViewModels
                 }
             }
         }
-
-        private string _cPlusPlusToolState;
-        /// <summary>
-        /// The state of the CPlusPlus tool.
-        /// </summary>
-        public string CPlusPlusToolState
-        {
-            get => _cPlusPlusToolState;
-            set
-            {
-                if (_cPlusPlusToolState != value)
-                {
-                    _cPlusPlusToolState = value;
-                    OnPropertyChanged(nameof(CPlusPlusToolState));
-                } 
-            }
-        }
         #endregion
 
         #region Commands
@@ -286,14 +252,12 @@ namespace ASTDiffTool.ViewModels
                 return;
             }
 
-            IsLoading = true;
-
             try
             {
                 // Step 1: Running AST Dump Tool
-                CPlusPlusToolState = "Dumping ASTs of the trees...";
+                PublishLoadingEvent(true, "Dumping ASTs of the trees...");
                 bool isDumpToolSuccessful = await RunCPlusPlusToolAsync(() =>
-                    _cPlusPlusService.RunASTDumpTool(
+                    _cPlusPlusService.RunASTDumpToolAsync(
                         _projectModel.CompilationDatabasePath,
                         _projectModel.MainFilePath,
                         _projectModel.ProjectName,
@@ -311,9 +275,9 @@ namespace ASTDiffTool.ViewModels
                 }
 
                 // Step 2: Running AST Tree Comparer Tool
-                CPlusPlusToolState = "Comparing ASTs and writing results...";
+                PublishLoadingEvent(true, "Comparing ASTs and writing differences...");
                 bool isComparerToolSuccessful = await RunCPlusPlusToolAsync(() =>
-                    _cPlusPlusService.RunComparerTool(
+                    _cPlusPlusService.RunComparerToolAsync(
                         _projectModel.FirstSelectedStandard,
                         _projectModel.SecondSelectedStandard));
 
@@ -342,7 +306,7 @@ namespace ASTDiffTool.ViewModels
             }
             finally
             {
-                IsLoading = false;
+                PublishLoadingEvent(false, String.Empty);
             }
         }
         #endregion
@@ -353,7 +317,7 @@ namespace ASTDiffTool.ViewModels
         /// </summary>
         /// <param name="toolAction">Delegate to run the necessary tool</param>
         /// <returns></returns>
-        private async Task<bool> RunCPlusPlusToolAsync(Func<bool> toolAction)
+        private async Task<bool> RunCPlusPlusToolAsync(Func<Task<bool>> toolAction)
         {
             try
             {
@@ -373,7 +337,7 @@ namespace ASTDiffTool.ViewModels
         /// <param name="success">Whether it is success or fail</param>
         private async Task ShowNotification(string message, bool success)
         {
-            IsLoading = false; // stop loading
+            PublishLoadingEvent(false, String.Empty); // stop loading
 
             NotificationMessage = message;
             IsProjectCompiled = success;
@@ -393,12 +357,22 @@ namespace ASTDiffTool.ViewModels
         }
 
         /// <summary>
-        /// Publishes an event about the result of the compilation
+        /// Publishes an event about the result of the compilation.
         /// </summary>
         private void PublishCompilationEvent(bool isSuccess)
         {
             var projectCompilationEvent = new ProjectCompilationEvent(isSuccess);
             _eventAggregator.Publish(projectCompilationEvent);
+        }
+
+        /// <summary>
+        /// Publishes an event about the current loading state.
+        /// </summary>
+        /// <param name="isLoading">Indicates whether the application is in a loading state.</param>
+        private void PublishLoadingEvent(bool isLoading, string toolState)
+        {
+            var loadingEvent = new LoadingEvent(isLoading, toolState);
+            _eventAggregator.Publish(loadingEvent);
         }
 
         /// <summary>
