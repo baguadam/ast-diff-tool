@@ -19,11 +19,6 @@ namespace ASTDiffTool.Services
         private readonly ILoggerService _loggerService;
         private readonly CompileCommandsHandler _commandsHandler;
 
-        private string? _dumpToolPath;
-        private string? _comparerToolPath;
-        private string? _baseASTDirectoryPath;
-        private string? _tempASTPath;
-
         /// <summary>
         /// Gets or sets the path where the project results are stored.
         /// </summary>

@@ -19,8 +19,6 @@ namespace ASTDiffTool.Services
         private readonly IFileService _fileService;
         private readonly CommandModifier _commandsModifier;
 
-        private string? _tempASTPath;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CompileCommandsHandler"/> class.
         /// </summary>
