@@ -54,27 +54,6 @@ namespace ASTDiffTool.Tests
         }
 
         [Fact]
-        public async Task CompileProject_ShouldSetIsLoadingTrueWhileExecuting_AndFalseAfterExecution()
-        {
-            _viewModel.ProjectName = "TestProject";
-            _viewModel.CompilationDatabasePath = "path/to/compile_commands.json";
-            _viewModel.MainFilePath = "path/to/main.cpp";
-            _viewModel.FirstSelectedStandard = "c++17";
-            _viewModel.SecondSelectedStandard = "c++20";
-
-            _mockCPlusPlusService.Setup(s => s.RunASTDumpTool(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(true);
-            _mockCPlusPlusService.Setup(s => s.RunComparerTool(It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(true);
-
-            var compileTask = _viewModel.CompileProject();
-            Assert.True(_viewModel.IsLoading);
-
-            await compileTask;
-            Assert.False(_viewModel.IsLoading);
-        }
-
-        [Fact]
         public async Task CompileProject_ShouldShowNotification_OnFailure()
         {
             _viewModel.ProjectName = "TestProject";

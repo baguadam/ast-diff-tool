@@ -13,13 +13,13 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
     <Grid>
-        <!--Main Grid of the application-->
+        <!--main Grid of the application-->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20*"/>
             <ColumnDefinition Width="80*"/>
         </Grid.ColumnDefinitions>
 
-        <!--Left side for project settings, visible on each view-->
+        <!--left side for project settings, visible on each view-->
         <Border Grid.Column="0" 
                 Background="{StaticResource SecondaryBackgroundColor}">
             <StackPanel Margin="0, 100, 0, 100">
@@ -27,10 +27,28 @@
             </StackPanel>
         </Border>
 
-        <!--Right side, its content is generated dynamically-->
+        <!--right side, its content is generated dynamically-->
         <Border Grid.Column="1">
             <ContentControl x:Name="Pages"
                             Content="{Binding CurrentViewModel}" />
+        </Border>
+
+        <!-- loading overlay covering the entire Window -->
+        <Border Background="#AA000000"
+                Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Grid.ColumnSpan="2">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="{Binding ToolState}"
+                           Foreground="White"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
+                <ProgressBar Width="200"
+                             Height="20"
+                             IsIndeterminate="True"
+                             Foreground="LightGreen"/>
+            </StackPanel>
         </Border>
     </Grid>
 </Window>
