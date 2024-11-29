@@ -257,7 +257,7 @@ namespace ASTDiffTool.ViewModels
                 // Step 1: Running AST Dump Tool
                 PublishLoadingEvent(true, "Dumping ASTs of the trees...");
                 bool isDumpToolSuccessful = await RunCPlusPlusToolAsync(() =>
-                    _cPlusPlusService.RunASTDumpTool(
+                    _cPlusPlusService.RunASTDumpToolAsync(
                         _projectModel.CompilationDatabasePath,
                         _projectModel.MainFilePath,
                         _projectModel.ProjectName,
@@ -277,7 +277,7 @@ namespace ASTDiffTool.ViewModels
                 // Step 2: Running AST Tree Comparer Tool
                 PublishLoadingEvent(true, "Comparing ASTs and writing differences...");
                 bool isComparerToolSuccessful = await RunCPlusPlusToolAsync(() =>
-                    _cPlusPlusService.RunComparerTool(
+                    _cPlusPlusService.RunComparerToolAsync(
                         _projectModel.FirstSelectedStandard,
                         _projectModel.SecondSelectedStandard));
 
@@ -317,7 +317,7 @@ namespace ASTDiffTool.ViewModels
         /// </summary>
         /// <param name="toolAction">Delegate to run the necessary tool</param>
         /// <returns></returns>
-        private async Task<bool> RunCPlusPlusToolAsync(Func<bool> toolAction)
+        private async Task<bool> RunCPlusPlusToolAsync(Func<Task<bool>> toolAction)
         {
             try
             {
