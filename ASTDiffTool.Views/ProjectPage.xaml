@@ -22,7 +22,7 @@
             </Border.Effect>
 
             <StackPanel>
-                <!--Header-->
+                <!-- header -->
                 <TextBlock Text="Project Details" 
                            FontSize="24" 
                            FontWeight="Bold" 
@@ -30,7 +30,7 @@
                            HorizontalAlignment="Center" 
                            Margin="0,0,0,20" />
 
-                <!--Total Node Count-->
+                <!-- total Node count -->
                 <StackPanel Margin="0,10,0,20">
                     <TextBlock Text="Total Nodes in Database:" 
                                Style="{StaticResource TextStyle}" 
@@ -47,7 +47,7 @@
                     </Border>
                 </StackPanel>
 
-                <!--Nodes by AST Origin-->
+                <!-- nodes by AST Origin -->
                 <StackPanel Margin="0,10,0,20">
                     <TextBlock Text="Nodes by AST Origin:" 
                                Style="{StaticResource TextStyle}" 
@@ -80,7 +80,7 @@
                     </StackPanel>
                 </StackPanel>
 
-                <!--Nodes by Categories-->
+                <!-- nodes by categories -->
                 <StackPanel Margin="0,10,0,20">
                     <TextBlock Text="Nodes by Category:" 
                                Style="{StaticResource TextStyle}" 
@@ -133,14 +133,14 @@
                     </StackPanel>
                 </StackPanel>
 
-                <!--Refresh Button-->
+                <!-- refresh button -->
                 <Button Content="Refresh Data" 
                         Style="{StaticResource ButtonStyle}" 
                         Command="{Binding LoadDatabaseInfoCommand}" />
             </StackPanel>
         </Border>
 
-        <!--Loading Overlay-->
+        <!-- loading overlay -->
         <Border Background="#AA000000"
                 Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
                 IsHitTestVisible="False">

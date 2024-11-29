@@ -22,7 +22,7 @@
             </Border.Effect>
 
             <StackPanel>
-                <!--Header-->
+                <!-- header -->
                 <TextBlock Text="Create new project" 
                            FontSize="24" 
                            FontWeight="Bold" 

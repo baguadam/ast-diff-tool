@@ -13,13 +13,13 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
     <Grid>
-        <!--main Grid of the application-->
+        <!-- main Grid of the application -->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20*"/>
             <ColumnDefinition Width="80*"/>
         </Grid.ColumnDefinitions>
 
-        <!--left side for project settings, visible on each view-->
+        <!-- left side for project settings, visible on each view -->
         <Border Grid.Column="0" 
                 Background="{StaticResource SecondaryBackgroundColor}">
             <StackPanel Margin="0, 100, 0, 100">
@@ -27,7 +27,7 @@
             </StackPanel>
         </Border>
 
-        <!--right side, its content is generated dynamically-->
+        <!-- right side, its content is generated dynamically -->
         <Border Grid.Column="1">
             <ContentControl x:Name="Pages"
                             Content="{Binding CurrentViewModel}" />
